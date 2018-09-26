@@ -29,3 +29,4 @@ www-test/
 /.gradle/
 /bin/
 /build/
+/war/

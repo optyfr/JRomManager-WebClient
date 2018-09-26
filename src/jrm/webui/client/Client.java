@@ -13,7 +13,7 @@ public class Client implements EntryPoint
 	@Override
 	public void onModuleLoad()
 	{
-		System.out.println("coucou");
+		System.out.println("hello!");
 	}
 
 }

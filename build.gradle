@@ -18,8 +18,8 @@ repositories {
 }
 
 apply plugin: 'eclipse'
-apply plugin: 'war'
-apply plugin: 'gwt'
+
+apply plugin: 'gwt-compiler'
 
 dependencies {
 	gwt group: 'smartgwt', name: 'smartgwt', version: '12.0p', classifier: 'sources'
@@ -38,9 +38,23 @@ sourceSets {
 }
 
 gwt {
-    gwtVersion='2.8.1'
+    gwtVersion = '2.8.1'
     modules 'jrm.webui.Client'
     minHeapSize = "512M"
     maxHeapSize = "1024M"
+    logLevel = 'INFO'
+    compiler {
+        strict = true
+        disableClassMetadata = true
+        disableCastChecking = true
+    }
+    jsInteropExports {
+        shouldGenerate = true
+    //    includePatterns = ['your package']
+    //    excludePatterns = ['your package']
+    }
 }
 
+war {
+    from tasks.compileGwt.outputs
+}
