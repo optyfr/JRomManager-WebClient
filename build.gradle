@@ -1,0 +1,45 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.wisepersist:gwt-gradle-plugin:1.0.6'
+    }
+}
+
+repositories {
+    mavenCentral()
+	ivy {
+		url "https://www.smartclient.com/builds/SmartGWT"
+		layout 'pattern', {
+            artifact '[revision]/LGPL/latest/[module].[ext]'
+        }
+	}
+}
+
+apply plugin: 'war'
+apply plugin: 'gwt'
+
+dependencies {
+	gwt group: 'smartgwt', name: 'smartgwt', version: '12.0p', classifier: 'sources'
+	gwt group: 'smartgwt', name: 'smartgwt-skins', version: '12.0p', classifier: 'sources'
+}
+
+sourceSets {
+	main {
+		java {
+			srcDirs = ["src"]
+		}
+		resources {
+			srcDirs = ["src"]
+		}
+	}
+}
+
+gwt {
+    gwtVersion='2.8.2'
+    modules 'jrm.webui.Client'
+    minHeapSize = "512M"
+    maxHeapSize = "1024M"
+}
+
