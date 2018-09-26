@@ -17,6 +17,7 @@ repositories {
 	}
 }
 
+apply plugin: 'eclipse'
 apply plugin: 'war'
 apply plugin: 'gwt'
 
@@ -37,7 +38,7 @@ sourceSets {
 }
 
 gwt {
-    gwtVersion='2.8.2'
+    gwtVersion='2.8.1'
     modules 'jrm.webui.Client'
     minHeapSize = "512M"
     maxHeapSize = "1024M"
