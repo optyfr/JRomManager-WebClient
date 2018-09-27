@@ -18,8 +18,8 @@ repositories {
 }
 
 apply plugin: 'eclipse'
-
-apply plugin: 'gwt-compiler'
+apply plugin: 'war'
+apply plugin: 'gwt'
 
 dependencies {
 	gwt group: 'smartgwt', name: 'smartgwt', version: '12.0p', classifier: 'sources'
