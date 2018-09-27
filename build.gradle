@@ -54,7 +54,8 @@ gwt {
     //    excludePatterns = ['your package']
     }
 }
-
+/*
 war {
     from tasks.compileGwt.outputs
 }
+*/
