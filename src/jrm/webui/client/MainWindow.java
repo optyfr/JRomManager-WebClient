@@ -3,12 +3,20 @@ package jrm.webui.client;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.TabBarControls;
+import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
 import com.smartgwt.client.widgets.events.CloseClickHandler;
+import com.smartgwt.client.widgets.grid.ListGrid;
+import com.smartgwt.client.widgets.layout.SplitPane;
+import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.Toolbar;
+import com.smartgwt.client.widgets.tree.TreeGrid;
 
 public class MainWindow extends Window
 {
@@ -45,9 +53,27 @@ public class MainWindow extends Window
 			);
 			addTab(new Tab() {{
 				setTitle("Profiles");
+				setPane(new VLayout() {{
+					addMembers(
+						new SplitPane() {{
+							setNavigationPane(new TreeGrid());
+							setListPane(new ListGrid() {{
+								setShowFilterEditor(false);
+							}});
+						}},
+						new ToolStrip() {{
+							setAlign(Alignment.CENTER);
+							addMembers(
+								new IButton("Import Dat"),
+								new IButton("Import Software List")
+							);
+						}}
+					);
+				}});
 			}});
 			addTab(new Tab() {{
 				setTitle("Scanner");
+				setDisabled(true);
 			}});
 			addTab(new Tab() {{
 				setTitle("Dir2Dat");
@@ -59,7 +85,7 @@ public class MainWindow extends Window
 				setTitle("Settings");
 			}});
 		}});
-		centerInPage();
+		//centerInPage();
 		show();
 	}
 

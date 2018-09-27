@@ -21,6 +21,13 @@ apply plugin: 'eclipse'
 apply plugin: 'war'
 apply plugin: 'gwt'
 
+eclipse {
+	classpath {
+		downloadJavadoc = true
+		downloadSources = true
+	}
+}
+
 dependencies {
 	gwt group: 'smartgwt', name: 'smartgwt', version: '12.0p', classifier: 'sources'
 	gwt group: 'smartgwt', name: 'smartgwt-skins', version: '12.0p', classifier: 'sources'
@@ -42,11 +49,14 @@ gwt {
     modules 'jrm.webui.Client'
     minHeapSize = "512M"
     maxHeapSize = "1024M"
-    logLevel = 'INFO'
+    logLevel = 'DEBUG'
     compiler {
         strict = true
         disableClassMetadata = true
         disableCastChecking = true
+        localWorkers = 4
+        draftCompile = true
+        optimize = 0
     }
     jsInteropExports {
         shouldGenerate = true
