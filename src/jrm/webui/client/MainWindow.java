@@ -3,7 +3,14 @@ package jrm.webui.client;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.smartgwt.client.data.OperationBinding;
+import com.smartgwt.client.data.RestDataSource;
+import com.smartgwt.client.data.fields.DataSourceIntegerField;
+import com.smartgwt.client.data.fields.DataSourceTextField;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.DSDataFormat;
+import com.smartgwt.client.types.DSOperationType;
+import com.smartgwt.client.types.DSProtocol;
 import com.smartgwt.client.types.TabBarControls;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
@@ -15,7 +22,6 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
-import com.smartgwt.client.widgets.toolbar.Toolbar;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 
 public class MainWindow extends Window
@@ -56,7 +62,29 @@ public class MainWindow extends Window
 				setPane(new VLayout() {{
 					addMembers(
 						new SplitPane() {{
-							setNavigationPane(new TreeGrid());
+							setNavigationPane(new TreeGrid() {{
+								setShowRoot(true);
+								setAutoFetchData(true);
+								setDataSource(new RestDataSource() {{
+									setID("profilesTree");
+							        setTitleField("Name");  
+							        setRecordXPath("/List/Dir");
+							        DataSourceTextField nameField = new DataSourceTextField("Name", "Name", 128);  
+							        DataSourceIntegerField IDField = new DataSourceIntegerField("ID", "ID");  
+							        IDField.setPrimaryKey(true);  
+							        IDField.setRequired(true);  
+							        DataSourceIntegerField parentIDField = new DataSourceIntegerField("parentId", "Parent");  
+							        parentIDField.setRequired(true);  
+							        parentIDField.setForeignKey(id + ".ID");  
+							        parentIDField.setRootValue("0");
+							        setFields(nameField, IDField, parentIDField);  
+									setOperationBindings(
+										new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTPARAMS);}}
+									);
+									setDataFormat(DSDataFormat.XML);
+									setDataURL("/datasources/"+getID());
+								}});
+							}});
 							setListPane(new ListGrid() {{
 								setShowFilterEditor(false);
 							}});
