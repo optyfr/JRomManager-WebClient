@@ -4,7 +4,7 @@ buildscript {
     }
     dependencies {
         classpath 'org.wisepersist:gwt-gradle-plugin:1.0.6'
-    }
+      }
 }
 
 repositories {
@@ -29,8 +29,11 @@ eclipse {
 }
 
 dependencies {
+	gwt 'com.google.code.findbugs:jsr305:3.0.0'
 	gwt group: 'smartgwt', name: 'smartgwt', version: '12.0p', classifier: 'sources'
 	gwt group: 'smartgwt', name: 'smartgwt-skins', version: '12.0p', classifier: 'sources'
+	gwt group: 'com.sksamuel.gwt', name: 'gwt-websockets', version: '1.0.4', classifier: 'sources'
+	gwt group: 'com.sksamuel.gwt', name: 'gwt-websockets', version: '1.0.4'
 }
 
 sourceSets {
@@ -49,7 +52,7 @@ gwt {
     modules 'jrm.webui.Client'
     minHeapSize = "512M"
     maxHeapSize = "1024M"
-    logLevel = 'DEBUG'
+    logLevel = 'INFO'
     compiler {
         strict = true
         disableClassMetadata = true
