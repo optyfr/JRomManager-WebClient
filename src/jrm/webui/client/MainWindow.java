@@ -180,6 +180,7 @@ public class MainWindow extends Window
 		}});
 		centerInPage();
 		show();
+		new Progress(this);
 	}
 
 }
