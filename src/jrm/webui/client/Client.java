@@ -70,11 +70,17 @@ public class Client implements EntryPoint
 										if(jso!= null && jso.containsKey("cmd"))
 										{
 											JSONObject params = jso.containsKey("params")?jso.get("params").isObject():null;
-											SC.logWarn(jso.get("cmd").isString().stringValue());
+										//	SC.logWarn(jso.get("cmd").isString().stringValue());
 											switch(jso.get("cmd").isString().stringValue())
 											{
 												case "Progress":
-													progress = new Progress();
+													if(progress==null)
+														progress = new Progress();
+													else
+														progress.show();
+													break;
+												case "Progress.close":
+													progress.close();;
 													break;
 												case "Progress.setInfos":
 													progress.setInfos(
@@ -88,15 +94,15 @@ public class Client implements EntryPoint
 												case "Progress.setProgress":
 													progress.setProgress(
 														(int)params.get("offset").isNumber().doubleValue(),
-														params.get("msg").isString().stringValue(),
+														params.get("msg").isNull()!=null?null:params.get("msg").isString().stringValue(),
 														params.get("val").isNull()!=null?null:((int)params.get("val").isNumber().doubleValue()),
 														params.get("max").isNull()!=null?null:((int)params.get("max").isNumber().doubleValue()),
-														params.get("submsg").isString().stringValue()
+														params.get("submsg").isNull()!=null?null:params.get("submsg").isString().stringValue()
 													);
 													break;
 												case "Progress.setProgress2":
 													progress.setProgress2(
-														params.get("msg").isString().stringValue(),
+														params.get("msg").isNull()!=null?null:params.get("msg").isString().stringValue(),
 														params.get("val").isNull()!=null?null:((int)params.get("val").isNumber().doubleValue()),
 														params.get("max").isNull()!=null?null:((int)params.get("max").isNumber().doubleValue())
 													);
@@ -106,7 +112,7 @@ public class Client implements EntryPoint
 									}
 									catch(Exception e)
 									{
-										e.printStackTrace();
+										SC.logWarn(e.getMessage());
 									}
 								}
 	

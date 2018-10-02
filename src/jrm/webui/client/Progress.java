@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.NumberUtil;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
@@ -78,14 +79,20 @@ public class Progress extends Window
 
 
 		progressBar = new Progressbar() {{setLength("100%");}};
-		lblTimeleft = new Label("--:--:--") {{
-			setWidth(50);
+		lblTimeleft = new Label("--:--:-- / --:--:--") {{
+			setWidth("*");
+			setWrap(false);
+			setHeight(20);
+			setValign(VerticalAlignment.CENTER);
 			setAlign(Alignment.CENTER);
 		}};
 
 		progressBar2 = new Progressbar() {{setLength("100%");}};
-		lblTimeLeft2 = new Label("--:--:--") {{
-			setWidth(50);
+		lblTimeLeft2 = new Label("--:--:-- / --:--:--") {{
+			setWidth("*");
+			setWrap(false);
+			setHeight(20);
+			setValign(VerticalAlignment.CENTER);
 			setAlign(Alignment.CENTER);
 		}};
 
@@ -175,21 +182,22 @@ public class Progress extends Window
 	
 	public void setProgress(final int offset, final String msg, final Integer val, final Integer max, final String submsg)
 	{
-		
 		if (msg != null)
-			lblInfo[offset].setTitle(msg);
+			lblInfo[offset].setContents(msg);
 		if (val != null)
 		{
 			if (val < 0 && progressBar.isVisible())
 			{
 				progressBar.setVisible(false);
 				lblTimeleft.setVisible(false);
+				reflowNow();
 //				packHeight();
 			}
 			else if (val > 0 && !progressBar.isVisible())
 			{
 				progressBar.setVisible(true);
 				lblTimeleft.setVisible(true);
+				reflowNow();
 //				packHeight();
 			}
 //			progressBar.setStringPainted(true);
@@ -202,17 +210,17 @@ public class Progress extends Window
 			if (val > 0)
 			{
 				pb_val = val;
-				final String left = toHMS((System.currentTimeMillis() - startTime) * (pb_max - pb_val) / pb_val); //$NON-NLS-1$
-				final String total = toHMS((System.currentTimeMillis() - startTime) * pb_max / pb_val); //$NON-NLS-1$
-				lblTimeleft.setTitle(left +" / "+ total); //$NON-NLS-1$
+				final String left = toHMS(((System.currentTimeMillis() - startTime) * (pb_max - pb_val) / pb_val) / 1000); //$NON-NLS-1$
+				final String total = toHMS(((System.currentTimeMillis() - startTime) * pb_max / pb_val) / 1000); //$NON-NLS-1$
+				lblTimeleft.setContents(left +" / "+ total); //$NON-NLS-1$
 			}
 			else
-				lblTimeleft.setTitle("--:--:-- / --:--:--"); //$NON-NLS-1$
+				lblTimeleft.setContents("--:--:-- / --:--:--"); //$NON-NLS-1$
 		}
 		if(lblSubInfo.length==1)
-			lblSubInfo[0].setTitle(submsg);
+			lblSubInfo[0].setContents(submsg);
 		else
-			lblSubInfo[offset].setTitle(submsg);
+			lblSubInfo[offset].setContents(submsg);
 	}
 
 	public boolean isCancel()
@@ -237,10 +245,11 @@ public class Progress extends Window
 			{
 				progressBar2.setVisible(true);
 				lblTimeLeft2.setVisible(true);
+				reflowNow();
 //				packHeight();
 			}
 //			progressBar2.setStringPainted(true);
-			progressBar2.setTitle(msg);
+			progressBar2.setContents(msg);
 			if (max != null)
 				pb2_max = max;;
 			if (val > 0)
@@ -252,15 +261,16 @@ public class Progress extends Window
 				pb2_val = val;
 				final String left = toHMS((System.currentTimeMillis() - startTime2) * (pb2_max - pb2_val) / pb2_val); //$NON-NLS-1$
 				final String total = toHMS((System.currentTimeMillis() - startTime2) * pb2_max / pb2_val); //$NON-NLS-1$
-				lblTimeLeft2.setTitle(left + " / " + total); //$NON-NLS-1$
+				lblTimeLeft2.setContents(left + " / " + total); //$NON-NLS-1$
 			}
 			else
-				lblTimeLeft2.setTitle("--:--:-- / --:--:--"); //$NON-NLS-1$
+				lblTimeLeft2.setContents("--:--:-- / --:--:--"); //$NON-NLS-1$
 		}
 		else if (progressBar2.isVisible())
 		{
 			progressBar2.setVisible(false);
 			lblTimeLeft2.setVisible(false);
+			reflowNow();
 //			packHeight();
 		}
 	}
@@ -277,8 +287,8 @@ public class Progress extends Window
 	
 	private String toHMS(long sec_num)
 	{
-		long hours   = (long)Math.floor(sec_num / 3600);
-		long minutes = (long)Math.floor((sec_num - (hours * 3600)) / 60);
+		long hours   = (long)Math.floor(sec_num / 3600.0);
+		long minutes = (long)Math.floor((sec_num - (hours * 3600.0)) / 60.0);
 		long seconds = sec_num - (hours * 3600) - (minutes * 60);
 		return NumberUtil.format(hours,"00")+':'+NumberUtil.format(minutes,"00")+':'+NumberUtil.format(seconds,"00");
 	}
@@ -288,5 +298,10 @@ public class Progress extends Window
 	{
 		Client.childWindows.remove(this);
 		super.onDestroy();
+	}
+	
+	public void close()
+	{
+		hide();
 	}
 }
