@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.NumberUtil;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
@@ -14,7 +15,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 
 public class Progress extends Window
 {
-	private VLayout panel = new VLayout();
+	private VLayout panel;
 
 	/** The lbl info. */
 	private Label[] lblInfo;
@@ -22,9 +23,6 @@ public class Progress extends Window
 	/** The lbl sub info. */
 	private Label[] lblSubInfo;
 	
-	/** The thread id offset. */
-	private Map<Long,Integer> threadId_Offset = new HashMap<>();
-
 	/** The progress bar. */
 	private final Progressbar progressBar;
 	
@@ -49,12 +47,16 @@ public class Progress extends Window
 	/** The lbl time left 2. */
 	private final Label lblTimeLeft2;
 	
-	public Progress(Window parent)
+	public Progress()
 	{
 		super();
+		Client.childWindows.add(this);
 		setIsModal(true);
 		setShowModalMask(true);
-		setAutoHeight();
+		setWidth(500);
+		setHeight(20);
+		setOverflow(Overflow.VISIBLE);
+		setBackgroundColor("#EEEEEE");
 		setCanDragResize(true);
 		//setParentCanvas(parent);
 		setID("Progress");
@@ -66,30 +68,60 @@ public class Progress extends Window
 		setHeaderIconDefaults(headerIconDefaults);
 		setShowCloseButton(false);
 		
-		addItem(panel);
+		panel = new VLayout() {{
+			setMembersMargin(2);
+			setWidth100();
+			setHeight(20);
+			setBackgroundColor("#EEEEEE");
+		}};
 		setInfos(1, false);
 
-		progressBar = new Progressbar() {{setWidth100();}};
-		lblTimeleft = new Label("--:--:--");
 
-		addItem(new HLayout() {{
+		progressBar = new Progressbar() {{setLength("100%");}};
+		lblTimeleft = new Label("--:--:--") {{
+			setWidth(50);
+			setAlign(Alignment.CENTER);
+		}};
+
+		progressBar2 = new Progressbar() {{setLength("100%");}};
+		lblTimeLeft2 = new Label("--:--:--") {{
+			setWidth(50);
+			setAlign(Alignment.CENTER);
+		}};
+
+		btnCancel = new IButton("Cancel") {{
+			setPadding(2);
+			setLayoutAlign(Alignment.CENTER);
+		}};
+
+		addItem(new VLayout() {{
+			setWidth100();
+			setHeight(20);
+			setLayoutMargin(2);
+			setMembersMargin(2);
 			addMembers(
-				progressBar,
-				lblTimeleft
-			);
-		}});
-
-		progressBar2 = new Progressbar() {{setWidth100();}};
-		lblTimeLeft2 = new Label("--:--:--");
-
-		addItem(new HLayout() {{
-			addMembers(
-				progressBar2,
-				lblTimeLeft2
+				panel,
+				new HLayout() {{
+					setWidth100();
+					setHeight(10);
+					addMembers(
+						progressBar,
+						lblTimeleft
+					);
+				}},
+				new HLayout() {{
+					setWidth100();
+					setHeight(10);
+					addMembers(
+						progressBar2,
+						lblTimeLeft2
+					);
+				}},
+				btnCancel
 			);
 		}});
 		
-		addItem(btnCancel = new IButton("Cancel") {{setLayoutAlign(Alignment.CENTER);}});
+		setAutoSize(true);
 		centerInPage();
 		show();
 	}
@@ -100,20 +132,34 @@ public class Progress extends Window
 		
 		lblInfo = new Label[threadCnt];
 		lblSubInfo = new Label[multipleSubInfos?threadCnt:1];
-		threadId_Offset.clear();
 		
 		for(int i = 0; i < threadCnt; i++)
 		{
-			panel.addMember(lblInfo[i] = new Label() {{setWidth100();}});
+			panel.addMember(lblInfo[i] = new Label() {{
+				setWidth100();
+				setHeight(20);
+				setBorder("2px inset");
+				setBackgroundColor("#DDDDDD");
+			}});
 	
 			if(multipleSubInfos)
 			{
-				panel.addMember(lblSubInfo[i] = new Label() {{setWidth100();}});
+				panel.addMember(lblSubInfo[i] = new Label() {{
+					setWidth100();
+					setHeight(20);
+					setBorder("2px inset");
+					setBackgroundColor("#DDDDDD");
+				}});
 			}
 		}
 		if(!multipleSubInfos)
 		{
-			panel.addMember(lblSubInfo[0] = new Label() {{setWidth100();}});
+			panel.addMember(lblSubInfo[0] = new Label() {{
+				setWidth100();
+				setHeight(20);
+				setBorder("2px inset");
+				setBackgroundColor("#DDDDDD");
+			}});
 		}
 	}
 	
@@ -235,5 +281,12 @@ public class Progress extends Window
 		long minutes = (long)Math.floor((sec_num - (hours * 3600)) / 60);
 		long seconds = sec_num - (hours * 3600) - (minutes * 60);
 		return NumberUtil.format(hours,"00")+':'+NumberUtil.format(minutes,"00")+':'+NumberUtil.format(seconds,"00");
+	}
+	
+	@Override
+	protected void onDestroy()
+	{
+		Client.childWindows.remove(this);
+		super.onDestroy();
 	}
 }

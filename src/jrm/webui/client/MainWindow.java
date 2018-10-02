@@ -3,17 +3,14 @@ package jrm.webui.client;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONString;
 import com.smartgwt.client.data.Criteria;
 import com.smartgwt.client.data.OperationBinding;
 import com.smartgwt.client.data.RestDataSource;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.DSDataFormat;
-import com.smartgwt.client.types.DSOperationType;
-import com.smartgwt.client.types.DSProtocol;
-import com.smartgwt.client.types.PreserveOpenState;
-import com.smartgwt.client.types.TabBarControls;
+import com.smartgwt.client.types.*;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
@@ -25,6 +22,8 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.RecordClickEvent;
 import com.smartgwt.client.widgets.grid.events.RecordClickHandler;
+import com.smartgwt.client.widgets.grid.events.RecordDoubleClickEvent;
+import com.smartgwt.client.widgets.grid.events.RecordDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.SplitPane;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
@@ -76,6 +75,24 @@ public class MainWindow extends Window
 								setShowHover(true);
 								setCanHover(true);
 								setHoverWidth(200);
+								addRecordDoubleClickHandler(new RecordDoubleClickHandler()
+								{
+									@Override
+									public void onRecordDoubleClick(RecordDoubleClickEvent event)
+									{
+										ListGridRecord record = event.getRecord();
+										if(record!=null)
+											SC.logWarn("record.path:"+record.getAttribute("Path"));
+										String msg = new JSONObject() {{
+											put("cmd", new JSONString("loadProfile"));
+											put("params", new JSONObject() {{
+												put("path", new JSONString(record.getAttribute("Path")));
+											}});
+										}}.toString();
+										SC.logWarn(msg);
+										Client.socket.send(msg);
+									}
+								});
 								setDataSource(new RestDataSource() {{
 									setID("profilesList");
 									setDataFormat(DSDataFormat.XML);
@@ -180,7 +197,11 @@ public class MainWindow extends Window
 		}});
 		centerInPage();
 		show();
-		new Progress(this);
 	}
 
+	@Override
+	protected void onDestroy()
+	{
+		super.onDestroy();
+	}
 }
