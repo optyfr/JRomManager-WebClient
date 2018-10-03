@@ -3,8 +3,7 @@ package jrm.webui.client;
 import java.util.HashSet;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.core.client.JsonUtils;
 import com.sksamuel.gwt.websockets.Websocket;
 import com.sksamuel.gwt.websockets.WebsocketListener;
 import com.smartgwt.client.rpc.RPCCallback;
@@ -16,6 +15,9 @@ import com.smartgwt.client.util.Page;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Window;
+
+import jrm.webui.client.protocol.A_;
+import jrm.webui.client.protocol.A_Progress;
 
 public class Client implements EntryPoint
 {
@@ -66,47 +68,38 @@ public class Client implements EntryPoint
 								{
 									try
 									{
-										JSONObject jso = JSONParser.parseStrict(msg).isObject();
-										if(jso!= null && jso.containsKey("cmd"))
+										A_ a = new A_(JsonUtils.safeEval(msg));
+										switch(a.getCmd())
 										{
-											JSONObject params = jso.containsKey("params")?jso.get("params").isObject():null;
-										//	SC.logWarn(jso.get("cmd").isString().stringValue());
-											switch(jso.get("cmd").isString().stringValue())
+											case "Progress":
+												if(progress==null)
+													progress = new Progress();
+												else
+													progress.show();
+												break;
+											case "Progress.close":
+												progress.close();;
+												break;
+											case "Progress.setInfos":
 											{
-												case "Progress":
-													if(progress==null)
-														progress = new Progress();
-													else
-														progress.show();
-													break;
-												case "Progress.close":
-													progress.close();;
-													break;
-												case "Progress.setInfos":
-													progress.setInfos(
-														(int)params.get("threadCnt").isNumber().doubleValue(),
-														params.get("multipleSubInfos").isBoolean().booleanValue()
-													);
-													break;
-												case "Progress.clearInfos":
-													progress.clearInfos();
-													break;
-												case "Progress.setProgress":
-													progress.setProgress(
-														(int)params.get("offset").isNumber().doubleValue(),
-														params.get("msg").isNull()!=null?null:params.get("msg").isString().stringValue(),
-														params.get("val").isNull()!=null?null:((int)params.get("val").isNumber().doubleValue()),
-														params.get("max").isNull()!=null?null:((int)params.get("max").isNumber().doubleValue()),
-														params.get("submsg").isNull()!=null?null:params.get("submsg").isString().stringValue()
-													);
-													break;
-												case "Progress.setProgress2":
-													progress.setProgress2(
-														params.get("msg").isNull()!=null?null:params.get("msg").isString().stringValue(),
-														params.get("val").isNull()!=null?null:((int)params.get("val").isNumber().doubleValue()),
-														params.get("max").isNull()!=null?null:((int)params.get("max").isNumber().doubleValue())
-													);
-													break;
+												A_Progress.SetInfos params = new A_Progress.SetInfos(a);
+												progress.setInfos(params.getThreadCnt(), params.getMultipleSubInfos());
+												break;
+											}
+											case "Progress.clearInfos":
+												progress.clearInfos();
+												break;
+											case "Progress.setProgress":
+											{
+												A_Progress.SetProgress params = new A_Progress.SetProgress(a);
+												progress.setProgress(params.getOffset(), params.getMsg(), params.getVal(), params.getMax(), params.getSubMsg());
+												break;
+											}
+											case "Progress.setProgress2":
+											{
+												A_Progress.SetProgress2 params = new A_Progress.SetProgress2(a);
+												progress.setProgress2(params.getMsg(), params.getVal(), params.getMax());
+												break;
 											}
 										}
 									}

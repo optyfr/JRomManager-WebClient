@@ -11,7 +11,10 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Progressbar;
 import com.smartgwt.client.widgets.Window;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.LayoutSpacer;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 public class Progress extends Window
@@ -27,9 +30,6 @@ public class Progress extends Window
 	/** The progress bar. */
 	private final Progressbar progressBar;
 	
-	/** The cancel. */
-	private boolean cancel = false;
-
 	/** The lbl timeleft. */
 	private final Label lblTimeleft;
 	
@@ -79,7 +79,7 @@ public class Progress extends Window
 
 
 		progressBar = new Progressbar() {{setLength("100%");}};
-		lblTimeleft = new Label("--:--:-- / --:--:--") {{
+		lblTimeleft = new Label("<code>--:--:-- / --:--:--</code>") {{
 			setWidth("*");
 			setWrap(false);
 			setHeight(20);
@@ -88,7 +88,7 @@ public class Progress extends Window
 		}};
 
 		progressBar2 = new Progressbar() {{setLength("100%");}};
-		lblTimeLeft2 = new Label("--:--:-- / --:--:--") {{
+		lblTimeLeft2 = new Label("<code>--:--:-- / --:--:--</code>") {{
 			setWidth("*");
 			setWrap(false);
 			setHeight(20);
@@ -99,6 +99,14 @@ public class Progress extends Window
 		btnCancel = new IButton("Cancel") {{
 			setPadding(2);
 			setLayoutAlign(Alignment.CENTER);
+			addClickHandler(new ClickHandler()
+			{
+				@Override
+				public void onClick(ClickEvent event)
+				{
+					cancel();
+				}
+			});
 		}};
 
 		addItem(new VLayout() {{
@@ -108,9 +116,11 @@ public class Progress extends Window
 			setMembersMargin(2);
 			addMembers(
 				panel,
+				new LayoutSpacer("*", "*"),
 				new HLayout() {{
 					setWidth100();
 					setHeight(10);
+					setMembersMargin(2);
 					addMembers(
 						progressBar,
 						lblTimeleft
@@ -119,6 +129,7 @@ public class Progress extends Window
 				new HLayout() {{
 					setWidth100();
 					setHeight(10);
+					setMembersMargin(2);
 					addMembers(
 						progressBar2,
 						lblTimeLeft2
@@ -190,14 +201,14 @@ public class Progress extends Window
 			{
 				progressBar.setVisible(false);
 				lblTimeleft.setVisible(false);
-				reflowNow();
+//				reflowNow();
 //				packHeight();
 			}
 			else if (val > 0 && !progressBar.isVisible())
 			{
 				progressBar.setVisible(true);
 				lblTimeleft.setVisible(true);
-				reflowNow();
+//				reflowNow();
 //				packHeight();
 			}
 //			progressBar.setStringPainted(true);
@@ -212,10 +223,10 @@ public class Progress extends Window
 				pb_val = val;
 				final String left = toHMS(((System.currentTimeMillis() - startTime) * (pb_max - pb_val) / pb_val) / 1000); //$NON-NLS-1$
 				final String total = toHMS(((System.currentTimeMillis() - startTime) * pb_max / pb_val) / 1000); //$NON-NLS-1$
-				lblTimeleft.setContents(left +" / "+ total); //$NON-NLS-1$
+				lblTimeleft.setContents("<code>"+left +" / "+ total+"</code>"); //$NON-NLS-1$
 			}
 			else
-				lblTimeleft.setContents("--:--:-- / --:--:--"); //$NON-NLS-1$
+				lblTimeleft.setContents("<code>--:--:-- / --:--:--</code>"); //$NON-NLS-1$
 		}
 		if(lblSubInfo.length==1)
 			lblSubInfo[0].setContents(submsg);
@@ -223,14 +234,8 @@ public class Progress extends Window
 			lblSubInfo[offset].setContents(submsg);
 	}
 
-	public boolean isCancel()
-	{
-		return cancel;
-	}
-
 	public void cancel()
 	{
-		cancel = true;
 		btnCancel.setDisabled(true);
 		btnCancel.setTitle("Canceling"); //$NON-NLS-1$
 	}
@@ -245,7 +250,7 @@ public class Progress extends Window
 			{
 				progressBar2.setVisible(true);
 				lblTimeLeft2.setVisible(true);
-				reflowNow();
+//				reflowNow();
 //				packHeight();
 			}
 //			progressBar2.setStringPainted(true);
@@ -259,18 +264,18 @@ public class Progress extends Window
 			if (val > 0)
 			{
 				pb2_val = val;
-				final String left = toHMS((System.currentTimeMillis() - startTime2) * (pb2_max - pb2_val) / pb2_val); //$NON-NLS-1$
-				final String total = toHMS((System.currentTimeMillis() - startTime2) * pb2_max / pb2_val); //$NON-NLS-1$
-				lblTimeLeft2.setContents(left + " / " + total); //$NON-NLS-1$
+				final String left = toHMS((System.currentTimeMillis() - startTime2) * (pb2_max - pb2_val) / pb2_val);
+				final String total = toHMS((System.currentTimeMillis() - startTime2) * pb2_max / pb2_val);
+				lblTimeLeft2.setContents("<code>"+left + " / " + total+"</code>"); //$NON-NLS-1$
 			}
 			else
-				lblTimeLeft2.setContents("--:--:-- / --:--:--"); //$NON-NLS-1$
+				lblTimeLeft2.setContents("<code>--:--:-- / --:--:--</code>"); //$NON-NLS-1$
 		}
 		else if (progressBar2.isVisible())
 		{
 			progressBar2.setVisible(false);
 			lblTimeLeft2.setVisible(false);
-			reflowNow();
+//			reflowNow();
 //			packHeight();
 		}
 	}
@@ -300,6 +305,7 @@ public class Progress extends Window
 		super.onDestroy();
 	}
 	
+	@Override
 	public void close()
 	{
 		hide();

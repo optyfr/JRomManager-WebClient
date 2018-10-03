@@ -3,8 +3,7 @@ package jrm.webui.client;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONString;
+import com.google.gwt.core.client.JsonUtils;
 import com.smartgwt.client.data.Criteria;
 import com.smartgwt.client.data.OperationBinding;
 import com.smartgwt.client.data.RestDataSource;
@@ -31,12 +30,14 @@ import com.smartgwt.client.widgets.tab.TabSet;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 
+import jrm.webui.client.protocol.Q_Profile;
+
 public class MainWindow extends Window
 {
 	public MainWindow()
 	{
 		super();
-		setTitle("JRomManager");
+		setTitle("JRomManager Web Client");
 		setWidth(800);
 		setHeight(600);
 		setAnimateMinimize(true);
@@ -80,17 +81,7 @@ public class MainWindow extends Window
 									@Override
 									public void onRecordDoubleClick(RecordDoubleClickEvent event)
 									{
-										ListGridRecord record = event.getRecord();
-										if(record!=null)
-											SC.logWarn("record.path:"+record.getAttribute("Path"));
-										String msg = new JSONObject() {{
-											put("cmd", new JSONString("loadProfile"));
-											put("params", new JSONObject() {{
-												put("path", new JSONString(record.getAttribute("Path")));
-											}});
-										}}.toString();
-										SC.logWarn(msg);
-										Client.socket.send(msg);
+										Client.socket.send(JsonUtils.stringify(Q_Profile.Load.instantiate().setPath(event.getRecord().getAttribute("Path"))));
 									}
 								});
 								setDataSource(new RestDataSource() {{
