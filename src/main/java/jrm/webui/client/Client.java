@@ -18,10 +18,11 @@ import com.smartgwt.client.widgets.Window;
 
 import jrm.webui.client.protocol.A_;
 import jrm.webui.client.protocol.A_Progress;
+import jrm.webui.client.protocol.A_Session;
 
 public class Client implements EntryPoint
 {
-	public static String session;
+	public static A_Session session;
 	public static Websocket socket;
 	public static MainWindow mainwindow;
 	public static HashSet<Window> childWindows;
@@ -55,7 +56,7 @@ public class Client implements EntryPoint
 				{
 					if(response.getHttpResponseCode() == 200)
 					{
-						session = rawData.toString();
+						session = JsonUtils.safeEval(rawData.toString());
 						if(Websocket.isSupported())
 						{
 							socket = new Websocket("ws://"+com.google.gwt.user.client.Window.Location.getHost());

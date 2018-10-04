@@ -67,7 +67,7 @@ public class MainWindow extends Window
 				TabBarControls.TAB_PICKER
 			);
 			addTab(new Tab() {{
-				setTitle("Profiles");
+				setTitle(Client.session.getMsg("MainFrame.Profiles"));
 				setPane(new VLayout() {{
 					addMembers(
 						new SplitPane() {{
@@ -91,16 +91,16 @@ public class MainWindow extends Window
 									setOperationBindings(
 										new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}}
 									);
-							        DataSourceTextField nameField = new DataSourceTextField("Name");
+							        DataSourceTextField nameField = new DataSourceTextField("Name",Client.session.getMsg("FileTableModel.Profile"));
 							        DataSourceTextField pathField = new DataSourceTextField("Path");
 							        pathField.setHidden(true);
-							        DataSourceTextField verField = new DataSourceTextField("version");
-							        DataSourceTextField haveSetsField = new DataSourceTextField("haveSets");
-							        DataSourceTextField haveRomsField = new DataSourceTextField("haveRoms");
-							        DataSourceTextField haveDisksField = new DataSourceTextField("haveDisks");
-							        DataSourceTextField createdField = new DataSourceTextField("created");
-							        DataSourceTextField scannedField = new DataSourceTextField("scanned");
-							        DataSourceTextField fixedField = new DataSourceTextField("fixed");
+							        DataSourceTextField verField = new DataSourceTextField("version",Client.session.getMsg("FileTableModel.Version"));
+							        DataSourceTextField haveSetsField = new DataSourceTextField("haveSets",Client.session.getMsg("FileTableModel.HaveSets"));
+							        DataSourceTextField haveRomsField = new DataSourceTextField("haveRoms",Client.session.getMsg("FileTableModel.HaveRoms"));
+							        DataSourceTextField haveDisksField = new DataSourceTextField("haveDisks",Client.session.getMsg("FileTableModel.HaveDisks"));
+							        DataSourceTextField createdField = new DataSourceTextField("created",Client.session.getMsg("FileTableModel.Created"));
+							        DataSourceTextField scannedField = new DataSourceTextField("scanned",Client.session.getMsg("FileTableModel.Scanned"));
+							        DataSourceTextField fixedField = new DataSourceTextField("fixed",Client.session.getMsg("FileTableModel.Fixed"));
 							        setFields(nameField, pathField, verField, haveSetsField, haveRomsField, haveDisksField, createdField, scannedField, fixedField);
 								}});
 							}};
@@ -165,25 +165,25 @@ public class MainWindow extends Window
 						new ToolStrip() {{
 							setAlign(Alignment.CENTER);
 							addMembers(
-								new IButton("Import Dat"),
-								new IButton("Import Software List")
+								new IButton(Client.session.getMsg("MainFrame.btnImportDat.text")) {{setAutoFit(true);}},
+								new IButton(Client.session.getMsg("MainFrame.btnImportSL.text")) {{setAutoFit(true);}}
 							);
 						}}
 					);
 				}});
 			}});
 			addTab(new Tab() {{
-				setTitle("Scanner");
+				setTitle(Client.session.getMsg("MainFrame.Scanner"));
 				setDisabled(true);
 			}});
 			addTab(new Tab() {{
-				setTitle("Dir2Dat");
+				setTitle(Client.session.getMsg("MainFrame.Dir2Dat"));
 			}});
 			addTab(new Tab() {{
-				setTitle("Batch Tools");
+				setTitle(Client.session.getMsg("MainFrame.BatchTools"));
 			}});
 			addTab(new Tab() {{
-				setTitle("Settings");
+				setTitle(Client.session.getMsg("MainFrame.Settings"));
 			}});
 		}});
 		centerInPage();
