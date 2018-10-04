@@ -1,10 +1,5 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'org.wisepersist:gwt-gradle-plugin:1.0.6'
-      }
+plugins {
+    id "de.esoco.gwt" version "1.0.2"
 }
 
 repositories {
@@ -27,33 +22,67 @@ eclipse {
 }
 
 apply plugin: 'war'
-apply plugin: 'gwt'
+apply plugin: 'de.esoco.gwt'
 
 dependencies {
-	gwt group: 'smartgwt', name: 'smartgwt', version: '12.0p', classifier: 'sources'
-	gwt group: 'smartgwt', name: 'smartgwt-skins', version: '12.0p', classifier: 'sources'
-	gwt group: 'com.sksamuel.gwt', name: 'gwt-websockets', version: '1.0.4', classifier: 'sources'
-	gwt group: 'com.sksamuel.gwt', name: 'gwt-websockets', version: '1.0.4'
-}
-
-sourceSets {
-	main {
-		java {
-			srcDirs = ["src"]
-		}
-		resources {
-			srcDirs = ["src"]
-		}
-	}
+	compile group:'smartgwt', name: 'smartgwt', version: '12.0p'
+	compile group: 'smartgwt', name: 'smartgwt-skins', version: '12.0p'
+	compile group: 'com.sksamuel.gwt', name: 'gwt-websockets', version: '1.0.4'
 }
 
 gwt {
-    gwtVersion = '2.8.1'
-    modules 'jrm.webui.Client'
-    minHeapSize = "512M"
-    maxHeapSize = "1024M"
-    logLevel = 'INFO'
-    compiler {
+    module 'jrm.webui.Client'
+	/** GWT version */
+	gwtVersion = '2.8.2'
+	/** Add the gwt-servlet lib */
+	gwtServletLib = false
+	/** Add the gwt-elemental lib */
+	gwtElementalLib = false
+	/** Add Google plugin config (only if plugin 'eclipse' is enabled) */
+	googlePluginEclipse = true//    minHeapSize = "512M"
+	compile {
+		/** The level of logging detail (ERROR, WARN, INFO, TRACE, 
+		 * DEBUG, SPAM, ALL) */
+		logLevel = "INFO"
+		/** Compile a report that tells the "Story of Your Compile". */
+		compileReport = true
+		/** Compile quickly with minimal optimizations. */
+		draftCompile = true
+		/** Include assert statements in compiled output. */
+		checkAssertions = false
+		/** Script output style. (OBF, PRETTY, DETAILED)*/
+		style = "OBF"
+		/** Sets the optimization level used by the compiler. 
+		 * 0=none 9=maximum. */
+		optimize = 5
+		/** Fail compilation if any input file contains an error. */
+		failOnError = false
+		/** Specifies Java source level. ("1.6", "1.7")*/
+		sourceLevel = "1.8"
+		/** The number of local workers for compiling permutations. */
+		localWorkers = 2
+		/** The maximum memory to be used by local workers. */
+		localWorkersMem = 2048
+		/** Emit extra information allow chrome dev tools to display 
+		 * Java identifiers in many places instead of JavaScript functions.
+		 * (NONE, ONLY_METHOD_NAME, ABBREVIATED, FULL)*/
+		methodNameDisplayMode = "NONE"
+		/** Specifies JsInterop mode (NONE, JS, CLOSURE) */
+		jsInteropMode = "JS"
+		/** Generate and export JsInterop (since GWT 2.8) */
+		generateJsInteropExports = true
+
+		/** shown all compile errors */
+        strict = false
+
+		/** Java args */
+		maxHeapSize="1024m"
+		minHeapSize="512m"
+		maxPermSize="128m"
+	}
+//    maxHeapSize = "1024M"
+//    logLevel = 'INFO'
+/*    compiler {
         strict = true
         disableClassMetadata = true
         disableCastChecking = true
@@ -65,7 +94,7 @@ gwt {
         shouldGenerate = true
     //    includePatterns = ['your package']
     //    excludePatterns = ['your package']
-    }
+    }*/
 }
 /*
 war {
