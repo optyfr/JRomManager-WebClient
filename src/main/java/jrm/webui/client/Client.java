@@ -25,12 +25,11 @@ public class Client implements EntryPoint
 	public static A_Session session;
 	public static Websocket socket;
 	public static MainWindow mainwindow;
-	public static HashSet<Window> childWindows;
+	public static HashSet<Window> childWindows = new HashSet<>();
 
 	public Client()
 	{
 		super();
-		childWindows = new HashSet<>();
 	}
 
 	@Override

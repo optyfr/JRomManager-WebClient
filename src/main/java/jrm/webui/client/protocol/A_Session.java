@@ -9,7 +9,7 @@ import jrm.webui.client.utils.EnhJSO;
 
 public class A_Session extends EnhJSO
 {
-	private static Map<String,String> msgs_cache = null;
+	private static Map<String,String> msgs_cache = new HashMap<>();
 	
 	protected A_Session()
 	{
@@ -24,9 +24,8 @@ public class A_Session extends EnhJSO
 
 	public final Map<String,String> getMsgs()
 	{
-		if (msgs_cache == null)
+		if (msgs_cache.size()==0)
 		{
-			msgs_cache = new HashMap<>();
 			EnhJSO prop_jso = getJSO("msgs");
 			JsArrayString props = getProperties(prop_jso);
 			for (int i = 0; i < props.length(); i++)
