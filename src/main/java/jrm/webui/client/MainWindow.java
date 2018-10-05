@@ -6,6 +6,7 @@ import java.util.Map;
 import com.google.gwt.core.client.JsonUtils;
 import com.smartgwt.client.data.Criteria;
 import com.smartgwt.client.data.OperationBinding;
+import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.RestDataSource;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
@@ -19,6 +20,8 @@ import com.smartgwt.client.widgets.grid.HoverCustomizer;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
+import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.grid.events.RecordClickEvent;
 import com.smartgwt.client.widgets.grid.events.RecordClickHandler;
 import com.smartgwt.client.widgets.grid.events.RecordDoubleClickEvent;
@@ -115,11 +118,22 @@ public class MainWindow extends Window
 								setShowHover(true);
 								setHoverWidth(200);
 								setCanHover(true);
+								addDataArrivedHandler(new DataArrivedHandler()
+								{
+									@Override
+									public void onDataArrived(DataArrivedEvent event)
+									{
+										selectRecord(0);
+										listgrid.invalidateCache();
+										listgrid.fetchData(new Criteria() {{addCriteria("Path", "");}});
+									}
+								});
 								addRecordClickHandler(new RecordClickHandler()
 								{
 									@Override
 									public void onRecordClick(RecordClickEvent event)
 									{
+										navigateDetailPane();
 										String path = event.getRecord().getAttribute("Path");
 										listgrid.invalidateCache();
 										listgrid.fetchData(new Criteria() {{addCriteria("Path", path==null?"":path);}});
@@ -160,14 +174,13 @@ public class MainWindow extends Window
 								}});
 							}});
 							setNavigationPaneWidth(200);
-							setListPane(listgrid);
-						}},
-						new ToolStrip() {{
-							setAlign(Alignment.CENTER);
-							addMembers(
+							setShowNavigationBar(true);
+							setShowDetailToolStrip(true);
+							setDetailToolButtons(
 								new IButton(Client.session.getMsg("MainFrame.btnImportDat.text")) {{setAutoFit(true);}},
 								new IButton(Client.session.getMsg("MainFrame.btnImportSL.text")) {{setAutoFit(true);}}
 							);
+							setDetailPane(listgrid);
 						}}
 					);
 				}});

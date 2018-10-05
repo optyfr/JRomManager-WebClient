@@ -215,7 +215,11 @@ public class Progress extends Window
 			if (max != null)
 				pb_max = max;
 			if (val > 0)
-				progressBar.setPercentDone((pb_val=val)*100/pb_max);
+			{
+				int percent = (pb_val = val) * 100 / pb_max;
+				if (progressBar.getPercentDone() != percent)
+					progressBar.setPercentDone(percent);
+			}
 			if (val == 0)
 				startTime = System.currentTimeMillis();
 			if (val > 0)
@@ -258,7 +262,11 @@ public class Progress extends Window
 			if (max != null)
 				pb2_max = max;;
 			if (val > 0)
-				progressBar2.setPercentDone((pb2_val=val)/pb2_max);
+			{
+				int percent = (pb2_val = val) * 100 / pb2_max;
+				if (progressBar2.getPercentDone() != percent)
+					progressBar2.setPercentDone(percent);
+			}
 			if (val == 0)
 				startTime2 = System.currentTimeMillis();
 			if (val > 0)
