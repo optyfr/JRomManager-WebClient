@@ -2,6 +2,9 @@ package jrm.webui.client;
 
 import java.util.HashSet;
 
+import org.apache.bcel.generic.GETSTATIC;
+import org.omg.PortableInterceptor.SUCCESSFUL;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.JsonUtils;
 import com.sksamuel.gwt.websockets.Websocket;
@@ -17,6 +20,7 @@ import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Window;
 
 import jrm.webui.client.protocol.A_;
+import jrm.webui.client.protocol.A_Profile;
 import jrm.webui.client.protocol.A_Progress;
 import jrm.webui.client.protocol.A_Session;
 
@@ -101,11 +105,30 @@ public class Client implements EntryPoint
 												progress.setProgress2(params.getMsg(), params.getVal(), params.getMax());
 												break;
 											}
+											case "Profile.loaded":
+											{
+												A_Profile.Loaded params = new A_Profile.Loaded(a);
+												mainwindow.lblProfileinfo.setContents(params.getSuccess()?params.getName():null);
+												mainwindow.scannerPanel.btnScan.setDisabled(!params.getSuccess());
+												mainwindow.scannerPanel.btnFix.setDisabled(true);
+												if(params.getSuccess())
+												{
+													mainwindow.mainPane.enableTab(1);
+													mainwindow.mainPane.selectTab(1);
+												}
+												else
+												{
+													if(mainwindow.mainPane.getSelectedTabNumber()==1)
+														mainwindow.mainPane.selectTab(0);
+													mainwindow.mainPane.disableTab(1);
+												}
+												break;
+											}
 										}
 									}
 									catch(Exception e)
 									{
-										SC.logWarn(e.getMessage());
+										//SC.logWarn(e.getMessage());
 									}
 								}
 	
