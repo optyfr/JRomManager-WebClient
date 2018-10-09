@@ -2,9 +2,6 @@ package jrm.webui.client;
 
 import java.util.HashSet;
 
-import org.apache.bcel.generic.GETSTATIC;
-import org.omg.PortableInterceptor.SUCCESSFUL;
-
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.JsonUtils;
 import com.sksamuel.gwt.websockets.Websocket;
