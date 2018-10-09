@@ -21,7 +21,7 @@ eclipse {
 	}
 }
 
-apply plugin: 'war'
+//apply plugin: 'war'
 apply plugin: 'de.esoco.gwt'
 
 dependencies {

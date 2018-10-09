@@ -1,4 +1,4 @@
-package jrm.webui.client;
+package jrm.webui.client.ui;
 
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.IButton;
@@ -7,9 +7,12 @@ import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 
+import jrm.webui.client.Client;
+
 public class ScannerPanel extends VLayout
 {
-	IButton btnFix,btnScan;
+	public IButton btnFix;
+	public IButton btnScan;
 
 	public ScannerPanel()
 	{
@@ -46,10 +49,7 @@ public class ScannerPanel extends VLayout
 				setTabs(
 					new Tab() {{
 						setTitle(Client.session.getMsg("MainFrame.scannerDirectories.title"));
-						setPane(new VLayout() {{
-							setWidth100();
-							setHeight100();
-						}});
+						setPane(new ScannerDirPanel());
 					}},
 					new Tab() {{
 						setTitle(Client.session.getMsg("MainFrame.scannerSettingsPanel.title"));

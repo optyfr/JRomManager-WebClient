@@ -20,6 +20,7 @@ import jrm.webui.client.protocol.A_;
 import jrm.webui.client.protocol.A_Profile;
 import jrm.webui.client.protocol.A_Progress;
 import jrm.webui.client.protocol.A_Session;
+import jrm.webui.client.ui.MainWindow;
 
 public class Client implements EntryPoint
 {
@@ -62,8 +63,6 @@ public class Client implements EntryPoint
 							socket = new Websocket("ws://"+com.google.gwt.user.client.Window.Location.getHost());
 							socket.addListener(new WebsocketListener()
 							{
-								Progress progress;
-								
 								@Override
 								public void onMessage(String msg)
 								{
@@ -73,54 +72,26 @@ public class Client implements EntryPoint
 										switch(a.getCmd())
 										{
 											case "Progress":
-												if(progress==null)
-													progress = new Progress();
-												else
-													progress.show();
+												mainwindow.update(new A_Progress(a));
 												break;
 											case "Progress.close":
-												progress.close();;
+												mainwindow.update(new A_Progress.Close(a));
 												break;
 											case "Progress.setInfos":
-											{
-												A_Progress.SetInfos params = new A_Progress.SetInfos(a);
-												progress.setInfos(params.getThreadCnt(), params.getMultipleSubInfos());
+												mainwindow.update(new A_Progress.SetInfos(a));
 												break;
-											}
 											case "Progress.clearInfos":
-												progress.clearInfos();
+												mainwindow.update(new A_Progress.ClearInfos(a));
 												break;
 											case "Progress.setProgress":
-											{
-												A_Progress.SetProgress params = new A_Progress.SetProgress(a);
-												progress.setProgress(params.getOffset(), params.getMsg(), params.getVal(), params.getMax(), params.getSubMsg());
+												mainwindow.update(new A_Progress.SetProgress(a));
 												break;
-											}
 											case "Progress.setProgress2":
-											{
-												A_Progress.SetProgress2 params = new A_Progress.SetProgress2(a);
-												progress.setProgress2(params.getMsg(), params.getVal(), params.getMax());
+												mainwindow.update(new A_Progress.SetProgress2(a));
 												break;
-											}
 											case "Profile.loaded":
-											{
-												A_Profile.Loaded params = new A_Profile.Loaded(a);
-												mainwindow.lblProfileinfo.setContents(params.getSuccess()?params.getName():null);
-												mainwindow.scannerPanel.btnScan.setDisabled(!params.getSuccess());
-												mainwindow.scannerPanel.btnFix.setDisabled(true);
-												if(params.getSuccess())
-												{
-													mainwindow.mainPane.enableTab(1);
-													mainwindow.mainPane.selectTab(1);
-												}
-												else
-												{
-													if(mainwindow.mainPane.getSelectedTabNumber()==1)
-														mainwindow.mainPane.selectTab(0);
-													mainwindow.mainPane.disableTab(1);
-												}
+												mainwindow.update(new A_Profile.Loaded(a));
 												break;
-											}
 										}
 									}
 									catch(Exception e)

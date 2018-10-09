@@ -1,9 +1,7 @@
-package jrm.webui.client;
+package jrm.webui.client.ui;
 
 import com.google.gwt.core.client.JsonUtils;
-import com.smartgwt.client.data.Criteria;
-import com.smartgwt.client.data.OperationBinding;
-import com.smartgwt.client.data.RestDataSource;
+import com.smartgwt.client.data.*;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 import com.smartgwt.client.types.DSDataFormat;
@@ -16,26 +14,24 @@ import com.smartgwt.client.widgets.grid.HoverCustomizer;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
-import com.smartgwt.client.widgets.grid.events.RecordClickEvent;
-import com.smartgwt.client.widgets.grid.events.RecordClickHandler;
-import com.smartgwt.client.widgets.grid.events.RecordDoubleClickEvent;
-import com.smartgwt.client.widgets.grid.events.RecordDoubleClickHandler;
+import com.smartgwt.client.widgets.grid.events.*;
 import com.smartgwt.client.widgets.layout.SplitPane;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 
+import jrm.webui.client.Client;
 import jrm.webui.client.protocol.Q_Profile;
 
 public class ProfilePanel extends VLayout
 {
+	ListGrid listgrid;
+	
 	public ProfilePanel()
 	{
 		super();
 		addMembers(
 			new SplitPane() {{
-				ListGrid listgrid = new ListGrid() {{
+				listgrid = new ListGrid() {{
 					setShowFilterEditor(false);
 					setShowHover(true);
 					setCanHover(true);
@@ -55,19 +51,20 @@ public class ProfilePanel extends VLayout
 						setOperationBindings(
 							new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}}
 						);
-				        DataSourceTextField nameField = new DataSourceTextField("Name",Client.session.getMsg("FileTableModel.Profile"));
-				        DataSourceTextField pathField = new DataSourceTextField("Path");
-				        pathField.setHidden(true);
-				        DataSourceTextField verField = new DataSourceTextField("version",Client.session.getMsg("FileTableModel.Version"));
-				        DataSourceTextField haveSetsField = new DataSourceTextField("haveSets",Client.session.getMsg("FileTableModel.HaveSets"));
-				        DataSourceTextField haveRomsField = new DataSourceTextField("haveRoms",Client.session.getMsg("FileTableModel.HaveRoms"));
-				        DataSourceTextField haveDisksField = new DataSourceTextField("haveDisks",Client.session.getMsg("FileTableModel.HaveDisks"));
-				        DataSourceTextField createdField = new DataSourceTextField("created",Client.session.getMsg("FileTableModel.Created"));
-				        DataSourceTextField scannedField = new DataSourceTextField("scanned",Client.session.getMsg("FileTableModel.Scanned"));
-				        DataSourceTextField fixedField = new DataSourceTextField("fixed",Client.session.getMsg("FileTableModel.Fixed"));
-				        setFields(nameField, pathField, verField, haveSetsField, haveRomsField, haveDisksField, createdField, scannedField, fixedField);
+						DataSourceTextField nameField = new DataSourceTextField("Name", Client.session.getMsg("FileTableModel.Profile"));
+						DataSourceTextField pathField = new DataSourceTextField("Path");
+						pathField.setHidden(true);
+						pathField.setPrimaryKey(true);
+						DataSourceTextField verField = new DataSourceTextField("version", Client.session.getMsg("FileTableModel.Version"));
+						DataSourceTextField haveSetsField = new DataSourceTextField("haveSets", Client.session.getMsg("FileTableModel.HaveSets"));
+						DataSourceTextField haveRomsField = new DataSourceTextField("haveRoms", Client.session.getMsg("FileTableModel.HaveRoms"));
+						DataSourceTextField haveDisksField = new DataSourceTextField("haveDisks", Client.session.getMsg("FileTableModel.HaveDisks"));
+						DataSourceTextField createdField = new DataSourceTextField("created", Client.session.getMsg("FileTableModel.Created"));
+						DataSourceTextField scannedField = new DataSourceTextField("scanned", Client.session.getMsg("FileTableModel.Scanned"));
+						DataSourceTextField fixedField = new DataSourceTextField("fixed", Client.session.getMsg("FileTableModel.Fixed"));
+						setFields(nameField, pathField, verField, haveSetsField, haveRomsField, haveDisksField, createdField, scannedField, fixedField);
 					}});
-				}};
+			}};
 				setNavigationPane(new TreeGrid() {{
 					setShowRoot(true);
 					setAutoFetchData(true);
@@ -150,5 +147,19 @@ public class ProfilePanel extends VLayout
 				setDetailPane(listgrid);
 			}}
 		);
+	}
+	
+	void refreshListGrid()
+	{
+		String selection = listgrid.getSelectedState();
+		listgrid.refreshData(new DSCallback()
+		{
+			@Override
+			public void execute(DSResponse dsResponse, Object data, DSRequest dsRequest)
+			{
+				 listgrid.setSelectedState(selection);
+			}
+		});
+		
 	}
 }

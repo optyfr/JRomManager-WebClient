@@ -1,4 +1,4 @@
-package jrm.webui.client;
+package jrm.webui.client.ui;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,12 +11,18 @@ import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
 
+import jrm.webui.client.Client;
+import jrm.webui.client.Progress;
+import jrm.webui.client.protocol.A_Profile;
+import jrm.webui.client.protocol.A_Progress;
+
 public class MainWindow extends Window
 {
 	TabSet mainPane;
 	ProfilePanel profilePanel;
 	ScannerPanel scannerPanel;
 	Label lblProfileinfo;
+	private Progress progress = null;
 	
 	public MainWindow()
 	{
@@ -83,5 +89,58 @@ public class MainWindow extends Window
 	protected void onDestroy()
 	{
 		super.onDestroy();
+	}
+	
+	public void update(A_Profile.Loaded params)
+	{
+		lblProfileinfo.setContents(params.getSuccess()?params.getName():null);
+		scannerPanel.btnScan.setDisabled(!params.getSuccess());
+		scannerPanel.btnFix.setDisabled(true);
+		if(params.getSuccess())
+		{
+			mainPane.enableTab(1);
+			mainPane.selectTab(1);
+			profilePanel.refreshListGrid();
+		}
+		else
+		{
+			if(mainPane.getSelectedTabNumber()==1)
+				mainPane.selectTab(0);
+			mainPane.disableTab(1);
+		}
+	}
+	
+	public void update(A_Progress params)
+	{
+		if(progress==null)
+			progress = new Progress();
+		else
+			progress.show();
+	}
+
+	
+	public void update(A_Progress.Close params)
+	{
+		progress.close();
+	}
+	
+	public void update(A_Progress.SetInfos params)
+	{
+		progress.setInfos(params.getThreadCnt(), params.getMultipleSubInfos());		
+	}
+	
+	public void update(A_Progress.ClearInfos params)
+	{
+		progress.clearInfos();		
+	}
+	
+	public void update(A_Progress.SetProgress params)
+	{
+		progress.setProgress(params.getOffset(), params.getMsg(), params.getVal(), params.getMax(), params.getSubMsg());
+	}
+	
+	public void update(A_Progress.SetProgress2 params)
+	{
+		progress.setProgress2(params.getMsg(), params.getVal(), params.getMax());
 	}
 }
