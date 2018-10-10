@@ -1,6 +1,9 @@
 package jrm.webui.client.ui;
 
+import java.util.Collections;
+
 import com.smartgwt.client.data.Criteria;
+import com.smartgwt.client.data.DSRequest;
 import com.smartgwt.client.data.OperationBinding;
 import com.smartgwt.client.data.RestDataSource;
 import com.smartgwt.client.data.ResultSet;
@@ -26,10 +29,14 @@ import com.smartgwt.client.widgets.layout.VLayout;
 
 import jrm.webui.client.Client;
 
-public class RemoteFileChooser extends Window
+public final class RemoteFileChooser extends Window
 {
-
-	public RemoteFileChooser(String context)
+	public interface CallBack
+	{
+		public void apply(String path);
+	}
+	
+	public RemoteFileChooser(String context, CallBack cb)
 	{
 		super();
 		setWidth(500);
@@ -70,17 +77,21 @@ public class RemoteFileChooser extends Window
 					public void onRecordDoubleClick(RecordDoubleClickEvent event)
 					{
 						ListGridRecord record = event.getRecord();
+						String path = record.getAttribute("Parent")+"/"+record.getAttribute("Name");
 						if(record.getAttributeAsBoolean("isDir"))
 						{
-							Criteria criteria = new Criteria("Parent",record.getAttribute("Parent")+"/"+record.getAttribute("Name"));
+							Criteria criteria = new Criteria("Parent", path);
 							invalidateCache();
 							fetchData(criteria);
 						}
+						else
+							cb.apply(path);
 					}
 				});
 				setDataSource(new RestDataSource() {{
 					setID("remoteFileChooser");
 					setDataURL("/datasources/"+getID());
+					setRequestProperties(new DSRequest() {{setParams(Collections.singletonMap("context", context));}});
 					setDataFormat(DSDataFormat.XML);
 					setOperationBindings(
 							new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}}
@@ -102,7 +113,7 @@ public class RemoteFileChooser extends Window
 							@Override
 							public String format(Object value, ListGridRecord record, int rowNum, int colNum)
 							{
-								return ((boolean)value)?"<img src='/images/icons/folder.png'/>":"<img src='/images/icons/file.png'/>";
+								return ((boolean)value)?"<img src='/images/icons/folder.png'/>":"<img src='/images/icons/page.png'/>";
 							}
 						});
 					}},
@@ -113,7 +124,9 @@ public class RemoteFileChooser extends Window
 			setNavigationPaneWidth(100);
 		}});
 		addItem(new VLayout() {{
+			setHeight(20);
 			addMember(new Label("pipo") {{
+				setHeight(20);
 				setWidth100();
 				setBorder("1px inset gray");
 			}});

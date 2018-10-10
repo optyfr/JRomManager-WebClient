@@ -6,11 +6,13 @@ import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ShowContextMenuEvent;
 import com.smartgwt.client.widgets.events.ShowContextMenuHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.*;
+import com.smartgwt.client.widgets.form.fields.ButtonItem;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.SpacerItem;
+import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.MenuItemIfFunction;
@@ -40,14 +42,7 @@ public final class ScannerDirPanel extends DynamicForm
 				setTitle(null);
 				setValueIconRightPadding(0);
 				setEndRow(false);
-				addClickHandler(new ClickHandler()
-				{
-					@Override
-					public void onClick(ClickEvent event)
-					{
-						new RemoteFileChooser("tfRomsDest");
-					}
-				});
+				addClickHandler(event->new RemoteFileChooser("tfRomsDest", getItem("tfRomsDest")::setValue));
 			}},
 			new SpacerItem(),
 			new TextItem("tfDisksDest",Client.session.getMsg("MainFrame.lblDisksDest.text")) {{
@@ -68,14 +63,9 @@ public final class ScannerDirPanel extends DynamicForm
 				setStartRow(false);
 				setShowLabel(false);
 				setShowTitle(false);
-				addChangedHandler(new ChangedHandler()
-				{
-					@Override
-					public void onChanged(ChangedEvent event)
-					{
-						event.getForm().getField("tfDisksDestBtn").setDisabled(!(boolean)event.getValue());
-						event.getForm().getField("tfDisksDest").setDisabled(!(boolean)event.getValue());
-					}
+				addChangedHandler(event->{
+					event.getForm().getField("tfDisksDestBtn").setDisabled(!(boolean)event.getValue());
+					event.getForm().getField("tfDisksDest").setDisabled(!(boolean)event.getValue());
 				});
 			}},
 			new TextItem("tfSWDest",Client.session.getMsg("MainFrame.chckbxSoftwareDest.text")) {{
@@ -96,14 +86,9 @@ public final class ScannerDirPanel extends DynamicForm
 				setStartRow(false);
 				setShowLabel(false);
 				setShowTitle(false);
-				addChangedHandler(new ChangedHandler()
-				{
-					@Override
-					public void onChanged(ChangedEvent event)
-					{
-						event.getForm().getField("tfSWDestBtn").setDisabled(!(boolean)event.getValue());
-						event.getForm().getField("tfSWDest").setDisabled(!(boolean)event.getValue());
-					}
+				addChangedHandler(event->{
+					event.getForm().getField("tfSWDestBtn").setDisabled(!(boolean)event.getValue());
+					event.getForm().getField("tfSWDest").setDisabled(!(boolean)event.getValue());
 				});
 			}},
 			new TextItem("tfSWDisksDest",Client.session.getMsg("MainFrame.chckbxSwdisksdest.text")) {{
