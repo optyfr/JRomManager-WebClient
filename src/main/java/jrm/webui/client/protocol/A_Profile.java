@@ -38,6 +38,11 @@ public class A_Profile extends A_
 		{
 			return params.getString("name");
 		}
+		
+		final public EnhJSO getSettings()
+		{
+			return params.getJSO("settings");
+		}
 	}
 
 	

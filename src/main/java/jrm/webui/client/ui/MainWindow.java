@@ -8,13 +8,15 @@ import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
 import com.smartgwt.client.widgets.events.CloseClickHandler;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
 
 import jrm.webui.client.Client;
-import jrm.webui.client.Progress;
 import jrm.webui.client.protocol.A_Profile;
 import jrm.webui.client.protocol.A_Progress;
+import jrm.webui.client.utils.EnhJSO;
 
 public class MainWindow extends Window
 {
@@ -101,6 +103,26 @@ public class MainWindow extends Window
 			mainPane.enableTab(1);
 			mainPane.selectTab(1);
 			profilePanel.refreshListGrid();
+			EnhJSO settings = params.getSettings();
+			scannerPanel.scannerDirPanel.getItem("tfRomsDest").setValue(settings.get("roms_dest_dir"));
+			String src_dir = settings.getString("src_dir",false);
+			if(src_dir != null)
+			{
+				String[] src_dirs = src_dir.split("\\|");
+				scannerPanel.scannerDirPanel.getItem("listSrcDir").setValueMap(src_dirs);
+			}
+			if(settings.exists("disks_dest_dir_enabled"))
+			{
+				boolean disks_dest_dir_enabled = settings.getBool("disks_dest_dir_enabled");
+				CheckboxItem item = (CheckboxItem)scannerPanel.scannerDirPanel.getItem("tfDisksDestCbx");
+				item.setValue(disks_dest_dir_enabled);
+				item.fireEvent(new ChangedEvent(item.getJsObj()){
+					@Override
+					public Object getValue() {
+						return item.getValue();
+					}
+				});
+			}
 		}
 		else
 		{

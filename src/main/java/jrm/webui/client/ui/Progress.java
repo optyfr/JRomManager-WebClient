@@ -1,4 +1,4 @@
-package jrm.webui.client;
+package jrm.webui.client.ui;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +16,8 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.LayoutSpacer;
 import com.smartgwt.client.widgets.layout.VLayout;
+
+import jrm.webui.client.Client;
 
 public class Progress extends Window
 {

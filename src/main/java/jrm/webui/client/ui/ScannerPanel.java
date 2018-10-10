@@ -1,18 +1,20 @@
 package jrm.webui.client.ui;
 
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 import jrm.webui.client.Client;
 
-public class ScannerPanel extends VLayout
+public final class ScannerPanel extends VLayout
 {
-	public IButton btnFix;
-	public IButton btnScan;
+	public ToolStripButton btnFix;
+	public ToolStripButton btnScan;
+	ScannerDirPanel scannerDirPanel;
+	ScannerSettingsPanel scannerSettingsPanel;
 
 	public ScannerPanel()
 	{
@@ -21,23 +23,29 @@ public class ScannerPanel extends VLayout
 			new ToolStrip() {{
 				setWidth100();
 				setAlign(Alignment.CENTER);
-				setMembers(
-					new IButton() {{
+				addButton(
+					new ToolStripButton() {{
 						setAutoFit(true);
 						setTitle(Client.session.getMsg("MainFrame.btnInfo.text"));
 						setIcon("icons/information.png");
-					}},
-					btnScan = new IButton() {{
+					}}
+				);
+				addButton(
+					btnScan = new ToolStripButton() {{
 						setAutoFit(true);
 						setTitle(Client.session.getMsg("MainFrame.btnScan.text"));
 						setIcon("icons/magnifier.png");
-					}},
-					new IButton() {{
+					}}
+				);
+				addButton(
+					new ToolStripButton() {{
 						setAutoFit(true);
 						setTitle(Client.session.getMsg("MainFrame.btnReport.text"));
 						setIcon("icons/report.png");
-					}},
-					btnFix = new IButton() {{
+					}}
+				);
+				addButton(
+					btnFix = new ToolStripButton() {{
 						setAutoFit(true);
 						setTitle(Client.session.getMsg("MainFrame.btnFix.text"));
 						setIcon("icons/tick.png");
@@ -49,14 +57,11 @@ public class ScannerPanel extends VLayout
 				setTabs(
 					new Tab() {{
 						setTitle(Client.session.getMsg("MainFrame.scannerDirectories.title"));
-						setPane(new ScannerDirPanel());
+						setPane(scannerDirPanel = new ScannerDirPanel());
 					}},
 					new Tab() {{
 						setTitle(Client.session.getMsg("MainFrame.scannerSettingsPanel.title"));
-						setPane(new VLayout() {{
-							setWidth100();
-							setHeight100();
-						}});
+						setPane(scannerSettingsPanel = new ScannerSettingsPanel());
 					}},
 					new Tab() {{
 						setTitle(Client.session.getMsg("MainFrame.Filters"));
