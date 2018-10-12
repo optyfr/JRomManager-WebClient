@@ -7,16 +7,18 @@ import java.util.stream.Collectors;
 
 import com.google.gwt.core.client.JsonUtils;
 import com.smartgwt.client.core.Rectangle;
-import com.smartgwt.client.data.AdvancedCriteria;
-import com.smartgwt.client.data.Criterion;
 import com.smartgwt.client.types.MultipleAppearance;
-import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ShowContextMenuEvent;
 import com.smartgwt.client.widgets.events.ShowContextMenuHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.*;
+import com.smartgwt.client.widgets.form.fields.ButtonItem;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+import com.smartgwt.client.widgets.form.fields.FormItem;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.SpacerItem;
+import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
@@ -166,6 +168,7 @@ public final class ScannerDirPanel extends DynamicForm
 				setMultiple(true);
 				setValueMap();
 				setMultipleAppearance(MultipleAppearance.GRID);
+				addChangedHandler(event->event.getForm().getItem("delSrcDirBtn").setDisabled(this.getValues().length==0));
 			}},
 			new ButtonItem() {{
 				setStartRow(false);
@@ -186,8 +189,8 @@ public final class ScannerDirPanel extends DynamicForm
 				setPrompt(Client.session.getMsg("MainFrame.mntmDeleteSelected.text"));
 				setTitle(null);
 				addClickHandler(event->delSrcDir());
+				setDisabled(true);
 				setShouldSaveValue(true);
-				setEnableWhen(new AdvancedCriteria(new Criterion("listSrcDir", OperatorId.NOT_BLANK)));
 			}},
 			new SpacerItem() {{
 				setHeight(160);

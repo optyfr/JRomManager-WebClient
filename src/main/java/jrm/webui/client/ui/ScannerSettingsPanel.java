@@ -3,9 +3,6 @@ package jrm.webui.client.ui;
 import java.util.HashMap;
 
 import com.google.gwt.core.client.JsonUtils;
-import com.smartgwt.client.data.AdvancedCriteria;
-import com.smartgwt.client.data.Criterion;
-import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
@@ -32,7 +29,10 @@ public final class ScannerSettingsPanel extends DynamicForm
 				addChangedHandler(event->setPropertyItemValue(getName(), "need_sha1_or_md5", (boolean)getValue()));
 			}},
 			new CheckboxItem("chckbxCreateMissingSets", Client.session.getMsg("MainFrame.chckbxCreateMissingSets.text")) {{
-				addChangedHandler(event->setPropertyItemValue(getName(), "create_mode", (boolean)getValue()));
+				addChangedHandler(event->{
+					setPropertyItemValue(getName(), "create_mode", (boolean)getValue());
+					event.getForm().getItem("chckbxCreateOnlyComplete").setDisabled(!getValueAsBoolean());
+				});
 				setDefaultValue(true);
 			}},
 			new CheckboxItem("chckbxUseParallelism", Client.session.getMsg("MainFrame.chckbxUseParallelism.text")) {{
@@ -41,7 +41,6 @@ public final class ScannerSettingsPanel extends DynamicForm
 			}},
 			new CheckboxItem("chckbxCreateOnlyComplete", Client.session.getMsg("MainFrame.chckbxCreateOnlyComplete.text")) {{
 				addChangedHandler(event->setPropertyItemValue(getName(), "createfull_mode", (boolean)getValue()));
-				setVisibleWhen(new AdvancedCriteria(new Criterion("chckbxCreateMissingSets", OperatorId.EQUALS, true)));
 			}},
 			new CheckboxItem("chckbxIgnoreUnneededContainers", Client.session.getMsg("MainFrame.chckbxIgnoreUnneededContainers.text")) {{
 				addChangedHandler(event->setPropertyItemValue(getName(), "ignore_unneeded_containers", (boolean)getValue()));
@@ -94,7 +93,10 @@ public final class ScannerSettingsPanel extends DynamicForm
 					put("SPLIT", Client.session.getMsg("MergeOptions.Split"));
 				}});
 				setDefaultValue("SPLIT");
-				addChangedHandler(event->setPropertyItemValue(getName(), "merge_mode", getValue().toString()));
+				addChangedHandler(event->{
+					setPropertyItemValue(getName(), "merge_mode", getValue().toString());
+					event.getForm().getItem("cbHashCollision").setDisabled(!(getValue().equals("MERGE") || getValue().equals("FULLMERGE")));
+				});
 				setColSpan(3);
 				setPrompt(Client.session.getMsg("MainFrame.cbbxMergeMode.toolTipText"));
 				setWidth("*");
@@ -112,7 +114,7 @@ public final class ScannerSettingsPanel extends DynamicForm
 				addChangedHandler(event->setPropertyItemValue(getName(), "hash_collision_mode", getValue().toString()));
 				setColSpan(3);
 				setWidth("*");
-				setVisibleWhen(new AdvancedCriteria(new Criterion("cbbxMergeMode", OperatorId.IN_SET, new String[] {"FULLMERGE","MERGE"})));
+				setDisabled(true);
 			}}
 		);
 	}

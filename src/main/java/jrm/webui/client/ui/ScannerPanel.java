@@ -15,6 +15,7 @@ public final class ScannerPanel extends VLayout
 	public ToolStripButton btnScan;
 	ScannerDirPanel scannerDirPanel;
 	ScannerSettingsPanel scannerSettingsPanel;
+	ScannerFiltersPanel scannerFiltersPanel;
 
 	public ScannerPanel()
 	{
@@ -65,10 +66,7 @@ public final class ScannerPanel extends VLayout
 					}},
 					new Tab() {{
 						setTitle(Client.session.getMsg("MainFrame.Filters"));
-						setPane(new VLayout() {{
-							setWidth100();
-							setHeight100();
-						}});
+						setPane(scannerFiltersPanel = new ScannerFiltersPanel());
 					}},
 					new Tab() {{
 						setTitle(Client.session.getMsg("MainFrame.AdvFilters"));

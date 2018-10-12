@@ -1,5 +1,8 @@
 package jrm.webui.client.protocol;
 
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArray;
+
 import jrm.webui.client.utils.EnhJSO;
 
 public class A_Profile extends A_
@@ -42,6 +45,11 @@ public class A_Profile extends A_
 		final public EnhJSO getSettings()
 		{
 			return params.getJSO("settings");
+		}
+
+		final public JsArray<JavaScriptObject> getSystems()
+		{
+			return params.getJSAJSO("systems");
 		}
 	}
 

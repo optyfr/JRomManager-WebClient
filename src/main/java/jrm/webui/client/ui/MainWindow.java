@@ -3,7 +3,9 @@ package jrm.webui.client.ui;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.TabBarControls;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
@@ -135,6 +137,11 @@ public class MainWindow extends Window
 			scannerPanel.scannerSettingsPanel.initPropertyItemValue("cbCompression", "format", settings);
 			scannerPanel.scannerSettingsPanel.initPropertyItemValue("cbbxMergeMode", "merge_mode", settings);
 			scannerPanel.scannerSettingsPanel.initPropertyItemValue("cbHashCollision", "hash_collision_mode", settings);
+			Record[] records = Record.convertToRecordArray(params.getSystems());
+			SC.logWarn("records:"+records.length);
+			for(Record record : records)
+				SC.logWarn("record:"+record);
+			scannerPanel.scannerFiltersPanel.systems.setData(records);
 		}
 		else
 		{
