@@ -25,4 +25,36 @@ public class Q_Profile extends Q_
 			return this;
 		}
 	}
+	
+	public static class SetProperty extends Q_
+	{
+		protected SetProperty()
+		{
+			super();
+		}
+		
+		
+		final public static SetProperty instantiate()
+		{
+			return Q_.instantiateCmd("Profile.setProperty").cast();
+		}
+		
+		final public SetProperty setProperty(String name, String value)
+		{
+			getParams().set(name, value);
+			return this;
+		}
+		
+		final public SetProperty setProperty(String name, int value)
+		{
+			getParams().set(name, value);
+			return this;
+		}
+		
+		final public SetProperty setProperty(String name, boolean value)
+		{
+			getParams().set(name, value);
+			return this;
+		}
+	}
 }

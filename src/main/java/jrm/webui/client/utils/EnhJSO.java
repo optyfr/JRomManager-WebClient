@@ -86,6 +86,14 @@ public class EnhJSO extends JavaScriptObject
 		return false;
 	}-*/;;
 
+	protected static native boolean isBoolean(JavaScriptObject jso, String name) /*-{
+		return $wnd.isc.isA.Boolean(jso[name]);
+	}-*/;;
+
+	protected static native boolean isString(JavaScriptObject jso, String name) /*-{
+		return $wnd.isc.isA.String(jso[name]);
+	}-*/;;
+
 	protected static native boolean isNull(JavaScriptObject jso, String name) /*-{
 		if(typeof (jso[name]) == 'undefined')
 			return true;
@@ -218,6 +226,16 @@ public class EnhJSO extends JavaScriptObject
 	public final boolean isVoid(final String name)
 	{
 		return EnhJSO.isVoid(this, name);
+	}
+
+	public final boolean isBoolean(final String name)
+	{
+		return EnhJSO.isBoolean(this, name);
+	}
+
+	public final boolean isString(final String name)
+	{
+		return EnhJSO.isString(this, name);
 	}
 
 	public final boolean set(final String name, final boolean value)
