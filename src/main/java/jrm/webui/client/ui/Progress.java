@@ -152,6 +152,8 @@ public class Progress extends Window
 		
 		lblInfo = new Label[threadCnt];
 		lblSubInfo = new Label[multipleSubInfos?threadCnt:1];
+		startTime = System.currentTimeMillis();
+		startTime2 = System.currentTimeMillis();
 		
 		for(int i = 0; i < threadCnt; i++)
 		{

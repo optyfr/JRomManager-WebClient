@@ -3,6 +3,7 @@ package jrm.webui.client.ui;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.google.gwt.core.client.JsonUtils;
@@ -34,7 +35,6 @@ public final class ScannerDirPanel extends DynamicForm
 	{
 		super();
 		setWidth100();
-		setHeight100();
 		setCellPadding(1);
 		setNumCols(4);
 		setColWidths("200","*","22","20");
@@ -288,7 +288,10 @@ public final class ScannerDirPanel extends DynamicForm
 				{
 					SelectItem selitem = (SelectItem)formItem;
 					if(selitem.isMultiple())
-						selitem.setValueMap(jso.get(name).split("\\|"));
+					{
+						selitem.setValueMap();
+						Optional.of(jso.getString(name, false)).ifPresent(strs->selitem.setValueMap(strs.split("\\|")));
+					}
 					else
 						selitem.setValue(jso.get(name));
 				}

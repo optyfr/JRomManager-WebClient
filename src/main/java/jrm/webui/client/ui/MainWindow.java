@@ -5,7 +5,6 @@ import java.util.Map;
 
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.TabBarControls;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
@@ -102,15 +101,8 @@ public class MainWindow extends Window
 		{
 			mainPane.enableTab(1);
 			mainPane.selectTab(1);
-			profilePanel.refreshListGrid();
 			EnhJSO settings = params.getSettings();
 			scannerPanel.scannerDirPanel.getItem("tfRomsDest").setValue(settings.get("roms_dest_dir"));
-			String src_dir = settings.getString("src_dir",false);
-			if(src_dir != null)
-			{
-				String[] src_dirs = src_dir.split("\\|");
-				scannerPanel.scannerDirPanel.getItem("listSrcDir").setValueMap(src_dirs);
-			}
 			scannerPanel.scannerDirPanel.initPropertyItemValue("tfRomsDest", "roms_dest_dir", settings);
 			scannerPanel.scannerDirPanel.initPropertyItemValue("tfDisksDestCbx", "disks_dest_dir_enabled", settings);
 			scannerPanel.scannerDirPanel.initPropertyItemValue("tfDisksDest", "disks_dest_dir", settings);
@@ -137,11 +129,7 @@ public class MainWindow extends Window
 			scannerPanel.scannerSettingsPanel.initPropertyItemValue("cbCompression", "format", settings);
 			scannerPanel.scannerSettingsPanel.initPropertyItemValue("cbbxMergeMode", "merge_mode", settings);
 			scannerPanel.scannerSettingsPanel.initPropertyItemValue("cbHashCollision", "hash_collision_mode", settings);
-			Record[] records = Record.convertToRecordArray(params.getSystems());
-			SC.logWarn("records:"+records.length);
-			for(Record record : records)
-				SC.logWarn("record:"+record);
-			scannerPanel.scannerFiltersPanel.systems.setData(records);
+			scannerPanel.scannerFiltersPanel.systems.setData(Record.convertToRecordArray(params.getSystems()));
 		}
 		else
 		{
@@ -149,6 +137,7 @@ public class MainWindow extends Window
 				mainPane.selectTab(0);
 			mainPane.disableTab(1);
 		}
+		profilePanel.refreshListGrid();
 	}
 	
 	public void update(A_Progress params)

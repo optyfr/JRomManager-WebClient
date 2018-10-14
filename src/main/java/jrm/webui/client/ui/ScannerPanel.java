@@ -1,6 +1,8 @@
 package jrm.webui.client.ui;
 
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.LayoutSpacer;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
@@ -55,14 +57,33 @@ public final class ScannerPanel extends VLayout
 				);
 			}},
 			new TabSet() {{
+				setPaneMargin(0);
 				setTabs(
 					new Tab() {{
 						setTitle(Client.session.getMsg("MainFrame.scannerDirectories.title"));
-						setPane(scannerDirPanel = new ScannerDirPanel());
+						setPane(new HLayout() {{
+							addMember(new LayoutSpacer("5%","*"));
+							addMember(new VLayout() {{
+								setHeight100();
+								addMember(new LayoutSpacer("100%","*"));
+								addMember(scannerDirPanel = new ScannerDirPanel());
+								addMember(new LayoutSpacer("100%","*"));
+							}});
+							addMember(new LayoutSpacer("5%","*"));
+						}});
 					}},
 					new Tab() {{
 						setTitle(Client.session.getMsg("MainFrame.scannerSettingsPanel.title"));
-						setPane(scannerSettingsPanel = new ScannerSettingsPanel());
+						setPane(new HLayout() {{
+							addMember(new LayoutSpacer("5%","*"));
+							addMember(new VLayout() {{
+								setHeight100();
+								addMember(new LayoutSpacer("100%","*"));
+								addMember(scannerSettingsPanel = new ScannerSettingsPanel());
+								addMember(new LayoutSpacer("100%","*"));
+							}});
+							addMember(new LayoutSpacer("5%","*"));
+						}});
 					}},
 					new Tab() {{
 						setTitle(Client.session.getMsg("MainFrame.Filters"));

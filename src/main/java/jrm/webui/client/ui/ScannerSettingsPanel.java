@@ -21,9 +21,9 @@ public final class ScannerSettingsPanel extends DynamicForm
 	{
 		super();
 		setWidth100();
-		setHeight100();
 		setNumCols(4);
-		setColWidths("15%","35%","15%","35%");
+		setColWidths("*","*","*","*");
+		setWrapItemTitles(false);
 		setItems(
 			new CheckboxItem("chckbxNeedSHA1", Client.session.getMsg("MainFrame.chckbxNeedSHA1.text")) {{
 				addChangedHandler(event->setPropertyItemValue(getName(), "need_sha1_or_md5", (boolean)getValue()));
