@@ -8,19 +8,17 @@ import java.util.stream.Collectors;
 
 import com.google.gwt.core.client.JsonUtils;
 import com.smartgwt.client.core.Rectangle;
+import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ShowContextMenuEvent;
 import com.smartgwt.client.widgets.events.ShowContextMenuHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.ButtonItem;
-import com.smartgwt.client.widgets.form.fields.CheckboxItem;
-import com.smartgwt.client.widgets.form.fields.FormItem;
-import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.SpacerItem;
-import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.*;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
+import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
+import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.MenuItemIfFunction;
@@ -40,6 +38,20 @@ public final class ScannerDirPanel extends DynamicForm
 		setColWidths("200","*","22","20");
 		setWrapItemTitles(false);
 		setItems(
+			new ButtonItem() {{
+				setTitle("Manager files uploads");
+				setColSpan(4);
+				setAlign(Alignment.CENTER);
+				addClickHandler(new ClickHandler()
+				{
+					@Override
+					public void onClick(ClickEvent event)
+					{
+						new RemoteFileChooser("manageUploads", null);
+					}
+				});
+			}},
+			new RowSpacerItem(),
 			new TextItem("tfRomsDest",Client.session.getMsg("MainFrame.lblRomsDest.text")) {{
 				setWidth("*");
 				setCanEdit(false);

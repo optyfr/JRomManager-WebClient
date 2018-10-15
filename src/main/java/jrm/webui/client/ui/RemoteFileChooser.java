@@ -8,26 +8,12 @@ import java.util.stream.Stream;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.i18n.client.NumberFormat;
-import com.smartgwt.client.data.DSRequest;
-import com.smartgwt.client.data.DSResponse;
-import com.smartgwt.client.data.OperationBinding;
-import com.smartgwt.client.data.RestDataSource;
-import com.smartgwt.client.data.ResultSet;
-import com.smartgwt.client.data.SortSpecifier;
-import com.smartgwt.client.data.XMLTools;
+import com.smartgwt.client.data.*;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceDateTimeField;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.DSDataFormat;
-import com.smartgwt.client.types.DSOperationType;
-import com.smartgwt.client.types.DSProtocol;
-import com.smartgwt.client.types.DateDisplayFormat;
-import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.types.SortDirection;
-import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.util.SC;
+import com.smartgwt.client.types.*;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Progressbar;
@@ -38,6 +24,8 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.LayoutSpacer;
 import com.smartgwt.client.widgets.layout.SplitPane;
+import com.smartgwt.client.widgets.menu.Menu;
+import com.smartgwt.client.widgets.menu.MenuItem;
 
 import jsinterop.annotations.JsMethod;
 import jsinterop.annotations.JsPackage;
@@ -61,9 +49,142 @@ public final class RemoteFileChooser extends Window
 		private int tot;
 		private float val[];
 		
-		public UploadList()
+		@SuppressWarnings("serial")
+		public UploadList(String context, CallBack cb)
 		{
 			super();
+			final boolean isMultiple, isChoose;
+			switch(context)
+			{
+				case "tfRomsDest":
+				case "tfDisksDest":
+				case "tfSWDest":
+				case "tfSWDisksDest":
+				case "tfSamplesDest":
+					isMultiple = false;
+					isChoose = true;
+					break;
+				case "listSrcDir":
+					isMultiple = true;
+					isChoose = true;
+					break;
+				case "manageUploads":
+					isMultiple = true;
+					isChoose = false;
+					break;
+				default:
+					isMultiple = false;
+					isChoose = true;
+					break;
+			}
+			setBorder("2px solid lightgrey");
+			setID("UploadList");
+			setShowFilterEditor(false);
+			setShowHover(true);
+			setCanHover(true);
+			setHoverWidth(200);
+			setAutoFetchData(true);
+			setSelectionType(isMultiple?SelectionStyle.MULTIPLE:SelectionStyle.SINGLE);
+			addEditFailedHandler(event->startEditing(event.getRowNum(),event.getColNum()));
+			setContextMenu(new Menu() {{
+				setItems(
+					new MenuItem() {{
+						setTitle("Create dir");
+						addClickHandler(event->{
+							UploadList.this.startEditingNew(new HashMap<String,Object>() {{
+								put("Name","New Folder");
+								put("isDir",true);
+								put("Size",-1);
+							}});
+						});
+					}},
+					new MenuItem() {{
+						setTitle("Delete selection");
+						addClickHandler(event -> UploadList.this.removeSelectedData());
+						setEnableIfCondition((target, menu, item) -> !isChoose && UploadList.this.getSelectedRecords().length > 0);
+					}}
+				);
+			}});
+			addRecordClickHandler(event->{
+			});
+			addRecordDoubleClickHandler(event->{
+				ListGridRecord record = event.getRecord();
+				String path = record.getAttribute("Path");
+				if(record.getAttributeAsBoolean("isDir"))
+				{
+					getDataSource().setRequestProperties(new DSRequest() {{
+						Map<String,String> params = new HashMap<>();
+						params.put("context", context);
+						params.put("parent", path);
+						//setParams(params);
+						setData(params);
+					}});
+					invalidateCache();
+				}
+				else if(isChoose)
+				{
+					if(cb!=null)
+						cb.apply(new String[] {path});
+					RemoteFileChooser.this.markForDestroy();
+				}
+			});
+			setInitialSort(new SortSpecifier("isDir", SortDirection.DESCENDING),new SortSpecifier("Name", SortDirection.ASCENDING));
+			setDataSource(new RestDataSource() {
+				{
+					setID("remoteFileChooser");
+					setDataURL("/datasources/"+getID());
+					setRequestProperties(new DSRequest() {{setData(Collections.singletonMap("context", context));}});
+					setDataFormat(DSDataFormat.XML);
+					setOperationBindings(
+						new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}},
+						new OperationBinding(){{setOperationType(DSOperationType.REMOVE);setDataProtocol(DSProtocol.POSTXML);}},
+						new OperationBinding(){{setOperationType(DSOperationType.ADD);setDataProtocol(DSProtocol.POSTXML);}},
+						new OperationBinding(){{setOperationType(DSOperationType.UPDATE);setDataProtocol(DSProtocol.POSTXML);}}
+					);
+					DataSourceTextField nameField = new DataSourceTextField("Name");
+					nameField.setPrimaryKey(true);
+					DataSourceTextField pathField = new DataSourceTextField("Path");
+					pathField.setHidden(true);
+					DataSourceBooleanField isDir = new DataSourceBooleanField("isDir");
+					isDir.setCanEdit(false);
+					DataSourceIntegerField sizefield = new DataSourceIntegerField("Size");
+					sizefield.setCanEdit(false);
+					DataSourceDateTimeField modifiedfield = new DataSourceDateTimeField("Modified") {{
+						setDatetimeFormatter(DateDisplayFormat.TOSERIALIZEABLEDATE);
+						setCanEdit(false);
+					}};
+					setFields(isDir, nameField, pathField, sizefield, modifiedfield);
+				}
+				@Override
+				protected void transformResponse(DSResponse dsResponse, DSRequest dsRequest, Object data) {
+					if(dsResponse.getStatus()==0)
+						parent.setContents(XMLTools.selectString(data, "/response/parent"));
+					super.transformResponse(dsResponse, dsRequest, data);
+				};
+			});
+			setFields(
+				new ListGridField("isDir") {{
+					setWidth(20);
+					setMaxWidth(20);
+					setCellFormatter((value,record,rowNum,colNum)->"<img src='/images/icons/"+((boolean)value?"folder.png":"page.png")+"'/>");
+				}},
+				new ListGridField("Name") {{
+					setWidth("*");
+				}},
+				new ListGridField("Size") {{
+					setAutoFitWidth(true);
+					setCellFormatter((value,record,rowNum,colNum)->{
+						return ((int)value)<0?"":readableFileSize((int)value);
+					});
+				}},
+				new ListGridField("Modified") {{
+					setAutoFitWidth(true);
+				}}
+			);
+			setDataProperties(new ResultSet() {{
+				setUseClientFiltering(false);
+				setUseClientSorting(true);
+			}});
 		}
 
 		public String readableFileSize(long size)
@@ -99,6 +220,7 @@ public final class RemoteFileChooser extends Window
 				pb.hide();
 				pb_text.hide();
 				pb_spacer.show();
+				invalidateCache();
 			}
 		}
 		
@@ -120,9 +242,12 @@ public final class RemoteFileChooser extends Window
 		public native void handleFileSelect(JavaScriptObject files) /*-{
 			if(typeof files !== "undefined")
 			{
-				this.initProgress(files.length);
-				for (var i=0, l=files.length; i<l; i++)
-					this.upload_file(i, files[i]);
+				if(files.length > 0)
+				{
+					this.initProgress(files.length);
+					for (var i=0, l=files.length; i<l; i++)
+						this.upload_file(i, files[i]);
+				}
 			}
 			else	// Should never happen since we redirect non compatible browser to the "classic" interface
 				$wnd.isc.warn("No support for the File API in this web browser");
@@ -168,6 +293,16 @@ public final class RemoteFileChooser extends Window
 				data.status = infos.status;
 				data.extstatus = infos.extstatus;
 				self.upload_result(data,data.fsize);
+				if(data.status==0)
+				{
+					data.xhr.open("put", "/upload/?", true);
+					data.xhr.setRequestHeader("X-File-Name", encodeURIComponent(file.filepath?file.filepath:(file.name?file.name:file.fileName)));
+					data.xhr.setRequestHeader("X-File-Parent", encodeURIComponent(self.getParentPath()));
+					data.xhr.setRequestHeader("X-File-Size", file.size?file.size:file.fileSize);
+					data.xhr.setRequestHeader("X-File-Type", file.type);
+					self.upload_result(data);
+					data.xhr.send(file);
+				}
 			}, false);
 
 			data.xhr.addEventListener("error", function(evt)
@@ -184,24 +319,14 @@ public final class RemoteFileChooser extends Window
 				self.upload_result(data);
 			}, false);  
 			
-			data.xhr.open("post", "/upload/?init=1", false);
-			data.xhr.setRequestHeader("X-File-Name", file.filepath?file.filepath:encodeURIComponent(file.name?file.name:file.fileName));
-			data.xhr.setRequestHeader("X-File-Parent", self.getParentPath());
+			data.xhr.open("post", "/upload/?init=1", true);
+			data.xhr.setRequestHeader("X-File-Name", encodeURIComponent(file.filepath?file.filepath:(file.name?file.name:file.fileName)));
+			data.xhr.setRequestHeader("X-File-Parent", encodeURIComponent(self.getParentPath()));
 			data.xhr.setRequestHeader("X-File-Size", file.size);
 			data.xhr.setRequestHeader("X-File-Type", file.type);
 			self.upload_result(data);
 			data.xhr.send();
 
-			if(data.status==0)
-			{
-				data.xhr.open("put", "/upload/?", true);
-				data.xhr.setRequestHeader("X-File-Name", file.filepath?file.filepath:encodeURIComponent(file.name?file.name:file.fileName));
-				data.xhr.setRequestHeader("X-File-Parent", self.getParentPath());
-				data.xhr.setRequestHeader("X-File-Size", file.size?file.size:file.fileSize);
-				data.xhr.setRequestHeader("X-File-Type", file.type);
-				self.upload_result(data);
-				data.xhr.send(file);
-			}
 		}-*/;
 
 		@JsMethod
@@ -257,6 +382,11 @@ public final class RemoteFileChooser extends Window
 				isMultiple = true;
 				isChoose = true;
 				break;
+			case "manageUploads":
+				isDir = false;
+				isMultiple = true;
+				isChoose = false;
+				break;
 			default:
 				isDir = false;
 				isMultiple = false;
@@ -265,7 +395,9 @@ public final class RemoteFileChooser extends Window
 		}
 		setAutoCenter(true);
 		setIsModal(true);
-		if(isMultiple)
+		if(!isChoose)
+			setTitle(isDir?"Manage directories":"Manage files");
+		else if(isMultiple)
 			setTitle(isDir?"Choose directories":"Choose files");
 		else
 			setTitle(isDir?"Choose a directory":"Choose a file");
@@ -314,84 +446,7 @@ public final class RemoteFileChooser extends Window
 					}}
 				);
 			}});
-			setDetailPane(list=new UploadList() {{
-				setID("UploadList");
-				setShowFilterEditor(false);
-				setShowHover(true);
-				setCanHover(true);
-				setHoverWidth(200);
-				setAutoFetchData(true);
-				setSelectionType(isMultiple?SelectionStyle.MULTIPLE:SelectionStyle.SINGLE);
-				addRecordClickHandler(event->{
-				});
-				setInitialSort(new SortSpecifier("isDir", SortDirection.DESCENDING),new SortSpecifier("Name", SortDirection.ASCENDING));
-				addRecordDoubleClickHandler(event->{
-					ListGridRecord record = event.getRecord();
-					String path = record.getAttribute("Path");
-					if(record.getAttributeAsBoolean("isDir"))
-					{
-						getDataSource().setRequestProperties(new DSRequest() {{
-							Map<String,String> params = new HashMap<>();
-							params.put("context", context);
-							params.put("parent", path);
-							//setParams(params);
-							setData(params);
-						}});
-						invalidateCache();
-					}
-					else
-					{
-						cb.apply(new String[] {path});
-						RemoteFileChooser.this.markForDestroy();
-					}
-				});
-				setDataSource(new RestDataSource() {
-					{
-						setID("remoteFileChooser");
-						setDataURL("/datasources/"+getID());
-						setRequestProperties(new DSRequest() {{setData(Collections.singletonMap("context", context));}});
-						setDataFormat(DSDataFormat.XML);
-						setOperationBindings(
-							new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}}
-						);
-						DataSourceTextField nameField = new DataSourceTextField("Name");
-						DataSourceTextField pathField = new DataSourceTextField("Path");
-						pathField.setHidden(true);
-						pathField.setPrimaryKey(true);
-						DataSourceBooleanField isDir = new DataSourceBooleanField("isDir");
-						DataSourceIntegerField sizefield = new DataSourceIntegerField("Size");
-						DataSourceDateTimeField modifiedfield = new DataSourceDateTimeField("Modified") {{
-							setDatetimeFormatter(DateDisplayFormat.TOSERIALIZEABLEDATE);
-						}};
-						setFields(isDir, nameField, pathField, sizefield, modifiedfield);
-					}
-					@Override
-					protected void transformResponse(DSResponse dsResponse, DSRequest dsRequest, Object data) {
-						parent.setContents(XMLTools.selectString(data, "/response/parent"));
-						super.transformResponse(dsResponse, dsRequest, data);
-					};
-				});
-				setFields(
-					new ListGridField("isDir") {{
-						setWidth(20);
-						setMaxWidth(20);
-						setCellFormatter((value,record,rowNum,colNum)->"<img src='/images/icons/"+((boolean)value?"folder.png":"page.png")+"'/>");
-					}},
-					new ListGridField("Name") {{
-						setWidth("*");
-					}},
-					new ListGridField("Size") {{
-						setAutoFitWidth(true);
-						setCellFormatter((value,record,rowNum,colNum)->{
-							return ((int)value)<0?"":readableFileSize((int)value);
-						});
-					}},
-					new ListGridField("Modified") {{
-						setAutoFitWidth(true);
-					}}
-				);
-				setDataProperties(new ResultSet() {{setUseClientFiltering(false);this.setUseClientSorting(true);}});
-			}});
+			setDetailPane(list=new UploadList(context,cb));
 			setDetailToolButtons(parent=new Label("parent") {{
 				setWidth100();
 				setBorder("1px inset");
@@ -405,44 +460,47 @@ public final class RemoteFileChooser extends Window
 			setPadding(3);
 			setMembersMargin(3);
 			setWidth100();
-			setMembers(
-				new IButton("Cancel") {{
-					setAutoFit(true);
-					addClickHandler(e->RemoteFileChooser.this.markForDestroy());
-				}},
-				pb_spacer = new LayoutSpacer("*","20"),
-				pb = new Progressbar() {{
-					setLength("*");
-					setBreadth(10);
-					setLayoutAlign(VerticalAlignment.CENTER);
-					hide();
-				}},
-				pb_text = new Label() {{
-					setWidth(25);
-					setAlign(Alignment.CENTER);
-					setLayoutAlign(VerticalAlignment.CENTER);
-					hide();
-				}},
-				new IButton("Choose") {{
+			addMember(new IButton(isChoose?"Cancel":"Close") {{
+				setAutoFit(true);
+				addClickHandler(e->RemoteFileChooser.this.markForDestroy());
+			}});
+			addMember(pb_spacer = new LayoutSpacer("*","20"));
+			addMember(pb = new Progressbar() {{
+				setLength("*");
+				setBreadth(10);
+				setLayoutAlign(VerticalAlignment.CENTER);
+				hide();
+			}});
+			addMember(pb_text = new Label() {{
+				setWidth(25);
+				setAlign(Alignment.CENTER);
+				setLayoutAlign(VerticalAlignment.CENTER);
+				hide();
+			}});
+			if(isChoose)
+			{
+				addMember(new IButton("Choose") {{
 					setAutoFit(true);
 					addClickHandler(e->{
 						ListGridRecord[] records =  list.getSelectedRecords();
 						if(records.length>0)
 						{
-							cb.apply(Stream.of(records).map(record->record.getAttribute("Path")).collect(Collectors.toList()).toArray(new String[0]));
+							if(cb != null)
+								cb.apply(Stream.of(records).map(record->record.getAttribute("Path")).collect(Collectors.toList()).toArray(new String[0]));
 							RemoteFileChooser.this.markForDestroy();
 						}
 						else if(isDir)
 						{
 							String path = parent.getContents();
-							cb.apply(new String[] {path});
+							if(cb != null)
+								cb.apply(new String[] {path});
 							RemoteFileChooser.this.markForDestroy();
 						}
 					});
-				}}
-			);
+				}});
+			}
 		}});
-		initUpload();
+		initUpload(!isChoose);
 		show();
 	}
 	
@@ -473,11 +531,11 @@ public final class RemoteFileChooser extends Window
 									entriesPromises.push(traverseFileTreePromise(entries[idx], path + item.name + "/"));
 								readEntries();
 							}
+							else
+								resolve(Promise.all(entriesPromises));
 						});
 					};
 					readEntries();
-					console.log(entriesPromises.length);
-					resolve(Promise.all(entriesPromises));
 				}
 			});
 		}
@@ -494,85 +552,100 @@ public final class RemoteFileChooser extends Window
 		});
 	}-*/;
 	
-	private static native void initUpload() /*-{
+	private static native void initUpload(boolean init) /*-{
 		if($wnd.File && $wnd.FileReader)
 		{
-			$wnd.c_drop = {
-				isInDropArea : function (target)
-				{
-					if(target)
+			if(init)
+			{
+				if(!$wnd.c_drop) $wnd.c_drop = {
+					isInDropArea : function (target)
 					{
-						if(target.getAttribute)
+						if(target)
 						{
-							var eventproxy = target.getAttribute('eventproxy');
-							if(eventproxy)
-								if(eventproxy=='UploadList')
-									return eventproxy;
+							if(target.getAttribute)
+							{
+								var eventproxy = target.getAttribute('eventproxy');
+								if(eventproxy)
+									if(eventproxy=='UploadList')
+										return eventproxy;
+							}
+							return this.isInDropArea(target.parentNode);
 						}
-						return this.isInDropArea(target.parentNode);
-					}
-					return false;
-				},
-				elt:null
-			};
-			
-			$doc.addEventListener("dragenter", function (evt)
-			{
-				var eventproxy = $wnd.c_drop.isInDropArea(evt.target);
-				if(eventproxy)
-				{
-					if($wnd.c_drop.elt && $wnd.c_drop.elt!=$wnd[eventproxy])
-						$wnd.c_drop.elt.setBorder("2px solid lightgrey");
-					$wnd.c_drop.elt = $wnd[eventproxy];
-					$wnd.c_drop.elt.setBorder("2px solid #55FF55");
-					evt.preventDefault();
-					evt.stopPropagation();
-				}
-				else if($wnd.c_drop.elt)
-				{
-					$wnd.c_drop.elt.setBorder("2px solid lightgrey");
-					$wnd.c_drop.elt=null;
-				}
-			}, false);
-			
-			$doc.addEventListener("dragleave", function (evt)
-			{
-				if($wnd.c_drop.isInDropArea(evt.target))
-				{
-					evt.preventDefault();
-					evt.stopPropagation();
-				}
-			}, false);
-		
-			$doc.addEventListener("dragover", function (evt)
-			{
-				if($wnd.c_drop.isInDropArea(evt.target))
-				{
-					evt.preventDefault();
-					evt.stopPropagation();
-				}
-			}, false);
-			
-			$doc.addEventListener("drop", function (evt)
-			{
-				if($wnd.c_drop.isInDropArea(evt.target))
-				{
-					if($wnd.c_drop.elt)
+						return false;
+					},
+					dragEnter:function (evt)
 					{
-						$wnd.c_drop.elt.setBorder("2px solid lightgrey");
-						$wnd.c_drop.elt=null;
-					}
-					//$wnd.getUploadList().handleFileSelect(evt.dataTransfer.files);
-					
-					var items = evt.dataTransfer.items;
-					$wnd.getFilesWebkitDataTransferItems(items).then(function(files) {
-						$wnd.getUploadList().handleFileSelect(files);
-					});
-					
-					evt.preventDefault();
-					evt.stopPropagation();
-				}
-			}, false);
+						var eventproxy = $wnd.c_drop.isInDropArea(evt.target);
+						if(eventproxy)
+						{
+							if($wnd.c_drop.elt && $wnd.c_drop.elt!=$wnd[eventproxy])
+								$wnd.c_drop.elt.setBorder("2px solid lightgrey");
+							$wnd.c_drop.elt = $wnd[eventproxy];
+							$wnd.c_drop.elt.setBorder("2px solid #55FF55");
+							evt.preventDefault();
+							evt.stopPropagation();
+						}
+						else if($wnd.c_drop.elt)
+						{
+							$wnd.c_drop.elt.setBorder("2px solid lightgrey");
+							$wnd.c_drop.elt=null;
+						}
+					},
+					dragLeave:function (evt)
+					{
+						if($wnd.c_drop.isInDropArea(evt.target))
+						{
+							evt.preventDefault();
+							evt.stopPropagation();
+						}
+					},
+					dragOver:function (evt)
+					{
+						if($wnd.c_drop.isInDropArea(evt.target))
+						{
+							evt.preventDefault();
+							evt.stopPropagation();
+						}
+					},
+					drop:function (evt)
+					{
+						if($wnd.c_drop.isInDropArea(evt.target))
+						{
+							if($wnd.c_drop.elt)
+							{
+								$wnd.c_drop.elt.setBorder("2px solid lightgrey");
+								$wnd.c_drop.elt=null;
+							}
+							
+							var items = evt.dataTransfer.items;
+							if(items)
+							{
+								$wnd.getFilesWebkitDataTransferItems(items).then(function(files) {
+									$wnd.getUploadList().handleFileSelect(files);
+								});
+							}
+							else
+								$wnd.getUploadList().handleFileSelect(evt.dataTransfer.files);
+								
+							evt.preventDefault();
+							evt.stopPropagation();
+						}
+					},
+					elt:null
+				};
+				
+				$doc.addEventListener("dragenter", $wnd.c_drop.dragEnter, false);
+				$doc.addEventListener("dragleave", $wnd.c_drop.dragLeave, false);
+				$doc.addEventListener("dragover", $wnd.c_drop.dragOver, false);
+				$doc.addEventListener("drop", $wnd.c_drop.drop, false);
+			}
+			else if($wnd.c_drop)
+			{
+				$doc.removeEventListener("dragenter", $wnd.c_drop.dragEnter, false);
+				$doc.removeEventListener("dragleave", $wnd.c_drop.dragLeave, false);
+				$doc.removeEventListener("dragover", $wnd.c_drop.dragOver, false);
+				$doc.removeEventListener("drop", $wnd.c_drop.drop, false);
+			}
 		}
 	}-*/;
 
