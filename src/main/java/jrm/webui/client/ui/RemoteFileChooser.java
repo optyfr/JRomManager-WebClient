@@ -86,12 +86,17 @@ public final class RemoteFileChooser extends Window
 			setAutoFetchData(true);
 			setSelectionType(isMultiple?SelectionStyle.MULTIPLE:SelectionStyle.SINGLE);
 			addEditFailedHandler(event->startEditing(event.getRowNum(),event.getColNum()));
+			addEditCompleteHandler(event->{
+				if(event.getDsResponse().getStatus()==0)
+					if(event.getOldValues()!=null)
+						refreshData((dsResponse, data, dsRequest)->selectSingleRecord(event.getNewValuesAsRecord()));
+			});
 			setContextMenu(new Menu() {{
 				setItems(
 					new MenuItem() {{
 						setTitle("Create dir");
 						addClickHandler(event->{
-							UploadList.this.startEditingNew(new HashMap<String,Object>() {{
+							startEditingNew(new HashMap<String,Object>() {{
 								put("Name","New Folder");
 								put("isDir",true);
 								put("Size",-1);
@@ -99,9 +104,14 @@ public final class RemoteFileChooser extends Window
 						});
 					}},
 					new MenuItem() {{
+						setTitle("Edit selection");
+						addClickHandler(event -> startEditing(getRecordIndex(getSelectedRecord())));
+						setEnableIfCondition((target, menu, item) -> !isChoose && getSelectedRecords().length == 1);
+					}},
+					new MenuItem() {{
 						setTitle("Delete selection");
-						addClickHandler(event -> UploadList.this.removeSelectedData());
-						setEnableIfCondition((target, menu, item) -> !isChoose && UploadList.this.getSelectedRecords().length > 0);
+						addClickHandler(event -> removeSelectedData());
+						setEnableIfCondition((target, menu, item) -> !isChoose && getSelectedRecords().length > 0);
 					}}
 				);
 			}});
