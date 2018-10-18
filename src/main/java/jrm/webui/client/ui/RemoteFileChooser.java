@@ -96,7 +96,7 @@ public final class RemoteFileChooser extends Window
 					new MenuItem() {{
 						setTitle("Create dir");
 						addClickHandler(event->{
-							startEditingNew(new HashMap<String,Object>() {{
+							UploadList.this.startEditingNew(new HashMap<String,Object>() {{
 								put("Name","New Folder");
 								put("isDir",true);
 								put("Size",-1);
@@ -105,13 +105,13 @@ public final class RemoteFileChooser extends Window
 					}},
 					new MenuItem() {{
 						setTitle("Edit selection");
-						addClickHandler(event -> startEditing(getRecordIndex(getSelectedRecord())));
-						setEnableIfCondition((target, menu, item) -> !isChoose && getSelectedRecords().length == 1);
+						addClickHandler(event -> UploadList.this.startEditing(UploadList.this.getRecordIndex(UploadList.this.getSelectedRecord())));
+						setEnableIfCondition((target, menu, item) -> !isChoose && UploadList.this.getSelectedRecords().length == 1);
 					}},
 					new MenuItem() {{
 						setTitle("Delete selection");
-						addClickHandler(event -> removeSelectedData());
-						setEnableIfCondition((target, menu, item) -> !isChoose && getSelectedRecords().length > 0);
+						addClickHandler(event -> UploadList.this.removeSelectedData());
+						setEnableIfCondition((target, menu, item) -> !isChoose && UploadList.this.getSelectedRecords().length > 0);
 					}}
 				);
 			}});
