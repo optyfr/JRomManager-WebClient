@@ -18,6 +18,7 @@ public final class ScannerPanel extends VLayout
 	ScannerDirPanel scannerDirPanel;
 	ScannerSettingsPanel scannerSettingsPanel;
 	ScannerFiltersPanel scannerFiltersPanel;
+	ScannerAdvFiltersPanel scannerAdvFiltersPanel;
 
 	public ScannerPanel()
 	{
@@ -91,10 +92,7 @@ public final class ScannerPanel extends VLayout
 					}},
 					new Tab() {{
 						setTitle(Client.session.getMsg("MainFrame.AdvFilters"));
-						setPane(new VLayout() {{
-							setWidth100();
-							setHeight100();
-						}});
+						setPane(scannerAdvFiltersPanel = new ScannerAdvFiltersPanel());
 					}}
 				);
 			}}
