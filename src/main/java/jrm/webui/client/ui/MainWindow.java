@@ -13,6 +13,7 @@ import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
 
 import jrm.webui.client.Client;
+import jrm.webui.client.protocol.A_CatVer;
 import jrm.webui.client.protocol.A_Profile;
 import jrm.webui.client.protocol.A_Progress;
 import jrm.webui.client.utils.EnhJSO;
@@ -172,5 +173,11 @@ public class MainWindow extends Window
 	public void update(A_Progress.SetProgress2 params)
 	{
 		progress.setProgress2(params.getMsg(), params.getVal(), params.getMax());
+	}
+	
+	public void update(A_CatVer.Loaded params)
+	{
+		scannerPanel.scannerAdvFiltersPanel.catver_path.setValue(params.getPath());
+		scannerPanel.scannerAdvFiltersPanel.catver_tree.invalidateCache();
 	}
 }

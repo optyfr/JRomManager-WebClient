@@ -16,10 +16,7 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Window;
 
-import jrm.webui.client.protocol.A_;
-import jrm.webui.client.protocol.A_Profile;
-import jrm.webui.client.protocol.A_Progress;
-import jrm.webui.client.protocol.A_Session;
+import jrm.webui.client.protocol.*;
 import jrm.webui.client.ui.MainWindow;
 
 public class Client implements EntryPoint
@@ -91,6 +88,9 @@ public class Client implements EntryPoint
 												break;
 											case "Profile.loaded":
 												mainwindow.update(new A_Profile.Loaded(a));
+												break;
+											case "CatVer.loaded":
+												mainwindow.update(new A_CatVer.Loaded(a));
 												break;
 										}
 									}
