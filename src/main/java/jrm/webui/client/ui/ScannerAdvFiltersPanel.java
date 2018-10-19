@@ -3,6 +3,7 @@ package jrm.webui.client.ui;
 import com.google.gwt.core.client.JsonUtils;
 import com.smartgwt.client.data.OperationBinding;
 import com.smartgwt.client.data.RestDataSource;
+import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 import com.smartgwt.client.types.*;
@@ -34,7 +35,7 @@ public final class ScannerAdvFiltersPanel extends HLayout
 			setMembers(new DynamicForm() {{
 				setCellPadding(0);
 				setNumCols(2);
-				setColWidths("*",24);
+				setColWidths("*",26);
 				setItems(new TextItem() {{
 					setShowTitle(false);
 					setWidth("*");
@@ -54,7 +55,7 @@ public final class ScannerAdvFiltersPanel extends HLayout
 			setMembers(new DynamicForm() {{
 				setCellPadding(0);
 				setNumCols(2);
-				setColWidths("*",24);
+				setColWidths("*",26);
 				setItems(
 					catver_path = new TextItem() {{
 						setShowTitle(false);
@@ -74,6 +75,7 @@ public final class ScannerAdvFiltersPanel extends HLayout
 				setSelectionAppearance(SelectionAppearance.CHECKBOX);
 				setShowSelectedStyle(false);
 				setShowPartialSelection(true);
+				setShowConnectors(true);
 				setCascadeSelection(true);
 				setAutoFetchData(true);
 				setDataProperties(new Tree() {{
@@ -83,9 +85,12 @@ public final class ScannerAdvFiltersPanel extends HLayout
 					setIdField("ID");
 					setParentIdField("ParentID");
 					setOpenProperty("isOpen");
-					setSelectionProperty("isSelected");
+					setIsFolderProperty("isFolder");
 				}});
-				addSelectionChangedHandler(event->Client.socket.send(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty(event.getRecord().getAttribute("ID"), event.getState()))));
+				setSelectionProperty("isSelected");
+				setNodeIcon(null);
+				setFolderIcon(null);
+				addSelectionChangedHandler(event -> Client.socket.send(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty(event.getRecord().getAttribute("ID"), !isPartiallySelected(event.getRecord()) && event.getState()))));
 				setDataSource(new RestDataSource() {{
 					setID("CatVer");
 					setDataURL("/datasources/"+getID());
@@ -97,7 +102,9 @@ public final class ScannerAdvFiltersPanel extends HLayout
 						new DataSourceTextField("Name"),
 						new DataSourceTextField("ID") {{setPrimaryKey(true);}},
 						new DataSourceTextField("ParentID") {{setForeignKey("ID");setRootValue(1);}},
-//						new DataSourceBooleanField("isOpen"),
+						new DataSourceBooleanField("isOpen") {{setHidden(true);}},
+						new DataSourceBooleanField("isSelected") {{setHidden(true);}},
+						new DataSourceBooleanField("isFolder") {{setHidden(true);}},
 						new DataSourceIntegerField("Cnt") {{setHidden(true);}}
 					);
 				}});
