@@ -14,6 +14,7 @@ import com.smartgwt.client.widgets.tab.TabSet;
 
 import jrm.webui.client.Client;
 import jrm.webui.client.protocol.A_CatVer;
+import jrm.webui.client.protocol.A_NPlayers;
 import jrm.webui.client.protocol.A_Profile;
 import jrm.webui.client.protocol.A_Progress;
 import jrm.webui.client.utils.EnhJSO;
@@ -179,5 +180,11 @@ public class MainWindow extends Window
 	{
 		scannerPanel.scannerAdvFiltersPanel.catver_path.setValue(params.getPath());
 		scannerPanel.scannerAdvFiltersPanel.catver_tree.invalidateCache();
+	}
+	
+	public void update(A_NPlayers.Loaded params)
+	{
+		scannerPanel.scannerAdvFiltersPanel.nplayers_path.setValue(params.getPath());
+		scannerPanel.scannerAdvFiltersPanel.nplayers_list.invalidateCache();
 	}
 }

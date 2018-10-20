@@ -32,6 +32,7 @@ public final class ScannerPanel extends VLayout
 						setAutoFit(true);
 						setTitle(Client.session.getMsg("MainFrame.btnInfo.text"));
 						setIcon("icons/information.png");
+						addClickHandler(event->new ProfileViewer());
 					}}
 				);
 				addButton(

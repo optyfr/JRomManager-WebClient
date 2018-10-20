@@ -92,6 +92,9 @@ public class Client implements EntryPoint
 											case "CatVer.loaded":
 												mainwindow.update(new A_CatVer.Loaded(a));
 												break;
+											case "NPlayers.loaded":
+												mainwindow.update(new A_NPlayers.Loaded(a));
+												break;
 										}
 									}
 									catch(Exception e)
