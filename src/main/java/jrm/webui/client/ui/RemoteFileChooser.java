@@ -27,6 +27,7 @@ import com.smartgwt.client.widgets.layout.SplitPane;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 
+import jrm.webui.client.Client;
 import jsinterop.annotations.JsMethod;
 import jsinterop.annotations.JsPackage;
 
@@ -373,6 +374,7 @@ public final class RemoteFileChooser extends Window
 	public RemoteFileChooser(String context, CallBack cb)
 	{
 		super();
+		Client.childWindows.remove(this);
 		setWidth(600);
 		setHeight(500);
 		final boolean isDir, isMultiple, isChoose;
@@ -665,4 +667,11 @@ public final class RemoteFileChooser extends Window
 		return list;
 	}
 
+	@Override
+	protected void onDestroy()
+	{
+		Client.childWindows.remove(this);
+		super.onDestroy();
+	}
+	
 }
