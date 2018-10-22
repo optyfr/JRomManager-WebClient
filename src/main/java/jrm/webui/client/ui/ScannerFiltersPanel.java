@@ -21,6 +21,7 @@ import jrm.webui.client.protocol.Q_Profile;
 public final class ScannerFiltersPanel extends HLayout
 {
 	ListGrid systems;
+	private boolean canResetPV = true;
 	
 	public ScannerFiltersPanel()
 	{
@@ -43,21 +44,20 @@ public final class ScannerFiltersPanel extends HLayout
 				setCanRemoveRecords(false);
 				addSelectionChangedHandler(event->{
 					Client.socket.send(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty(event.getRecord().getAttribute("property"), event.getState())));
-					if(Client.mainwindow.scannerPanel.profileViewer!=null && Client.childWindows.contains(Client.mainwindow.scannerPanel.profileViewer))
-						Client.mainwindow.scannerPanel.profileViewer.anywareListList.reset();
+					resetProfileViewer();
 				});
 				setContextMenu(new Menu() {{
 					addItem(new MenuItem() {{
 						setTitle(Client.session.getMsg("MainFrame.mnSelect.text"));
 						this.setSubmenu(new Menu() {{
 							addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmSelectAll.text")) {{
-								addClickHandler(event->systems.selectAllRecords());
+								addClickHandler(event->resetProfileViewer(()->systems.selectAllRecords()));
 							}});
 							addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmAllBios.text")) {{
-								addClickHandler(event->systems.selectRecords(Stream.of(systems.getRecords()).filter(r->r.getAttribute("type").equals("BIOS")).collect(Collectors.toList()).toArray(new ListGridRecord[0])));
+								addClickHandler(event->resetProfileViewer(()->systems.selectRecords(Stream.of(systems.getRecords()).filter(r->r.getAttribute("type").equals("BIOS")).collect(Collectors.toList()).toArray(new ListGridRecord[0]))));
 							}});
 							addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmAllSoftwares.text")) {{
-								addClickHandler(event->systems.selectRecords(Stream.of(systems.getRecords()).filter(r->r.getAttribute("type").equals("SOFTWARELIST")).collect(Collectors.toList()).toArray(new ListGridRecord[0])));
+								addClickHandler(event->resetProfileViewer(()->systems.selectRecords(Stream.of(systems.getRecords()).filter(r->r.getAttribute("type").equals("SOFTWARELIST")).collect(Collectors.toList()).toArray(new ListGridRecord[0]))));
 							}});
 						}});
 					}});
@@ -65,27 +65,47 @@ public final class ScannerFiltersPanel extends HLayout
 						setTitle(Client.session.getMsg("MainFrame.mnUnselect.text"));
 						this.setSubmenu(new Menu() {{
 							addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmSelectNone.text")) {{
-								addClickHandler(event->systems.deselectAllRecords());
+								addClickHandler(event->resetProfileViewer(()->systems.deselectAllRecords()));
 							}});
 							addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmAllBios.text")) {{
-								addClickHandler(event->systems.deselectRecords(Stream.of(systems.getRecords()).filter(r->r.getAttribute("type").equals("BIOS")).collect(Collectors.toList()).toArray(new ListGridRecord[0])));
+								addClickHandler(event->resetProfileViewer(()->systems.deselectRecords(Stream.of(systems.getRecords()).filter(r->r.getAttribute("type").equals("BIOS")).collect(Collectors.toList()).toArray(new ListGridRecord[0]))));
 							}});
 							addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmAllSoftwares.text")) {{
-								addClickHandler(event->systems.deselectRecords(Stream.of(systems.getRecords()).filter(r->r.getAttribute("type").equals("SOFTWARELIST")).collect(Collectors.toList()).toArray(new ListGridRecord[0])));
+								addClickHandler(event->resetProfileViewer(()->systems.deselectRecords(Stream.of(systems.getRecords()).filter(r->r.getAttribute("type").equals("SOFTWARELIST")).collect(Collectors.toList()).toArray(new ListGridRecord[0]))));
 							}});
 						}});
 					}});
 					addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmInvertSelection.text")) {{
-						addClickHandler(event->{
+						addClickHandler(event->resetProfileViewer(()->{
 							ListGridRecord[] to_unselect = systems.getSelectedRecords();
 							List<ListGridRecord> to_unselect_list = Arrays.asList(to_unselect);
 							ListGridRecord[] to_select = Stream.of(systems.getRecords()).filter(r->!to_unselect_list.contains(r)).collect(Collectors.toList()).toArray(new ListGridRecord[0]);
 							systems.deselectRecords(to_unselect);
 							systems.selectRecords(to_select);
-						});
+						}));
 					}});
 				}});
 			}}
 		);
+	}
+	
+	interface resetProfileViewerCB
+	{
+		void apply();
+	}
+	
+	public void resetProfileViewer(resetProfileViewerCB cb)
+	{
+		canResetPV=false;
+		cb.apply();
+		canResetPV=true;
+		resetProfileViewer();
+	}
+	
+	public void resetProfileViewer()
+	{
+		if(canResetPV)
+			if(Client.mainwindow.scannerPanel.profileViewer!=null && Client.childWindows.contains(Client.mainwindow.scannerPanel.profileViewer))
+				Client.mainwindow.scannerPanel.profileViewer.anywareListList.reset();
 	}
 }

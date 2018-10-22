@@ -3,10 +3,20 @@ package jrm.webui.client.ui;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.smartgwt.client.data.*;
+import com.smartgwt.client.data.Criteria;
+import com.smartgwt.client.data.DSRequest;
+import com.smartgwt.client.data.DataSource;
+import com.smartgwt.client.data.OperationBinding;
+import com.smartgwt.client.data.Record;
+import com.smartgwt.client.data.RestDataSource;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
+import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
-import com.smartgwt.client.types.*;
+import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.DSDataFormat;
+import com.smartgwt.client.types.DSOperationType;
+import com.smartgwt.client.types.DSProtocol;
+import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -38,11 +48,14 @@ public class ProfileViewer extends Window
 			super();
 			setCanEdit(false);
 			setCanRemoveRecords(false);
+			setCanHover(true);
+			setHoverAutoFitWidth(true);
+			setHoverAutoFitMaxWidth("50%");
 			setSelectionType(SelectionStyle.SINGLE);
 			addSelectionChangedHandler(event -> {
-				anywareList.reset(event.getRecord(), getDataSource());
+				if(event.getState())
+					anywareList.reset(event.getRecord(), getDataSource());
 			});
-			setDataProperties(new ResultSet() {{setUseClientFiltering(false);}});
 			addDataArrivedHandler(event->{
 				getDataSource().setRequestProperties(new DSRequest());
 				if(getTotalRows()>0 && !anySelected())
@@ -130,8 +143,12 @@ public class ProfileViewer extends Window
 			setSelectionType(SelectionStyle.SINGLE);
 			//setShowRowNumbers(true);
 			//setAutoFetchData(true);
+			setCanHover(true);
+			setHoverAutoFitWidth(true);
+			setHoverAutoFitMaxWidth("50%");
 			addSelectionChangedHandler(event -> {
-				anyware.reset(event.getRecord(), getDataSource());
+				if(event.getState())
+					anyware.reset(event.getRecord(), getDataSource());
 			});
 			addDataArrivedHandler(event->{
 				getDataSource().setRequestProperties(new DSRequest());
@@ -241,20 +258,43 @@ public class ProfileViewer extends Window
 					put("reset","true");
 				}});
 			}});
-			ismachinelist =  "*".equals(record.getAttribute("list"));
-			fetchRelatedData(record, ds);
-			refreshData();
+			ismachinelist =  "*".equals(record.getAttribute("name"));
+			if(willFetchData(new Criteria() {{addCriteria("list", record.getAttribute("name"));}}))
+				fetchRelatedData(record, ds);
+			else
+				refreshData();
 		}
 	}
 	
+	@SuppressWarnings("serial")
 	private class Anyware extends ListGrid
 	{
+		private HashMap<String,String> status_icons = new HashMap<String,String>() {{
+			put("COMPLETE","/images/icons/bullet_green.png");
+			put("MISSING","/images/icons/bullet_red.png");
+			put("UNKNOWN","/images/icons/bullet_black.png");
+		}};
+		private HashMap<String,String> dumpstatus_icons = new HashMap<String,String>() {{
+			put("verified","/images/icons/star.png");
+			put("good","/images/icons/tick.png");
+			put("baddump","/images/icons/delete.png");
+			put("nodump","/images/icons/error.png");
+		}};
+		private HashMap<String,String> type_icons = new HashMap<String,String>() {{
+			put("ROM","/images/rom_small.png");
+			put("DISK","/images/icons/drive.png");
+			put("SAMPLE","/images/icons/sound.png");
+		}};
+		
 		public Anyware()
 		{
 			super();
 			setCanEdit(false);
 			setCanRemoveRecords(false);
 			setSelectionType(SelectionStyle.NONE);
+			setCanHover(true);
+			setHoverAutoFitWidth(true);
+			setHoverAutoFitMaxWidth("50%");
 			addDataArrivedHandler(event->{
 				getDataSource().setRequestProperties(new DSRequest());
 			});
@@ -279,17 +319,79 @@ public class ProfileViewer extends Window
 						}},
 						new DataSourceTextField("name") {{
 							setPrimaryKey(true);
-						}}
+						}},
+						new DataSourceTextField("status"),
+						new DataSourceIntegerField("size"),
+						new DataSourceTextField("crc"),
+						new DataSourceTextField("md5"),
+						new DataSourceTextField("sha1")
 					);
 				}}, 
-				new ListGridField("name") {{
+				new ListGridField("status",Client.session.getMsg("AnywareRenderer.Status"),24) {{
+					setValueIcons(status_icons);
+					setShowValueIconOnly(true);
+					setAlign(Alignment.CENTER);
+					setCanEdit(false);
+				}},
+				new ListGridField("name",Client.session.getMsg("AnywareRenderer.Name")) {{
+					setMinWidth(128);
+					setWidth("*");
+				}},
+				new ListGridField("size",Client.session.getMsg("AnywareRenderer.Size")) {{
+					setMinWidth(48);
 					setAutoFitWidth(true);
+				}},
+				new ListGridField("crc") {{
+					setMinWidth(48);
+					setAutoFitWidth(true);
+					setCellFormatter((value, record, rowNum, colNum)->{
+						if(value!=null)
+							return "<code>"+value+"</code>";
+						return null;
+					});
+				}},
+				new ListGridField("md5") {{
+					setMinWidth(100);
+					setAutoFitWidth(true);
+					setCellFormatter((value, record, rowNum, colNum)->{
+						if(value!=null)
+							return "<code>"+value+"</code>";
+						return null;
+					});
+				}},
+				new ListGridField("sha1") {{
+					setMinWidth(160);
+					setAutoFitWidth(true);
+					setCellFormatter((value, record, rowNum, colNum)->{
+						if(value!=null)
+							return "<code>"+value+"</code>";
+						return null;
+					});
+				}},
+				new ListGridField("merge",Client.session.getMsg("AnywareRenderer.Merge")) {{
+					setMinWidth(128);
+					setAutoFitWidth(true);
+				}},
+				new ListGridField("dumpstatus",Client.session.getMsg("AnywareRenderer.DumpStatus"),24) {{
+					setValueIcons(dumpstatus_icons);
+					setShowValueIconOnly(true);
+					setAlign(Alignment.CENTER);
+					setCanEdit(false);
 				}}
 			);
 		}
-
 		
-		@SuppressWarnings("serial")
+		@Override
+		public String getValueIcon(ListGridField field, Object value, ListGridRecord record)
+		{
+			switch(field.getName())
+			{
+				case "name":
+					return type_icons.get(record.getAttribute("type"));
+			}
+			return super.getValueIcon(field, value, record);
+		};
+
 		public void reset(Record record, DataSource ds)
 		{
 			getDataSource().setRequestProperties(new DSRequest() {{
@@ -297,7 +399,10 @@ public class ProfileViewer extends Window
 					put("reset","true");
 				}});
 			}});
-			fetchRelatedData(record, ds);
+			if(willFetchData(new Criteria() {{addCriteria("list", record.getAttribute("list"));addCriteria("ware", record.getAttribute("name"));}}))
+				fetchRelatedData(record, ds);
+			else
+				refreshData();
 		}
 	}
 	
