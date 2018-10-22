@@ -19,6 +19,7 @@ public final class ScannerPanel extends VLayout
 	ScannerSettingsPanel scannerSettingsPanel;
 	ScannerFiltersPanel scannerFiltersPanel;
 	ScannerAdvFiltersPanel scannerAdvFiltersPanel;
+	ProfileViewer profileViewer;
 
 	public ScannerPanel()
 	{
@@ -32,7 +33,14 @@ public final class ScannerPanel extends VLayout
 						setAutoFit(true);
 						setTitle(Client.session.getMsg("MainFrame.btnInfo.text"));
 						setIcon("icons/information.png");
-						addClickHandler(event->new ProfileViewer());
+						addClickHandler(event->{
+							if(profileViewer==null || !Client.childWindows.contains(profileViewer))
+								profileViewer = new ProfileViewer();
+							else if(profileViewer.isVisible())
+								profileViewer.bringToFront();
+							else
+								profileViewer.show();
+						});
 					}}
 				);
 				addButton(

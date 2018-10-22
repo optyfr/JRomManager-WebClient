@@ -43,6 +43,8 @@ public final class ScannerFiltersPanel extends HLayout
 				setCanRemoveRecords(false);
 				addSelectionChangedHandler(event->{
 					Client.socket.send(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty(event.getRecord().getAttribute("property"), event.getState())));
+					if(Client.mainwindow.scannerPanel.profileViewer!=null && Client.childWindows.contains(Client.mainwindow.scannerPanel.profileViewer))
+						Client.mainwindow.scannerPanel.profileViewer.anywareListList.reset();
 				});
 				setContextMenu(new Menu() {{
 					addItem(new MenuItem() {{
