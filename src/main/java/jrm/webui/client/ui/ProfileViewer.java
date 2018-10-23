@@ -44,6 +44,7 @@ public class ProfileViewer extends Window
 			setHoverAutoFitWidth(true);
 			setHoverAutoFitMaxWidth("50%");
 			setSelectionType(SelectionStyle.SINGLE);
+			setCanSort(false);
 			addSelectionChangedHandler(event -> {
 				if(event.getState())
 					anywareList.reset(event.getRecord(), getDataSource());
@@ -186,6 +187,7 @@ public class ProfileViewer extends Window
 					setShowValueIconOnly(true);
 					setAlign(Alignment.CENTER);
 					setCanEdit(false);
+					setCanFilter(false);
 				}},
 				new ListGridField("name",Client.session.getMsg("MachineListRenderer.Name")) {{
 					setMinWidth(70);
@@ -200,6 +202,8 @@ public class ProfileViewer extends Window
 					setWidth("8%");
 					setAlign(Alignment.CENTER);
 					setCanEdit(false);
+					setCanFilter(false);
+					setCanSort(false);
 				}},
 				new ListGridField("cloneof",Client.session.getMsg("MachineListRenderer.CloneOf")) {{
 					setMinWidth(70);
@@ -221,6 +225,7 @@ public class ProfileViewer extends Window
 				new ListGridField("selected",Client.session.getMsg("MachineListRenderer.Selected"),20) {{
 					setAlign(Alignment.CENTER);
 					setCanToggle(true);
+					setCanSort(false);
 				}}
 			);
 		}
@@ -287,6 +292,7 @@ public class ProfileViewer extends Window
 			setHoverAutoFitWidth(true);
 			setHoverAutoFitMaxWidth("50%");
 			setAlternateRecordStyles(true);
+			setCanSort(false);
 			addDataArrivedHandler(event->{
 				getDataSource().setRequestProperties(new DSRequest());
 			});
