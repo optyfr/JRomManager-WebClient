@@ -3,20 +3,11 @@ package jrm.webui.client.ui;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.smartgwt.client.data.Criteria;
-import com.smartgwt.client.data.DSRequest;
-import com.smartgwt.client.data.DataSource;
-import com.smartgwt.client.data.OperationBinding;
-import com.smartgwt.client.data.Record;
-import com.smartgwt.client.data.RestDataSource;
+import com.smartgwt.client.data.*;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.DSDataFormat;
-import com.smartgwt.client.types.DSOperationType;
-import com.smartgwt.client.types.DSProtocol;
-import com.smartgwt.client.types.SelectionStyle;
+import com.smartgwt.client.types.*;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -24,6 +15,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 import jrm.webui.client.Client;
 
@@ -140,9 +132,8 @@ public class ProfileViewer extends Window
 		{
 			setCanEdit(true);
 			setCanRemoveRecords(false);
+			setShowFilterEditor(true);
 			setSelectionType(SelectionStyle.SINGLE);
-			//setShowRowNumbers(true);
-			//setAutoFetchData(true);
 			setCanHover(true);
 			setHoverAutoFitWidth(true);
 			setHoverAutoFitMaxWidth("50%");
@@ -295,6 +286,7 @@ public class ProfileViewer extends Window
 			setCanHover(true);
 			setHoverAutoFitWidth(true);
 			setHoverAutoFitMaxWidth("50%");
+			setAlternateRecordStyles(true);
 			addDataArrivedHandler(event->{
 				getDataSource().setRequestProperties(new DSRequest());
 			});
@@ -431,19 +423,78 @@ public class ProfileViewer extends Window
 				addMember(new VLayout() {{
 					setWidth("30%");
 					addMember(anywareListList = new AnywareListList());
-					addMember(new ToolStrip() {{}});
+					addMember(new ToolStrip() {{
+						addButton(new ToolStripButton() {{
+							setIcon("/images/disk_multiple_red.png");
+							setActionType(SelectionType.CHECKBOX);
+							setShowFocused(false);
+							setSelected(true);
+							setPrompt(Client.session.getMsg("ProfileViewer.tglbtnMissingWL.toolTipText"));
+						}});
+						addButton(new ToolStripButton() {{
+							setIcon("/images/disk_multiple_orange.png");
+							setActionType(SelectionType.CHECKBOX);
+							setShowFocused(false);
+							setSelected(true);
+							setPrompt(Client.session.getMsg("ProfileViewer.tglbtnPartialWL.toolTipText"));
+						}});
+						addButton(new ToolStripButton() {{
+							setIcon("/images/disk_multiple_green.png");
+							setActionType(SelectionType.CHECKBOX);
+							setShowFocused(false);
+							setSelected(true);
+							setPrompt(Client.session.getMsg("ProfileViewer.tglbtnCompleteWL.toolTipText"));
+						}});
+					}});
 					setShowResizeBar(true);
 				}});
 				addMember(new VLayout() {{
 					addMember(anywareList = new AnywareList());
-					addMember(new ToolStrip() {{}});
+					addMember(new ToolStrip() {{
+						addButton(new ToolStripButton() {{
+							setIcon("/images/folder_closed_red.png");
+							setActionType(SelectionType.CHECKBOX);
+							setShowFocused(false);
+							setSelected(true);
+							setPrompt(Client.session.getMsg("ProfileViewer.tglbtnMissingW.toolTipText"));
+						}});
+						addButton(new ToolStripButton() {{
+							setIcon("/images/folder_closed_orange.png");
+							setActionType(SelectionType.CHECKBOX);
+							setShowFocused(false);
+							setSelected(true);
+							setPrompt(Client.session.getMsg("ProfileViewer.tglbtnPartialW.toolTipText"));
+						}});
+						addButton(new ToolStripButton() {{
+							setIcon("/images/folder_closed_green.png");
+							setActionType(SelectionType.CHECKBOX);
+							setShowFocused(false);
+							setSelected(true);
+							setPrompt(Client.session.getMsg("ProfileViewer.tglbtnCompleteW.toolTipText"));
+						}});
+					}});
 				}});
 				setShowResizeBar(true);
 				setResizeBarTarget("next");
 			}});
 			addMember(new VLayout() {{
 				addMember(anyware = new Anyware());
-				addMember(new ToolStrip() {{}});
+				addMember(new ToolStrip() {{
+					addButton(new ToolStripButton() {{
+						setIcon("/images/icons/bullet_red.png");
+						setActionType(SelectionType.CHECKBOX);
+						setShowFocused(false);
+						setSelected(true);
+						setPrompt(Client.session.getMsg("ProfileViewer.tglbtnBad.toolTipText"));
+					}});
+					addButton(new ToolStripButton() {{
+						setIcon("/images/icons/bullet_green.png");
+						setActionType(SelectionType.CHECKBOX);
+						setShowFocused(false);
+						setSelected(true);
+						setPrompt(Client.session.getMsg("ProfileViewer.tglbtnOK.toolTipText"));
+					}});
+				}});
 			}});
 		}});
 		show();
