@@ -54,4 +54,31 @@ public class A_Profile extends A_
 	}
 
 	
+	public static class Scanned extends A_
+	{
+		private EnhJSO params;
+		
+		public Scanned(final A_ a)
+		{
+			this(a.response);
+		}
+		
+		public Scanned(final EnhJSO response)
+		{
+			super(response);
+			params = response.getJSO("params");
+		}
+		
+		final public boolean getSuccess()
+		{
+			return params.getBool("success");
+		}
+		
+		final public Integer getActions()
+		{
+			return params.getInteger("actions");
+		}
+	}
+
+	
 }

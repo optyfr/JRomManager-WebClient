@@ -14,6 +14,8 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.menu.Menu;
+import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -129,6 +131,8 @@ public class ProfileViewer extends Window
 		}};
 		private boolean ismachinelist=false;
 		
+		private Integer to_select = null;
+		
 		public AnywareList()
 		{
 			setCanEdit(true);
@@ -138,15 +142,73 @@ public class ProfileViewer extends Window
 			setCanHover(true);
 			setHoverAutoFitWidth(true);
 			setHoverAutoFitMaxWidth("50%");
+			setContextMenu(new Menu() {{
+				setItems(
+					new MenuItem(Client.session.getMsg("ProfileViewer.mntmCollectKeywords.text")) {{
+						
+					}},
+					new MenuItem(Client.session.getMsg("ProfileViewer.mntmSelectNone.text")) {{
+						addClickHandler(event->AnywareList.this.getDataSource().performCustomOperation("selectNone", new Record(AnywareList.this.getCriteria().getValues()), (dsResponse, data, dsRequest)->AnywareList.this.refreshData()));
+					}},
+					new MenuItem(Client.session.getMsg("ProfileViewer.mntmSelectAll.text")) {{
+						addClickHandler(event->AnywareList.this.getDataSource().performCustomOperation("selectAll", new Record(AnywareList.this.getCriteria().getValues()), (dsResponse, data, dsRequest)->AnywareList.this.refreshData()));
+					}},
+					new MenuItem(Client.session.getMsg("ProfileViewer.mntmSelectInvert.text")) {{
+						addClickHandler(event->AnywareList.this.getDataSource().performCustomOperation("selectInvert", new Record(AnywareList.this.getCriteria().getValues()), (dsResponse, data, dsRequest)->AnywareList.this.refreshData()));
+					}}
+				);
+			}});
 			addSelectionChangedHandler(event -> {
 				if(event.getState())
 					anyware.reset(event.getRecord(), getDataSource());
 			});
 			addDataArrivedHandler(event->{
 				getDataSource().setRequestProperties(new DSRequest());
-				if(getTotalRows()>0 && !anySelected())
-					selectSingleRecord(0);
+				if(getTotalRows()>0)
+				{
+					if(to_select!=null)
+					{
+						selectSingleRecord(to_select);
+						to_select=null;
+					}
+					else if(!anySelected())
+						selectSingleRecord(0);
+				}
 				refreshFields();
+			});
+			addCellDoubleClickHandler(event->{
+				ListGridField field = getField(event.getColNum());
+				DSCallback cb = new DSCallback() {
+					@Override
+					public void execute(DSResponse dsResponse, Object data, DSRequest dsRequest)
+					{
+						try
+						{
+							Integer idx = Integer.valueOf(dsResponse.getAttribute("found"));
+							if(idx!=null)
+							{
+								Record record = getRecordList().get(idx);
+								if(record==null || record.getAttribute("name")==null)
+									to_select = idx;
+								else
+									selectSingleRecord(idx);
+								scrollToRow(idx);
+							}
+						}
+						catch(NumberFormatException e)
+						{
+							e.printStackTrace();
+						}
+					}
+				};
+				if(field.getName().equals("cloneof"))
+					getDataSource().performCustomOperation("find", new Record(getCriteria().getValues()) {{
+						setAttribute("find", event.getRecord().getAttribute("cloneof"));
+					}}, cb);
+				else if(field.getName().equals("romof"))
+					getDataSource().performCustomOperation("find", new Record(getCriteria().getValues()) {{
+						setAttribute("find", event.getRecord().getAttribute("romof"));
+					}}, cb);
 			});
 			setDataSource(
 				new RestDataSource()
@@ -157,7 +219,8 @@ public class ProfileViewer extends Window
 						setDataFormat(DSDataFormat.XML);
 						setOperationBindings(
 							new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}},
-							new OperationBinding(){{setOperationType(DSOperationType.UPDATE);setDataProtocol(DSProtocol.POSTXML);}}
+							new OperationBinding(){{setOperationType(DSOperationType.UPDATE);setDataProtocol(DSProtocol.POSTXML);}},
+							new OperationBinding(){{setOperationType(DSOperationType.CUSTOM);setDataProtocol(DSProtocol.POSTXML);}}
 						);
 						setFields(
 							new DataSourceTextField("status"),
@@ -180,6 +243,14 @@ public class ProfileViewer extends Window
 							new DataSourceTextField("sampleof_status"),
 							new DataSourceBooleanField("selected")
 						);
+					}
+					
+					@Override
+					protected void transformResponse(DSResponse dsResponse, DSRequest dsRequest, Object data)
+					{
+						if(dsResponse.getStatus()==0)
+							dsResponse.setAttribute("found", XMLTools.selectString(data, "/response/found"));
+						super.transformResponse(dsResponse, dsRequest, data);
 					}
 				}, 
 				new ListGridField("status",Client.session.getMsg("MachineListRenderer.Status"),24) {{
@@ -262,8 +333,7 @@ public class ProfileViewer extends Window
 		}
 	}
 	
-	@SuppressWarnings("serial")
-	private class Anyware extends ListGrid
+	@SuppressWarnings("serial") class Anyware extends ListGrid
 	{
 		private HashMap<String,String> status_icons = new HashMap<String,String>() {{
 			put("COMPLETE","/images/icons/bullet_green.png");
@@ -293,6 +363,7 @@ public class ProfileViewer extends Window
 			setHoverAutoFitMaxWidth("50%");
 			setAlternateRecordStyles(true);
 			setCanSort(false);
+			setContextMenu(new Menu());
 			addDataArrivedHandler(event->{
 				getDataSource().setRequestProperties(new DSRequest());
 			});

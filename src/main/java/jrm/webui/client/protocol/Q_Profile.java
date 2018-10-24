@@ -26,6 +26,19 @@ public class Q_Profile extends Q_
 		}
 	}
 	
+	public static class Scan extends Q_
+	{
+		protected Scan()
+		{
+			super();
+		}
+		
+		final public static Scan instantiate()
+		{
+			return Q_.instantiateCmd("Profile.scan").cast();
+		}
+	}
+	
 	public static class SetProperty extends Q_
 	{
 		protected SetProperty()

@@ -147,7 +147,10 @@ public class MainWindow extends Window
 		if(progress==null)
 			progress = new Progress();
 		else
+		{
+			progress.clearInfos();
 			progress.show();
+		}
 	}
 
 	
@@ -186,5 +189,19 @@ public class MainWindow extends Window
 	{
 		scannerPanel.scannerAdvFiltersPanel.nplayers_path.setValue(params.getPath());
 		scannerPanel.scannerAdvFiltersPanel.nplayers_list.invalidateCache();
+	}
+
+	public void update(A_Profile.Scanned params)
+	{
+		if(params.getSuccess())
+		{
+			scannerPanel.btnFix.setDisabled(params.getActions()==null || params.getActions()==0);
+			if(Client.mainwindow.scannerPanel.profileViewer!=null && Client.childWindows.contains(Client.mainwindow.scannerPanel.profileViewer))
+			{
+				Client.mainwindow.scannerPanel.profileViewer.anywareListList.refreshData();
+				Client.mainwindow.scannerPanel.profileViewer.anywareList.refreshData();
+				Client.mainwindow.scannerPanel.profileViewer.anyware.refreshData();
+			}
+		}
 	}
 }

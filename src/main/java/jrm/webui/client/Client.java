@@ -89,6 +89,9 @@ public class Client implements EntryPoint
 											case "Profile.loaded":
 												mainwindow.update(new A_Profile.Loaded(a));
 												break;
+											case "Profile.scanned":
+												mainwindow.update(new A_Profile.Scanned(a));
+												break;
 											case "CatVer.loaded":
 												mainwindow.update(new A_CatVer.Loaded(a));
 												break;

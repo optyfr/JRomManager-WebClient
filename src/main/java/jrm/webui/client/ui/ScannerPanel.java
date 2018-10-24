@@ -1,5 +1,6 @@
 package jrm.webui.client.ui;
 
+import com.google.gwt.core.client.JsonUtils;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.LayoutSpacer;
@@ -10,6 +11,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 import jrm.webui.client.Client;
+import jrm.webui.client.protocol.Q_Profile;
 
 public final class ScannerPanel extends VLayout
 {
@@ -48,6 +50,9 @@ public final class ScannerPanel extends VLayout
 						setAutoFit(true);
 						setTitle(Client.session.getMsg("MainFrame.btnScan.text"));
 						setIcon("icons/magnifier.png");
+						addClickHandler(event->{
+							Client.socket.send(JsonUtils.stringify(Q_Profile.Scan.instantiate()));
+						});
 					}}
 				);
 				addButton(

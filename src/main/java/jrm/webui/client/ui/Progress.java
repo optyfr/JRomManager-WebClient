@@ -3,6 +3,7 @@ package jrm.webui.client.ui;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gwt.core.client.JsonUtils;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.VerticalAlignment;
@@ -18,6 +19,7 @@ import com.smartgwt.client.widgets.layout.LayoutSpacer;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 import jrm.webui.client.Client;
+import jrm.webui.client.protocol.Q_Progress;
 
 public class Progress extends Window
 {
@@ -31,6 +33,7 @@ public class Progress extends Window
 	
 	/** The progress bar. */
 	private final Progressbar progressBar;
+	private final Label progressBarLabel;
 	
 	/** The lbl timeleft. */
 	private final Label lblTimeleft;
@@ -46,6 +49,8 @@ public class Progress extends Window
 
 	/** The progress bar 2. */
 	private final Progressbar progressBar2;
+	private final Label progressBarLabel2;
+	
 	
 	/** The lbl time left 2. */
 	private final Label lblTimeLeft2;
@@ -57,7 +62,7 @@ public class Progress extends Window
 		setIsModal(true);
 		setShowModalMask(true);
 		setWidth(500);
-		setHeight(20);
+		setHeight(100);
 		setOverflow(Overflow.VISIBLE);
 		setBackgroundColor("#EEEEEE");
 		setCanDragResize(true);
@@ -81,22 +86,24 @@ public class Progress extends Window
 
 
 		progressBar = new Progressbar() {{setLength("100%");}};
-		lblTimeleft = new Label("<code>--:--:-- / --:--:--</code>") {{
+		lblTimeleft = new Label("<code>--:--:--/--:--:--</code>") {{
 			setWidth("*");
 			setWrap(false);
 			setHeight(20);
 			setValign(VerticalAlignment.CENTER);
 			setAlign(Alignment.CENTER);
 		}};
+		progressBar.addChild(progressBarLabel=new Label() {{setWidth100();setAlign(Alignment.CENTER);}}, "label", true);
 
 		progressBar2 = new Progressbar() {{setLength("100%");}};
-		lblTimeLeft2 = new Label("<code>--:--:-- / --:--:--</code>") {{
+		lblTimeLeft2 = new Label("<code>--:--:--/--:--:--</code>") {{
 			setWidth("*");
 			setWrap(false);
 			setHeight(20);
 			setValign(VerticalAlignment.CENTER);
 			setAlign(Alignment.CENTER);
 		}};
+		progressBar2.addChild(progressBarLabel2=new Label() {{setWidth100();setAlign(Alignment.CENTER);}}, "label", true);
 
 		btnCancel = new IButton("Cancel") {{
 			setPadding(2);
@@ -113,12 +120,12 @@ public class Progress extends Window
 
 		addItem(new VLayout() {{
 			setWidth100();
-			setHeight(20);
+			setHeight("*");
 			setLayoutMargin(2);
 			setMembersMargin(2);
 			addMembers(
 				panel,
-				new LayoutSpacer("*", "*"),
+				new LayoutSpacer("*", "100%"),
 				new HLayout() {{
 					setWidth100();
 					setHeight(10);
@@ -141,7 +148,6 @@ public class Progress extends Window
 			);
 		}});
 		
-		setAutoSize(true);
 		centerInPage();
 		show();
 	}
@@ -206,14 +212,14 @@ public class Progress extends Window
 				progressBar.setVisible(false);
 				lblTimeleft.setVisible(false);
 //				reflowNow();
-//				packHeight();
+				packHeight();
 			}
 			else if (val > 0 && !progressBar.isVisible())
 			{
 				progressBar.setVisible(true);
 				lblTimeleft.setVisible(true);
 //				reflowNow();
-//				packHeight();
+				packHeight();
 			}
 //			progressBar.setStringPainted(true);
 			if (max != null)
@@ -222,7 +228,10 @@ public class Progress extends Window
 			{
 				int percent = (pb_val = val) * 100 / pb_max;
 				if (progressBar.getPercentDone() != percent)
+				{
 					progressBar.setPercentDone(percent);
+					progressBarLabel.setContents(progressBar.getPercentDone()+"%");
+				}
 			}
 			if (val == 0)
 				startTime = System.currentTimeMillis();
@@ -231,10 +240,10 @@ public class Progress extends Window
 				pb_val = val;
 				final String left = toHMS(((System.currentTimeMillis() - startTime) * (pb_max - pb_val) / pb_val) / 1000); //$NON-NLS-1$
 				final String total = toHMS(((System.currentTimeMillis() - startTime) * pb_max / pb_val) / 1000); //$NON-NLS-1$
-				lblTimeleft.setContents("<code>"+left +" / "+ total+"</code>"); //$NON-NLS-1$
+				lblTimeleft.setContents("<code>" + left +"/"+ total + "</code>"); //$NON-NLS-1$
 			}
 			else
-				lblTimeleft.setContents("<code>--:--:-- / --:--:--</code>"); //$NON-NLS-1$
+				lblTimeleft.setContents("<code>--:--:--/--:--:--</code>"); //$NON-NLS-1$
 		}
 		if(lblSubInfo.length==1)
 			lblSubInfo[0].setContents(submsg);
@@ -246,6 +255,7 @@ public class Progress extends Window
 	{
 		btnCancel.setDisabled(true);
 		btnCancel.setTitle("Canceling"); //$NON-NLS-1$
+		Client.socket.send(JsonUtils.stringify(Q_Progress.Cancel.instantiate()));
 	}
 
 	private int pb2_val, pb2_max;
@@ -259,10 +269,10 @@ public class Progress extends Window
 				progressBar2.setVisible(true);
 				lblTimeLeft2.setVisible(true);
 //				reflowNow();
-//				packHeight();
+				packHeight();
 			}
 //			progressBar2.setStringPainted(true);
-			progressBar2.setContents(msg);
+			progressBarLabel2.setContents(msg);
 			if (max != null)
 				pb2_max = max;;
 			if (val > 0)
@@ -276,22 +286,28 @@ public class Progress extends Window
 			if (val > 0)
 			{
 				pb2_val = val;
-				final String left = toHMS((System.currentTimeMillis() - startTime2) * (pb2_max - pb2_val) / pb2_val);
-				final String total = toHMS((System.currentTimeMillis() - startTime2) * pb2_max / pb2_val);
-				lblTimeLeft2.setContents("<code>"+left + " / " + total+"</code>"); //$NON-NLS-1$
+				final String left = toHMS(((System.currentTimeMillis() - startTime2) * (pb2_max - pb2_val) / pb2_val) / 1000);
+				final String total = toHMS(((System.currentTimeMillis() - startTime2) * pb2_max / pb2_val) / 1000);
+				lblTimeLeft2.setContents("<code>" + left + "/" + total + "</code>"); //$NON-NLS-1$
 			}
 			else
-				lblTimeLeft2.setContents("<code>--:--:-- / --:--:--</code>"); //$NON-NLS-1$
+				lblTimeLeft2.setContents("<code>--:--:--/--:--:--</code>"); //$NON-NLS-1$
 		}
 		else if (progressBar2.isVisible())
 		{
 			progressBar2.setVisible(false);
 			lblTimeLeft2.setVisible(false);
 //			reflowNow();
-//			packHeight();
+			packHeight();
 		}
 	}
 
+	private void packHeight()
+	{
+		if(getScrollHeight()>0)
+			setHeight(getHeight()+getScrollHeight());
+	}
+	
 	public int getValue()
 	{
 		return pb_val;
