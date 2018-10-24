@@ -62,8 +62,8 @@ public class Progress extends Window
 		setIsModal(true);
 		setShowModalMask(true);
 		setWidth(500);
-		setHeight(100);
-		setOverflow(Overflow.VISIBLE);
+		setHeight(50);
+		setOverflow(Overflow.AUTO);
 		setBackgroundColor("#EEEEEE");
 		setCanDragResize(true);
 		//setParentCanvas(parent);
@@ -120,12 +120,12 @@ public class Progress extends Window
 
 		addItem(new VLayout() {{
 			setWidth100();
-			setHeight("*");
+			setHeight100();
 			setLayoutMargin(2);
 			setMembersMargin(2);
 			addMembers(
 				panel,
-				new LayoutSpacer("*", "100%"),
+				new LayoutSpacer("*", "*"),
 				new HLayout() {{
 					setWidth100();
 					setHeight(10);
@@ -150,6 +150,7 @@ public class Progress extends Window
 		
 		centerInPage();
 		show();
+		packHeight();
 	}
 
 	public void setInfos(int threadCnt, boolean multipleSubInfos)
@@ -189,6 +190,8 @@ public class Progress extends Window
 				setBackgroundColor("#DDDDDD");
 			}});
 		}
+		if(isVisible()&&isDrawn())
+			packHeight();
 	}
 	
 	public void clearInfos()
@@ -304,8 +307,8 @@ public class Progress extends Window
 
 	private void packHeight()
 	{
-		if(getScrollHeight()>0)
-			setHeight(getHeight()+getScrollHeight());
+		reflowNow();
+		setHeight(Math.max(getRect().getHeight(), getItems()[0].getViewportHeight()-getItems()[0].getVisibleHeight()));
 	}
 	
 	public int getValue()
