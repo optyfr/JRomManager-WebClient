@@ -144,13 +144,13 @@ public class MainWindow extends Window
 	
 	public void update(A_Progress params)
 	{
-		if(progress==null)
+//		if(progress==null || progress.getDestroyed() || progress.getDestroying())
 			progress = new Progress();
-		else
+/*		else
 		{
 			progress.clearInfos();
 			progress.show();
-		}
+		}*/
 	}
 
 	

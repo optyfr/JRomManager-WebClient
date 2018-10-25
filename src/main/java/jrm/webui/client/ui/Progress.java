@@ -15,7 +15,6 @@ import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
-import com.smartgwt.client.widgets.layout.LayoutSpacer;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 import jrm.webui.client.Client;
@@ -62,9 +61,9 @@ public class Progress extends Window
 		setIsModal(true);
 		setShowModalMask(true);
 		setWidth(500);
-		setHeight(50);
-		setOverflow(Overflow.AUTO);
-		setBackgroundColor("#EEEEEE");
+		setHeight(250);
+		setMinHeight(150);
+//		setBackgroundColor("#EEEEEE");
 		setCanDragResize(true);
 		//setParentCanvas(parent);
 		setID("Progress");
@@ -79,8 +78,9 @@ public class Progress extends Window
 		panel = new VLayout() {{
 			setMembersMargin(2);
 			setWidth100();
-			setHeight(20);
-			setBackgroundColor("#EEEEEE");
+			setHeight100();
+//			setBackgroundColor("#EEEEEE");
+			setOverflow(Overflow.AUTO);
 		}};
 		setInfos(1, false);
 
@@ -125,7 +125,6 @@ public class Progress extends Window
 			setMembersMargin(2);
 			addMembers(
 				panel,
-				new LayoutSpacer("*", "*"),
 				new HLayout() {{
 					setWidth100();
 					setHeight(10);
@@ -169,6 +168,10 @@ public class Progress extends Window
 				setHeight(20);
 				setBorder("2px inset");
 				setBackgroundColor("#DDDDDD");
+				setWrap(false);
+				setOverflow(Overflow.CLIP_H);
+				setShowClippedTitleOnHover(true);
+				setShowHover(true);
 			}});
 	
 			if(multipleSubInfos)
@@ -178,6 +181,10 @@ public class Progress extends Window
 					setHeight(20);
 					setBorder("2px inset");
 					setBackgroundColor("#DDDDDD");
+					setWrap(false);
+					setOverflow(Overflow.CLIP_H);
+					setShowClippedTitleOnHover(true);
+					setShowHover(true);
 				}});
 			}
 		}
@@ -188,6 +195,10 @@ public class Progress extends Window
 				setHeight(20);
 				setBorder("2px inset");
 				setBackgroundColor("#DDDDDD");
+				setWrap(false);
+				setOverflow(Overflow.CLIP_H);
+				setShowClippedTitleOnHover(true);
+				setShowHover(true);
 			}});
 		}
 		if(isVisible()&&isDrawn())
@@ -214,17 +225,14 @@ public class Progress extends Window
 			{
 				progressBar.setVisible(false);
 				lblTimeleft.setVisible(false);
-//				reflowNow();
 				packHeight();
 			}
 			else if (val > 0 && !progressBar.isVisible())
 			{
 				progressBar.setVisible(true);
 				lblTimeleft.setVisible(true);
-//				reflowNow();
 				packHeight();
 			}
-//			progressBar.setStringPainted(true);
 			if (max != null)
 				pb_max = max;
 			if (val > 0)
@@ -271,10 +279,8 @@ public class Progress extends Window
 			{
 				progressBar2.setVisible(true);
 				lblTimeLeft2.setVisible(true);
-//				reflowNow();
 				packHeight();
 			}
-//			progressBar2.setStringPainted(true);
 			progressBarLabel2.setContents(msg);
 			if (max != null)
 				pb2_max = max;;
@@ -300,15 +306,12 @@ public class Progress extends Window
 		{
 			progressBar2.setVisible(false);
 			lblTimeLeft2.setVisible(false);
-//			reflowNow();
 			packHeight();
 		}
 	}
 
 	private void packHeight()
 	{
-		reflowNow();
-		setHeight(Math.max(getRect().getHeight(), getItems()[0].getViewportHeight()-getItems()[0].getVisibleHeight()));
 	}
 	
 	public int getValue()
@@ -339,6 +342,6 @@ public class Progress extends Window
 	@Override
 	public void close()
 	{
-		hide();
+		markForDestroy();
 	}
 }

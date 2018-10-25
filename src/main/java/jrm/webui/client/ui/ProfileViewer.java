@@ -142,6 +142,7 @@ public class ProfileViewer extends Window
 			setCanHover(true);
 			setHoverAutoFitWidth(true);
 			setHoverAutoFitMaxWidth("50%");
+			setAllowFilterOperators(false);
 			setContextMenu(new Menu() {{
 				setItems(
 					new MenuItem(Client.session.getMsg("ProfileViewer.mntmCollectKeywords.text")) {{
@@ -336,8 +337,8 @@ public class ProfileViewer extends Window
 	@SuppressWarnings("serial") class Anyware extends ListGrid
 	{
 		private HashMap<String,String> status_icons = new HashMap<String,String>() {{
-			put("COMPLETE","/images/icons/bullet_green.png");
-			put("MISSING","/images/icons/bullet_red.png");
+			put("OK","/images/icons/bullet_green.png");
+			put("KO","/images/icons/bullet_red.png");
 			put("UNKNOWN","/images/icons/bullet_black.png");
 		}};
 		private HashMap<String,String> dumpstatus_icons = new HashMap<String,String>() {{
