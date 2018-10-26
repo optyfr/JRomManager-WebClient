@@ -7,6 +7,7 @@ import com.google.gwt.core.client.JsonUtils;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.VerticalAlignment;
+import com.smartgwt.client.types.Visibility;
 import com.smartgwt.client.util.NumberUtil;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
@@ -208,9 +209,9 @@ public class Progress extends Window
 	public void clearInfos()
 	{
 		for(Label label : lblInfo)
-			label.setTitle(null);
+			label.setContents("&nbsp;");
 		for(Label label : lblSubInfo)
-			label.setTitle(null);
+			label.setContents("&nbsp;");
 	}
 	
 	private int pb_val, pb_max;
@@ -223,14 +224,14 @@ public class Progress extends Window
 		{
 			if (val < 0 && progressBar.isVisible())
 			{
-				progressBar.setVisible(false);
-				lblTimeleft.setVisible(false);
+				progressBar.setVisibility(Visibility.HIDDEN);
+				lblTimeleft.setVisibility(Visibility.HIDDEN);
 				packHeight();
 			}
 			else if (val > 0 && !progressBar.isVisible())
 			{
-				progressBar.setVisible(true);
-				lblTimeleft.setVisible(true);
+				progressBar.setVisibility(Visibility.INHERIT);
+				lblTimeleft.setVisibility(Visibility.INHERIT);
 				packHeight();
 			}
 			if (max != null)
@@ -251,15 +252,15 @@ public class Progress extends Window
 				pb_val = val;
 				final String left = toHMS(((System.currentTimeMillis() - startTime) * (pb_max - pb_val) / pb_val) / 1000); //$NON-NLS-1$
 				final String total = toHMS(((System.currentTimeMillis() - startTime) * pb_max / pb_val) / 1000); //$NON-NLS-1$
-				lblTimeleft.setContents("<code>" + left +"/"+ total + "</code>"); //$NON-NLS-1$
+				lblTimeleft.setContents("<code>" + left + "/" + total + "</code>"); //$NON-NLS-1$
 			}
 			else
 				lblTimeleft.setContents("<code>--:--:--/--:--:--</code>"); //$NON-NLS-1$
 		}
 		if(lblSubInfo.length==1)
-			lblSubInfo[0].setContents(submsg);
+			lblSubInfo[0].setContents(submsg!=null?submsg:"&nbsp;");
 		else
-			lblSubInfo[offset].setContents(submsg);
+			lblSubInfo[offset].setContents(submsg!=null?submsg:"&nbsp;");
 	}
 
 	public void cancel()
@@ -277,11 +278,13 @@ public class Progress extends Window
 		{
 			if (!progressBar2.isVisible())
 			{
-				progressBar2.setVisible(true);
-				lblTimeLeft2.setVisible(true);
+				progressBar2.setVisibility(Visibility.INHERIT);
+				lblTimeLeft2.setVisibility(Visibility.INHERIT);
 				packHeight();
 			}
-			progressBarLabel2.setContents(msg);
+			final String oldmsg = progressBarLabel2.getContents();
+			if(oldmsg==null || !msg.equals(oldmsg))
+				progressBarLabel2.setContents(msg);
 			if (max != null)
 				pb2_max = max;;
 			if (val > 0)
@@ -304,14 +307,15 @@ public class Progress extends Window
 		}
 		else if (progressBar2.isVisible())
 		{
-			progressBar2.setVisible(false);
-			lblTimeLeft2.setVisible(false);
+			progressBar2.setVisibility(Visibility.HIDDEN);
+			lblTimeLeft2.setVisibility(Visibility.HIDDEN);
 			packHeight();
 		}
 	}
 
 	private void packHeight()
 	{
+//		markForRedraw();
 	}
 	
 	public int getValue()

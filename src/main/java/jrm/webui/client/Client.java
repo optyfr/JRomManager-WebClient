@@ -4,6 +4,8 @@ import java.util.HashSet;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.RepeatingCommand;
 import com.sksamuel.gwt.websockets.Websocket;
 import com.sksamuel.gwt.websockets.WebsocketListener;
 import com.smartgwt.client.rpc.RPCCallback;
@@ -65,40 +67,49 @@ public class Client implements EntryPoint
 								{
 									try
 									{
-										A_ a = new A_(JsonUtils.safeEval(msg));
-										switch(a.getCmd())
+										Scheduler.get().scheduleIncremental(new RepeatingCommand()
 										{
-											case "Progress":
-												mainwindow.update(new A_Progress(a));
-												break;
-											case "Progress.close":
-												mainwindow.update(new A_Progress.Close(a));
-												break;
-											case "Progress.setInfos":
-												mainwindow.update(new A_Progress.SetInfos(a));
-												break;
-											case "Progress.clearInfos":
-												mainwindow.update(new A_Progress.ClearInfos(a));
-												break;
-											case "Progress.setProgress":
-												mainwindow.update(new A_Progress.SetProgress(a));
-												break;
-											case "Progress.setProgress2":
-												mainwindow.update(new A_Progress.SetProgress2(a));
-												break;
-											case "Profile.loaded":
-												mainwindow.update(new A_Profile.Loaded(a));
-												break;
-											case "Profile.scanned":
-												mainwindow.update(new A_Profile.Scanned(a));
-												break;
-											case "CatVer.loaded":
-												mainwindow.update(new A_CatVer.Loaded(a));
-												break;
-											case "NPlayers.loaded":
-												mainwindow.update(new A_NPlayers.Loaded(a));
-												break;
-										}
+											@Override
+											public boolean execute()
+											{
+												A_ a = new A_(JsonUtils.safeEval(msg));
+												switch(a.getCmd())
+												{
+													case "Progress":
+														mainwindow.update(new A_Progress(a));
+														break;
+													case "Progress.close":
+														mainwindow.update(new A_Progress.Close(a));
+														break;
+													case "Progress.setInfos":
+														mainwindow.update(new A_Progress.SetInfos(a));
+														break;
+													case "Progress.clearInfos":
+														mainwindow.update(new A_Progress.ClearInfos(a));
+														break;
+													case "Progress.setProgress":
+														mainwindow.update(new A_Progress.SetProgress(a));
+														break;
+													case "Progress.setProgress2":
+														mainwindow.update(new A_Progress.SetProgress2(a));
+														break;
+													case "Profile.loaded":
+														mainwindow.update(new A_Profile.Loaded(a));
+														break;
+													case "Profile.scanned":
+														mainwindow.update(new A_Profile.Scanned(a));
+														break;
+													case "CatVer.loaded":
+														mainwindow.update(new A_CatVer.Loaded(a));
+														break;
+													case "NPlayers.loaded":
+														mainwindow.update(new A_NPlayers.Loaded(a));
+														break;
+												}
+												return false;
+											}
+										});
+										
 									}
 									catch(Exception e)
 									{
