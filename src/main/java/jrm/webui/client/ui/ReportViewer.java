@@ -9,6 +9,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
 import com.smartgwt.client.types.DSDataFormat;
 import com.smartgwt.client.types.DSOperationType;
 import com.smartgwt.client.types.DSProtocol;
+import com.smartgwt.client.types.FetchMode;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.tree.TreeGrid;
@@ -52,9 +53,19 @@ public class ReportViewer extends Window
 			super();
 			setWidth100();
 			setHeight100();
+			setAutoFetchData(true);
+/*			setDataProperties(new Tree() {{
+				setModelType(TreeModelType.PARENT);
+				setNameProperty("title");
+				setIdField("ID");
+				setParentIdField("ParentID");
+				setRootValue(0);
+			}});*/
+			setDataFetchMode(FetchMode.PAGED);
 			setDataSource(
 				new RestDataSource() {{
 					setID("Report");
+					setTitleField("title");
 					setOperationBindings(
 						new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}}
 					);
