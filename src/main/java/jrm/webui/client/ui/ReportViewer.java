@@ -3,6 +3,7 @@ package jrm.webui.client.ui;
 import java.util.HashMap;
 
 import com.smartgwt.client.data.OperationBinding;
+import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.RestDataSource;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
@@ -54,6 +55,7 @@ public class ReportViewer extends Window
 			setWidth100();
 			setHeight100();
 			setAutoFetchData(true);
+			setShowConnectors(true);
 /*			setDataProperties(new Tree() {{
 				setModelType(TreeModelType.PARENT);
 				setNameProperty("title");
@@ -79,11 +81,55 @@ public class ReportViewer extends Window
 			        parentIDField.setRequired(true);  
 			        parentIDField.setForeignKey(id + ".ID");  
 			        parentIDField.setRootValue(0);
-			        setFields(nameField, IDField, parentIDField);  
+			        DataSourceTextField classField = new DataSourceTextField("class");
+			        DataSourceTextField statusField = new DataSourceTextField("status");
+			        setFields(nameField, IDField, parentIDField, classField, statusField);  
 				}},
 				new TreeGridField("title")
 			);
 		}
+		
+		@Override
+		protected String getIcon(Record node, boolean defaultState)
+		{
+			switch(node.getAttribute("class"))
+			{
+				case "RomSuspiciousCRC":
+					return "/images/icons/information.png";
+				case "ContainerUnknown":
+				case "ContainerUnneeded":
+					return "/images/icons/error.png";
+				case "ContainerTZip":
+					return "/images/icons/compress.png";
+				case "SubjectSet":
+				{
+					String icon = "/images/folder";
+/*					if(is)
+						icon += "_open";
+					else
+						icon += "_closed";*/
+					switch(node.getAttribute("status"))
+					{
+/*						case "MISSING":
+							icon += "_red";
+							break;*/
+						default:
+							return super.getIcon(node, defaultState);
+					}
+				//	icon += ".png";
+				//	return icon;
+				}
+				default:
+					return super.getIcon(node, defaultState);
+			}
+		}
+	}
+	
+	@Override
+	protected void onDestroy()
+	{
+		Client.childWindows.remove(this);
+		super.onDestroy();
 	}
 	
 }
