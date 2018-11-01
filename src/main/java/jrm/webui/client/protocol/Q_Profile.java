@@ -39,6 +39,19 @@ public class Q_Profile extends Q_
 		}
 	}
 	
+	public static class Fix extends Q_
+	{
+		protected Fix()
+		{
+			super();
+		}
+		
+		final public static Fix instantiate()
+		{
+			return Q_.instantiateCmd("Profile.fix").cast();
+		}
+	}
+	
 	public static class SetProperty extends Q_
 	{
 		protected SetProperty()

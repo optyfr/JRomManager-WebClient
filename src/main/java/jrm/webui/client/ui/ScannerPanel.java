@@ -77,6 +77,9 @@ public final class ScannerPanel extends VLayout
 						setTitle(Client.session.getMsg("MainFrame.btnFix.text"));
 						setIcon("icons/tick.png");
 						setDisabled(true);
+						addClickHandler(event->{
+							Client.socket.send(JsonUtils.stringify(Q_Profile.Fix.instantiate()));
+						});
 					}}
 				);
 			}},
