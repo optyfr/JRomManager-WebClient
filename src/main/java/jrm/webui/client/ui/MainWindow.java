@@ -78,6 +78,21 @@ public class MainWindow extends Window
 			addTab(new Tab() {{
 				setIcon("icons/application_osx_terminal.png");
 				setTitle(Client.session.getMsg("MainFrame.BatchTools"));
+				setPane(new TabSet() {{
+					setPaneMargin(0);
+					setTabBarControls(
+							TabBarControls.TAB_SCROLLER,
+							TabBarControls.TAB_PICKER
+						);
+					addTab(new Tab() {{
+						setTitle(Client.session.getMsg("MainFrame.panelBatchToolsDat2Dir.title"));
+						setPane(new BatchDirUpd8rPanel());
+					}});
+					addTab(new Tab() {{
+						setTitle(Client.session.getMsg("MainFrame.panelBatchToolsDir2Torrent.title"));
+						setPane(new BatchTrrntChkPanel());
+					}});
+				}});
 			}});
 			addTab(new Tab() {{
 				setIcon("icons/cog.png");
