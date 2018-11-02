@@ -105,6 +105,9 @@ public class Client implements EntryPoint
 													case "NPlayers.loaded":
 														mainwindow.update(new A_NPlayers.Loaded(a));
 														break;
+													case "Report.applyFilters":
+														mainwindow.update(new A_Report.ApplyFilter(a));
+														break;
 												}
 												return false;
 											}

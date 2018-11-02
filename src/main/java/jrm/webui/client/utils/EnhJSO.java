@@ -155,6 +155,13 @@ public class EnhJSO extends JavaScriptObject
 		return EnhJSO.getBool(this, name);
 	}
 
+	public final Boolean getBoolean(final String name)
+	{
+		if(EnhJSO.isNull(this, name))
+			return null;
+		return EnhJSO.getBool(this, name);
+	}
+
 	public final int getInt(final String name)
 	{
 		return EnhJSO.getInt(this, name);
@@ -271,6 +278,17 @@ public class EnhJSO extends JavaScriptObject
 		{
 			prop = props.get(i);
 			bc.accept(prop, prop_jso.getJSO(prop));
+		}
+	}
+	
+	public final void forEachBoolean(String prop, ForEachConsumer<String, Boolean> bc)
+	{
+		EnhJSO prop_jso = getJSO(prop);
+		JsArrayString props = getProperties(prop_jso);
+		for(int i = 0; i < props.length(); i++)
+		{
+			prop = props.get(i);
+			bc.accept(prop, prop_jso.getBoolean(prop));
 		}
 	}
 }

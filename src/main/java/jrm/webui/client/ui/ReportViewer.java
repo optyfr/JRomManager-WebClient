@@ -2,6 +2,7 @@ package jrm.webui.client.ui;
 
 import java.util.HashMap;
 
+import com.google.gwt.core.client.JsonUtils;
 import com.smartgwt.client.data.OperationBinding;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.RestDataSource;
@@ -20,10 +21,15 @@ import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeGridField;
 
 import jrm.webui.client.Client;
+import jrm.webui.client.protocol.Q_Report;
 
 @SuppressWarnings("serial")
 public class ReportViewer extends Window
 {
+	ReportTree tree;
+	
+	HashMap<String, Boolean> filters = new HashMap<>();
+	
 	public ReportViewer()
 	{
 		super();
@@ -44,12 +50,22 @@ public class ReportViewer extends Window
 		}});
 		setShowHeaderIcon(true);
 		addCloseClickHandler(event->ReportViewer.this.markForDestroy());
-		addItem(new ReportTree());
+		addItem(tree = new ReportTree());
 		setShowFooter(true);
 		setFooterControls(new Label() {{setWidth100();setBorder("2px inset");}});
 		show();
 	}
 
+	void applyFilter(String name, Boolean value)
+	{
+		filters.put(name, value);
+	}
+	
+	void reload()
+	{
+		tree.invalidateCache();
+	}
+	
 	class ReportTree extends TreeGrid
 	{
 		public ReportTree()
@@ -67,9 +83,13 @@ public class ReportViewer extends Window
 				setItems(
 					new MenuItem() {{
 						setTitle(Client.session.getMsg("ReportFrame.chckbxmntmShowOkEntries.text"));
+						addClickHandler(e->Client.socket.send(JsonUtils.stringify(Q_Report.SetFilter.instantiate().setFilter("SHOWOK",  !(filters.containsKey("SHOWOK")&&filters.get("SHOWOK"))))));
+						setCheckIfCondition((target, menu, item)->filters.containsKey("SHOWOK")&&filters.get("SHOWOK"));
 					}},
 					new MenuItem() {{
 						setTitle(Client.session.getMsg("ReportFrame.chckbxmntmHideFullyMissing.text"));
+						addClickHandler(e->Client.socket.send(JsonUtils.stringify(Q_Report.SetFilter.instantiate().setFilter("HIDEMISSING", !(filters.containsKey("HIDEMISSING")&&filters.get("HIDEMISSING"))))));
+						setCheckIfCondition((target, menu, item)->filters.containsKey("HIDEMISSING")&&filters.get("HIDEMISSING"));
 					}}
 				);
 			}});
@@ -85,7 +105,7 @@ public class ReportViewer extends Window
 			        DataSourceTextField nameField = new DataSourceTextField("title");
 			        DataSourceIntegerField IDField = new DataSourceIntegerField("ID") {{
 				        setPrimaryKey(true);  
-				        setRequired(true);  
+				        setRequired(true);
 			        }};  
 			        DataSourceIntegerField parentIDField = new DataSourceIntegerField("ParentID") {{
 				        setRequired(true);  

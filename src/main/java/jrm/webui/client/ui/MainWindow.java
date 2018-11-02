@@ -17,6 +17,7 @@ import jrm.webui.client.protocol.A_CatVer;
 import jrm.webui.client.protocol.A_NPlayers;
 import jrm.webui.client.protocol.A_Profile;
 import jrm.webui.client.protocol.A_Progress;
+import jrm.webui.client.protocol.A_Report;
 import jrm.webui.client.utils.EnhJSO;
 
 public class MainWindow extends Window
@@ -204,4 +205,11 @@ public class MainWindow extends Window
 			}
 		}
 	}
+
+	public void update(A_Report.ApplyFilter params)
+	{
+		params.forEachParams((k, v) -> scannerPanel.reportViewer.applyFilter(k,v));
+		scannerPanel.reportViewer.reload();
+	}
+
 }
