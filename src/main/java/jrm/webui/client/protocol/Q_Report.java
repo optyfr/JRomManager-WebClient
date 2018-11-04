@@ -15,9 +15,9 @@ public class Q_Report extends Q_
 		}
 		
 		
-		final public static SetFilter instantiate()
+		final public static SetFilter instantiate(boolean lite)
 		{
-			return Q_.instantiateCmd("Report.setFilter").cast();
+			return Q_.instantiateCmd(lite?"ReportLite.setFilter":"Report.setFilter").cast();
 		}
 		
 		final public SetFilter setFilter(String name, boolean value)

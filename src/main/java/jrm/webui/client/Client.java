@@ -108,6 +108,15 @@ public class Client implements EntryPoint
 													case "Report.applyFilters":
 														mainwindow.update(new A_Report.ApplyFilter(a));
 														break;
+													case "ReportLite.applyFilters":
+														mainwindow.update(new A_ReportLite.ApplyFilter(a));
+														break;
+													case "Dat2Dir.clearResults":
+														mainwindow.update(new A_Dat2Dir.ClearResults(a));
+														break;
+													case "Dat2Dir.updateResult":
+														mainwindow.update(new A_Dat2Dir.UpdateResult(a));
+														break;
 												}
 												return false;
 											}

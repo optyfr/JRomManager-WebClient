@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.smartgwt.client.data.Record;
+import com.smartgwt.client.data.RecordList;
 import com.smartgwt.client.types.TabBarControls;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Window;
@@ -14,10 +15,12 @@ import com.smartgwt.client.widgets.tab.TabSet;
 
 import jrm.webui.client.Client;
 import jrm.webui.client.protocol.A_CatVer;
+import jrm.webui.client.protocol.A_Dat2Dir;
 import jrm.webui.client.protocol.A_NPlayers;
 import jrm.webui.client.protocol.A_Profile;
 import jrm.webui.client.protocol.A_Progress;
 import jrm.webui.client.protocol.A_Report;
+import jrm.webui.client.protocol.A_ReportLite;
 import jrm.webui.client.utils.EnhJSO;
 
 public class MainWindow extends Window
@@ -25,6 +28,7 @@ public class MainWindow extends Window
 	TabSet mainPane;
 	ProfilePanel profilePanel;
 	ScannerPanel scannerPanel;
+	BatchDirUpd8rPanel batchDirUpd8rPanel;
 	Label lblProfileinfo;
 	private Progress progress = null;
 	
@@ -86,7 +90,7 @@ public class MainWindow extends Window
 						);
 					addTab(new Tab() {{
 						setTitle(Client.session.getMsg("MainFrame.panelBatchToolsDat2Dir.title"));
-						setPane(new BatchDirUpd8rPanel());
+						setPane(batchDirUpd8rPanel = new BatchDirUpd8rPanel());
 					}});
 					addTab(new Tab() {{
 						setTitle(Client.session.getMsg("MainFrame.panelBatchToolsDir2Torrent.title"));
@@ -227,4 +231,27 @@ public class MainWindow extends Window
 		scannerPanel.reportViewer.reload();
 	}
 
+
+	public void update(A_ReportLite.ApplyFilter params)
+	{
+		params.forEachParams((k, v) -> batchDirUpd8rPanel.report.applyFilter(k,v));
+		batchDirUpd8rPanel.report.reload();
+	}
+
+	public void update(A_Dat2Dir.ClearResults params)
+	{
+		RecordList list = batchDirUpd8rPanel.sdr.getResultSet().getAllCachedRows();
+		for(int i = 0; i < list.getLength(); i++)
+		{
+			batchDirUpd8rPanel.sdr.setEditValue(i, 2, "");
+		}
+//		batchDirUpd8rPanel.report.reload();
+	}
+
+	public void update(A_Dat2Dir.UpdateResult params)
+	{
+		final int row = params.getRow();
+		final String result = params.getResult();
+		batchDirUpd8rPanel.sdr.setEditValue(row, 2, result);
+	}
 }

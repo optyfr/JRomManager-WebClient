@@ -1,5 +1,6 @@
 package jrm.webui.client.ui;
 
+import com.google.gwt.core.client.JsonUtils;
 import com.smartgwt.client.data.OperationBinding;
 import com.smartgwt.client.data.RestDataSource;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
@@ -22,10 +23,15 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.LayoutSpacer;
 import com.smartgwt.client.widgets.layout.VLayout;
 
+import jrm.webui.client.Client;
+import jrm.webui.client.protocol.Q_Dat2Dir;
+import jrm.webui.client.protocol.Q_Global;
+
 public class BatchDirUpd8rPanel extends VLayout
 {
 	ListGrid src;
 	ListGrid sdr;
+	ReportLite report;
 	
 	public BatchDirUpd8rPanel()
 	{
@@ -206,7 +212,7 @@ public class BatchDirUpd8rPanel extends VLayout
 						{
 							case "report":
 							{
-								return new IButton("Report") {{
+								return new IButton("Report", e -> report = new ReportLite(record.getAttribute("src"))) {{
 									setAutoFit(true);
 								}};
 							}
@@ -222,12 +228,13 @@ public class BatchDirUpd8rPanel extends VLayout
 			addMember(new DynamicForm() {{
 				setColWidths(100,50);
 				setWrapItemTitles(false);
-				setItems(new CheckboxItem("dry_run", "Dry Run") {{
+				setItems(new CheckboxItem("dry_run", Client.session.getMsg("MainFrame.cbBatchToolsDat2DirDryRun.text")) {{
 					setLabelAsTitle(true);
 					setShowLabel(false);
+					addChangedHandler(e->Client.socket.send(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("dry_run", (Boolean)e.getValue()))));
 				}});
 			}});
-			addMember(new IButton("Start", event-> {}));
+			addMember(new IButton(Client.session.getMsg("MainFrame.btnStart.text"), e->Client.socket.send(JsonUtils.stringify(Q_Dat2Dir.Start.instantiate()))));
 		}});
 	}
 
