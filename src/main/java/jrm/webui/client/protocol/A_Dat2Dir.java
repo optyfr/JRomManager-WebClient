@@ -30,6 +30,19 @@ public class A_Dat2Dir extends A_
 		}
 	}
 
+	public static class End extends A_
+	{
+		public End(final A_ a)
+		{
+			this(a.response);
+		}
+		
+		public End(final EnhJSO response)
+		{
+			super(response);
+		}
+	}
+
 	public static class UpdateResult extends A_
 	{
 		private EnhJSO params;

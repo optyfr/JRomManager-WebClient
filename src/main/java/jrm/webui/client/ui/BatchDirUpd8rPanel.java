@@ -6,11 +6,7 @@ import com.smartgwt.client.data.RestDataSource;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.DSDataFormat;
-import com.smartgwt.client.types.DSOperationType;
-import com.smartgwt.client.types.DSProtocol;
-import com.smartgwt.client.types.SelectionStyle;
+import com.smartgwt.client.types.*;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -230,11 +226,15 @@ public class BatchDirUpd8rPanel extends VLayout
 				setWrapItemTitles(false);
 				setItems(new CheckboxItem("dry_run", Client.session.getMsg("MainFrame.cbBatchToolsDat2DirDryRun.text")) {{
 					setLabelAsTitle(true);
+					setDefaultValue(Client.session.getMsgs());
 					setShowLabel(false);
 					addChangedHandler(e->Client.socket.send(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("dry_run", (Boolean)e.getValue()))));
 				}});
 			}});
-			addMember(new IButton(Client.session.getMsg("MainFrame.btnStart.text"), e->Client.socket.send(JsonUtils.stringify(Q_Dat2Dir.Start.instantiate()))));
+			addMember(new IButton(Client.session.getMsg("MainFrame.btnStart.text"), e->{
+				Client.mainwindow.mainPane.disableTab(1);
+				Client.socket.send(JsonUtils.stringify(Q_Dat2Dir.Start.instantiate()));
+			}));
 		}});
 	}
 

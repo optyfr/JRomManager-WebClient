@@ -14,13 +14,7 @@ import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
 
 import jrm.webui.client.Client;
-import jrm.webui.client.protocol.A_CatVer;
-import jrm.webui.client.protocol.A_Dat2Dir;
-import jrm.webui.client.protocol.A_NPlayers;
-import jrm.webui.client.protocol.A_Profile;
-import jrm.webui.client.protocol.A_Progress;
-import jrm.webui.client.protocol.A_Report;
-import jrm.webui.client.protocol.A_ReportLite;
+import jrm.webui.client.protocol.*;
 import jrm.webui.client.utils.EnhJSO;
 
 public class MainWindow extends Window
@@ -242,16 +236,19 @@ public class MainWindow extends Window
 	{
 		RecordList list = batchDirUpd8rPanel.sdr.getResultSet().getAllCachedRows();
 		for(int i = 0; i < list.getLength(); i++)
-		{
-			batchDirUpd8rPanel.sdr.setEditValue(i, 2, "");
-		}
-//		batchDirUpd8rPanel.report.reload();
+			batchDirUpd8rPanel.sdr.setEditValue(i, 3, "");
 	}
 
 	public void update(A_Dat2Dir.UpdateResult params)
 	{
 		final int row = params.getRow();
 		final String result = params.getResult();
-		batchDirUpd8rPanel.sdr.setEditValue(row, 2, result);
+		batchDirUpd8rPanel.sdr.setEditValue(row, 3, result);
+	}
+
+	public void update(A_Dat2Dir.End params)
+	{
+		batchDirUpd8rPanel.sdr.cancelEditing();
+		batchDirUpd8rPanel.sdr.invalidateCache();
 	}
 }

@@ -117,6 +117,9 @@ public class Client implements EntryPoint
 													case "Dat2Dir.updateResult":
 														mainwindow.update(new A_Dat2Dir.UpdateResult(a));
 														break;
+													case "Dat2Dir.end":
+														mainwindow.update(new A_Dat2Dir.End(a));
+														break;
 												}
 												return false;
 											}
