@@ -65,6 +65,12 @@ public class Q_Profile extends Q_
 			return Q_.instantiateCmd("Profile.setProperty").cast();
 		}
 		
+		final public SetProperty setProfile(String name)
+		{
+			set("profile", name);
+			return this;
+		}
+		
 		final public SetProperty setProperty(String name, String value)
 		{
 			getParams().set(name, value);

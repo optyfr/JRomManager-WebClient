@@ -165,5 +165,25 @@ public final class ScannerSettingsPanel extends DynamicForm
 			}
 		}
 	}
+	
+	void initPropertyItemValues(EnhJSO settings)
+	{
+		initPropertyItemValue("chckbxNeedSHA1", "need_sha1_or_md5", settings);
+		initPropertyItemValue("chckbxUseParallelism", "use_parallelism", settings);
+		initPropertyItemValue("chckbxCreateMissingSets", "create_mode", settings);
+		initPropertyItemValue("chckbxCreateOnlyComplete", "createfull_mode", settings);
+		initPropertyItemValue("chckbxIgnoreUnneededContainers", "ignore_unneeded_containers", settings);
+		initPropertyItemValue("chckbxIgnoreUnneededEntries", "ignore_unneeded_entries", settings);
+		initPropertyItemValue("chckbxIgnoreUnknownContainers", "ignore_unknown_containers", settings);
+		initPropertyItemValue("chckbxUseImplicitMerge", "implicit_merge", settings);
+		initPropertyItemValue("chckbxIgnoreMergeNameRoms", "ignore_merge_name_roms", settings);
+		initPropertyItemValue("chckbxIgnoreMergeNameDisks", "ignore_merge_name_disks", settings);
+		initPropertyItemValue("chckbxExcludeGames", "exclude_games", settings);
+		initPropertyItemValue("chckbxExcludeMachines", "exclude_machines", settings);
+		initPropertyItemValue("chckbxBackup", "backup", settings);
+		initPropertyItemValue("cbCompression", "format", settings);
+		initPropertyItemValue("cbbxMergeMode", "merge_mode", settings);
+		initPropertyItemValue("cbHashCollision", "hash_collision_mode", settings);
+	}
 
 }

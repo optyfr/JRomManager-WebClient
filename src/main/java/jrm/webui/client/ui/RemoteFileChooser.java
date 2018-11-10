@@ -399,6 +399,12 @@ public final class RemoteFileChooser extends Window
 				isMultiple = true;
 				isChoose = false;
 				break;
+			case "updDat":
+				isDir = true;
+				isMultiple = false;
+				isChoose = true;
+				break;
+			case "addDat":
 			default:
 				isDir = false;
 				isMultiple = false;

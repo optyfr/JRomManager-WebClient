@@ -118,33 +118,8 @@ public class MainWindow extends Window
 			mainPane.enableTab(1);
 			mainPane.selectTab(1);
 			EnhJSO settings = params.getSettings();
-			scannerPanel.scannerDirPanel.getItem("tfRomsDest").setValue(settings.get("roms_dest_dir"));
-			scannerPanel.scannerDirPanel.initPropertyItemValue("tfRomsDest", "roms_dest_dir", settings);
-			scannerPanel.scannerDirPanel.initPropertyItemValue("tfDisksDestCbx", "disks_dest_dir_enabled", settings);
-			scannerPanel.scannerDirPanel.initPropertyItemValue("tfDisksDest", "disks_dest_dir", settings);
-			scannerPanel.scannerDirPanel.initPropertyItemValue("tfSWDestCbx", "swroms_dest_dir_enabled", settings);
-			scannerPanel.scannerDirPanel.initPropertyItemValue("tfSWDest", "swroms_dest_dir", settings);
-			scannerPanel.scannerDirPanel.initPropertyItemValue("tfSWDisksDestCbx", "swdisks_dest_dir_enabled", settings);
-			scannerPanel.scannerDirPanel.initPropertyItemValue("tfSWDisksDest", "swdisks_dest_dir", settings);
-			scannerPanel.scannerDirPanel.initPropertyItemValue("tfSamplesDestCbx", "samples_dest_dir_enabled", settings);
-			scannerPanel.scannerDirPanel.initPropertyItemValue("tfSamplesDest", "samples_dest_dir", settings);
-			scannerPanel.scannerDirPanel.initPropertyItemValue("listSrcDir", "src_dir", settings);
-			scannerPanel.scannerSettingsPanel.initPropertyItemValue("chckbxNeedSHA1", "need_sha1_or_md5", settings);
-			scannerPanel.scannerSettingsPanel.initPropertyItemValue("chckbxUseParallelism", "use_parallelism", settings);
-			scannerPanel.scannerSettingsPanel.initPropertyItemValue("chckbxCreateMissingSets", "create_mode", settings);
-			scannerPanel.scannerSettingsPanel.initPropertyItemValue("chckbxCreateOnlyComplete", "createfull_mode", settings);
-			scannerPanel.scannerSettingsPanel.initPropertyItemValue("chckbxIgnoreUnneededContainers", "ignore_unneeded_containers", settings);
-			scannerPanel.scannerSettingsPanel.initPropertyItemValue("chckbxIgnoreUnneededEntries", "ignore_unneeded_entries", settings);
-			scannerPanel.scannerSettingsPanel.initPropertyItemValue("chckbxIgnoreUnknownContainers", "ignore_unknown_containers", settings);
-			scannerPanel.scannerSettingsPanel.initPropertyItemValue("chckbxUseImplicitMerge", "implicit_merge", settings);
-			scannerPanel.scannerSettingsPanel.initPropertyItemValue("chckbxIgnoreMergeNameRoms", "ignore_merge_name_roms", settings);
-			scannerPanel.scannerSettingsPanel.initPropertyItemValue("chckbxIgnoreMergeNameDisks", "ignore_merge_name_disks", settings);
-			scannerPanel.scannerSettingsPanel.initPropertyItemValue("chckbxExcludeGames", "exclude_games", settings);
-			scannerPanel.scannerSettingsPanel.initPropertyItemValue("chckbxExcludeMachines", "exclude_machines", settings);
-			scannerPanel.scannerSettingsPanel.initPropertyItemValue("chckbxBackup", "backup", settings);
-			scannerPanel.scannerSettingsPanel.initPropertyItemValue("cbCompression", "format", settings);
-			scannerPanel.scannerSettingsPanel.initPropertyItemValue("cbbxMergeMode", "merge_mode", settings);
-			scannerPanel.scannerSettingsPanel.initPropertyItemValue("cbHashCollision", "hash_collision_mode", settings);
+			scannerPanel.scannerDirPanel.initPropertyItemValues(settings);
+			scannerPanel.scannerSettingsPanel.initPropertyItemValues(settings);
 			scannerPanel.scannerFiltersPanel.systems.setData(Record.convertToRecordArray(params.getSystems()));
 		}
 		else

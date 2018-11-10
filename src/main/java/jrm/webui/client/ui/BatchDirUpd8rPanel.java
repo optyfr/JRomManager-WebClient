@@ -2,11 +2,16 @@ package jrm.webui.client.ui;
 
 import com.google.gwt.core.client.JsonUtils;
 import com.smartgwt.client.data.OperationBinding;
+import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.RestDataSource;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
-import com.smartgwt.client.types.*;
+import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.DSDataFormat;
+import com.smartgwt.client.types.DSOperationType;
+import com.smartgwt.client.types.DSProtocol;
+import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -18,10 +23,14 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.LayoutSpacer;
 import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.menu.Menu;
+import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemIfFunction;
 
 import jrm.webui.client.Client;
 import jrm.webui.client.protocol.Q_Dat2Dir;
 import jrm.webui.client.protocol.Q_Global;
+import jrm.webui.client.protocol.Q_Profile;
 
 public class BatchDirUpd8rPanel extends VLayout
 {
@@ -72,6 +81,113 @@ public class BatchDirUpd8rPanel extends VLayout
 				setAutoFitFieldsFillViewport(true);
 				setAutoFetchData(true);
 				setCanExpandRecords(true);
+				setContextMenu(new Menu() {{
+					addItem(new MenuItem() {{
+						setTitle(Client.session.getMsg("MainFrame.AddDat"));
+						addClickHandler(e -> new RemoteFileChooser("addDat", path -> {
+							sdr.addData(new Record() {{
+								setAttribute("src",path);
+							}});
+						}));
+					}});
+					addItem(new MenuItem() {{
+						setTitle("Set Destination");
+						setEnableIfCondition(new MenuItemIfFunction()
+						{
+							@Override
+							public boolean execute(Canvas target, Menu menu, MenuItem item)
+							{
+								return sdr.getSelectedRecords().length==1;
+							}
+						});
+						addClickHandler(e -> new RemoteFileChooser("updDat", path -> {
+							Record record = sdr.getSelectedRecord();
+							record.setAttribute("dst", path);
+							sdr.updateData(record);
+						}));
+					}});
+					addItem(new MenuItem() {{
+						setTitle(Client.session.getMsg("MainFrame.DelDat"));
+						setEnableIfCondition(new MenuItemIfFunction()
+						{
+							@Override
+							public boolean execute(Canvas target, Menu menu, MenuItem item)
+							{
+								return sdr.getSelectedRecords().length==1;
+							}
+						});
+						addClickHandler(e -> sdr.removeSelectedData());
+					}});
+					addItem(new MenuItem() {{
+						setTitle(Client.session.getMsg("MainFrame.Presets"));
+						setEnableIfCondition(new MenuItemIfFunction()
+						{
+							@Override
+							public boolean execute(Canvas target, Menu menu, MenuItem item)
+							{
+								return sdr.anySelected();
+							}
+						});
+						setSubmenu(new Menu() {{
+							addItem(new MenuItem() {{
+								setTitle(Client.session.getMsg("MainFrame.Dir2DatMenu"));
+								setSubmenu(new Menu() {{
+									addItem(new MenuItem() {{
+										setTitle(Client.session.getMsg("MainFrame.TZIP"));
+										addClickHandler(e -> {
+											Q_Profile.SetProperty settings = Q_Profile.SetProperty.instantiate();
+											settings.setProperty("need_sha1_or_md5", false); //$NON-NLS-1$
+											settings.setProperty("use_parallelism", true); //$NON-NLS-1$
+											settings.setProperty("create_mode", true); //$NON-NLS-1$
+											settings.setProperty("createfull_mode", false); //$NON-NLS-1$
+											settings.setProperty("ignore_unneeded_containers", false); //$NON-NLS-1$
+											settings.setProperty("ignore_unneeded_entries", false); //$NON-NLS-1$
+											settings.setProperty("ignore_unknown_containers", true); //$NON-NLS-1$
+											settings.setProperty("implicit_merge", false); //$NON-NLS-1$
+											settings.setProperty("ignore_merge_name_roms", false); //$NON-NLS-1$
+											settings.setProperty("ignore_merge_name_disks", false); //$NON-NLS-1$
+											settings.setProperty("exclude_games", false); //$NON-NLS-1$
+											settings.setProperty("exclude_machines", false); //$NON-NLS-1$
+											settings.setProperty("backup", true); //$NON-NLS-1$
+											settings.setProperty("format", "TZIP"); //$NON-NLS-1$
+											settings.setProperty("merge_mode", "NOMERGE"); //$NON-NLS-1$
+											settings.setProperty("archives_and_chd_as_roms", false); //$NON-NLS-1$
+											for(ListGridRecord record : sdr.getSelectedRecords())
+												Client.socket.send(JsonUtils.stringify(settings.setProfile(record.getAttribute("src"))));
+										});
+									}});
+									addItem(new MenuItem() {{
+										setTitle(Client.session.getMsg("MainFrame.DIR"));
+										addClickHandler(e -> {
+											Q_Profile.SetProperty settings = Q_Profile.SetProperty.instantiate();
+											settings.setProperty("need_sha1_or_md5", false); //$NON-NLS-1$
+											settings.setProperty("use_parallelism", true); //$NON-NLS-1$
+											settings.setProperty("create_mode", true); //$NON-NLS-1$
+											settings.setProperty("createfull_mode", false); //$NON-NLS-1$
+											settings.setProperty("ignore_unneeded_containers", false); //$NON-NLS-1$
+											settings.setProperty("ignore_unneeded_entries", false); //$NON-NLS-1$
+											settings.setProperty("ignore_unknown_containers", true); //$NON-NLS-1$
+											settings.setProperty("implicit_merge", false); //$NON-NLS-1$
+											settings.setProperty("ignore_merge_name_roms", false); //$NON-NLS-1$
+											settings.setProperty("ignore_merge_name_disks", false); //$NON-NLS-1$
+											settings.setProperty("exclude_games", false); //$NON-NLS-1$
+											settings.setProperty("exclude_machines", false); //$NON-NLS-1$
+											settings.setProperty("backup", true); //$NON-NLS-1$
+											settings.setProperty("format", "DIR"); //$NON-NLS-1$
+											settings.setProperty("merge_mode", "NOMERGE"); //$NON-NLS-1$
+											settings.setProperty("archives_and_chd_as_roms", true); //$NON-NLS-1$
+											for(ListGridRecord record : sdr.getSelectedRecords())
+												Client.socket.send(JsonUtils.stringify(settings.setProfile(record.getAttribute("src"))));
+										});
+									}});
+								}});
+							}});
+							addItem(new MenuItem() {{
+								setTitle(Client.session.getMsg("BatchToolsDirUpd8rPanel.mntmCustom.text"));
+							}});
+						}});
+					}});
+				}});
 				setDataSource(new RestDataSource() {{
 					setID("BatchDat2DirSDR");
 					setDataURL("/datasources/"+getID());
@@ -105,7 +221,9 @@ public class BatchDirUpd8rPanel extends VLayout
 							@Override
 							public String format(Object value, ListGridRecord record, int rowNum, int colNum)
 							{
-								return "<div style='overflow:hidden;text-overflow:ellipsis;direction:rtl'>"+value+"</div>";
+								if(value!=null)
+									return "<div style='overflow:hidden;text-overflow:ellipsis;direction:rtl'>"+value+"</div>";
+								return null;
 							}
 						});
 					}},
@@ -116,7 +234,9 @@ public class BatchDirUpd8rPanel extends VLayout
 							@Override
 							public String format(Object value, ListGridRecord record, int rowNum, int colNum)
 							{
-								return "<div style='overflow:hidden;text-overflow:ellipsis;direction:rtl'>"+value+"</div>";
+								if(value!=null)
+									return "<div style='overflow:hidden;text-overflow:ellipsis;direction:rtl'>"+value+"</div>";
+								return null;
 							}
 						});
 					}},

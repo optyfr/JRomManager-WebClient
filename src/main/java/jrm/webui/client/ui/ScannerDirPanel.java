@@ -310,4 +310,19 @@ public final class ScannerDirPanel extends DynamicForm
 			}
 		}
 	}
+	
+	void initPropertyItemValues(EnhJSO settings)
+	{
+		getItem("tfRomsDest").setValue(settings.get("roms_dest_dir"));
+		initPropertyItemValue("tfRomsDest", "roms_dest_dir", settings);
+		initPropertyItemValue("tfDisksDestCbx", "disks_dest_dir_enabled", settings);
+		initPropertyItemValue("tfDisksDest", "disks_dest_dir", settings);
+		initPropertyItemValue("tfSWDestCbx", "swroms_dest_dir_enabled", settings);
+		initPropertyItemValue("tfSWDest", "swroms_dest_dir", settings);
+		initPropertyItemValue("tfSWDisksDestCbx", "swdisks_dest_dir_enabled", settings);
+		initPropertyItemValue("tfSWDisksDest", "swdisks_dest_dir", settings);
+		initPropertyItemValue("tfSamplesDestCbx", "samples_dest_dir_enabled", settings);
+		initPropertyItemValue("tfSamplesDest", "samples_dest_dir", settings);
+		initPropertyItemValue("listSrcDir", "src_dir", settings);
+	}
 }
