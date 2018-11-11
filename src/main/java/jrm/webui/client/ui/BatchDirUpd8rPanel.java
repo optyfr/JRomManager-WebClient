@@ -1,5 +1,12 @@
 package jrm.webui.client.ui;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.core.client.JsonUtils;
 import com.smartgwt.client.data.OperationBinding;
 import com.smartgwt.client.data.Record;
@@ -12,8 +19,10 @@ import com.smartgwt.client.types.DSDataFormat;
 import com.smartgwt.client.types.DSOperationType;
 import com.smartgwt.client.types.DSProtocol;
 import com.smartgwt.client.types.SelectionStyle;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.grid.CellFormatter;
@@ -31,6 +40,7 @@ import jrm.webui.client.Client;
 import jrm.webui.client.protocol.Q_Dat2Dir;
 import jrm.webui.client.protocol.Q_Global;
 import jrm.webui.client.protocol.Q_Profile;
+import jrm.webui.client.utils.EnhJSO;
 
 public class BatchDirUpd8rPanel extends VLayout
 {
@@ -184,6 +194,10 @@ public class BatchDirUpd8rPanel extends VLayout
 							}});
 							addItem(new MenuItem() {{
 								setTitle(Client.session.getMsg("BatchToolsDirUpd8rPanel.mntmCustom.text"));
+								addClickHandler(e -> {
+									final List<String> srcs = Stream.of(sdr.getSelectedRecords()).map(n->n.getAttribute("src")).collect(Collectors.toList());
+									Q_Dat2Dir.Settings.instantiate().setSrcs(srcs).send();
+								});
 							}});
 						}});
 					}});
@@ -356,6 +370,76 @@ public class BatchDirUpd8rPanel extends VLayout
 				Client.socket.send(JsonUtils.stringify(Q_Dat2Dir.Start.instantiate()));
 			}));
 		}});
+	}
+	
+	@SuppressWarnings("serial")
+	class Settings extends Window
+	{
+		ScannerSettingsPanel settings_panel;
+
+		Settings(EnhJSO settings, JsArrayString srcs)
+		{
+			Client.childWindows.add(this);
+			setAnimateMinimize(true);
+			setIsModal(true);
+			setShowModalMask(true);
+			setCanDragReposition(true);
+			setCanDragResize(true);
+			setShowHeaderIcon(true);
+			setShowMaximizeButton(true);
+			setHeaderIconDefaults(new HashMap<String,Object>() {{
+				put("width", 16);
+				put("height", 16);
+				put("src", "rom.png");
+			}});
+			setShowHeaderIcon(true);
+			addCloseClickHandler(event->Settings.this.markForDestroy());
+			addItem(new HLayout() {{
+				setHeight100();
+				addMember(new LayoutSpacer("5%","*"));
+				addMember(new VLayout() {{
+					setHeight100();
+					addMember(new LayoutSpacer("100%","*"));
+					addMember(settings_panel=new ScannerSettingsPanel(settings));
+					addMember(new LayoutSpacer("100%","*"));
+				}});
+				addMember(new LayoutSpacer("5%","*"));
+			}});
+			addItem(new HLayout() {{
+				addMember(new LayoutSpacer("*",20));
+				addMember(new IButton("OK", e-> {
+					Q_Profile.SetProperty props = Q_Profile.SetProperty.instantiate();
+					Map<String, Object> values = settings_panel.getFilteredValues();
+					SC.logWarn("size="+values.size());
+					values.forEach((k, v) -> props.setProperty(k, v));
+					for(int i = 0; i < srcs.length(); i++)
+					{
+						SC.logWarn(i+":"+srcs.get(i));
+						props.setProfile(srcs.get(i)).send();
+					}
+					Settings.this.markForDestroy();
+				}));
+				addMember(new IButton("Cancel", e->Settings.this.markForDestroy()));
+			}});
+			setAutoCenter(true);
+			setWidth("50%");
+			setHeight("50%");
+			show();
+			redraw();
+		}
+
+		@Override
+		protected void onDestroy()
+		{
+			Client.childWindows.remove(this);
+			super.onDestroy();
+		}
+		
+	}
+	
+	public void showSettings(EnhJSO settings, JsArrayString srcs)
+	{
+		new Settings(settings, srcs);
 	}
 
 }

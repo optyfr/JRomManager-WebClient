@@ -70,7 +70,17 @@ public class Q_Profile extends Q_
 			set("profile", name);
 			return this;
 		}
-		
+
+		final public SetProperty setProperty(String name, Object value)
+		{
+			if(value instanceof Boolean)
+				return setProperty(name, (boolean)value);
+			else if(value instanceof Integer)
+				return setProperty(name, (int)value);
+			else
+				return setProperty(name, value.toString());
+		}
+
 		final public SetProperty setProperty(String name, String value)
 		{
 			getParams().set(name, value);

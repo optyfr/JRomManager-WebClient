@@ -1,7 +1,9 @@
 package jrm.webui.client.protocol;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsonUtils;
 
+import jrm.webui.client.Client;
 import jrm.webui.client.utils.EnhJSO;
 
 public class Q_ extends EnhJSO
@@ -33,6 +35,11 @@ public class Q_ extends EnhJSO
 		if(!exists("params"))
 			set("params", JavaScriptObject.createObject());
 		return getJSO("params");
+	}
+	
+	final public void send()
+	{
+		Client.socket.send(JsonUtils.stringify(this));
 	}
 	
 }

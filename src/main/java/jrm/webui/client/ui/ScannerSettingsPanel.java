@@ -1,8 +1,8 @@
 package jrm.webui.client.ui;
 
 import java.util.HashMap;
+import java.util.Map;
 
-import com.google.gwt.core.client.JsonUtils;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
@@ -16,10 +16,38 @@ import jrm.webui.client.utils.EnhJSO;
 
 public final class ScannerSettingsPanel extends DynamicForm
 {
+	private boolean hasSettings = false;
+	
 	@SuppressWarnings("serial")
+	final static private Map<String,String> fname2name= new HashMap<String,String>() {{
+		put("chckbxNeedSHA1","need_sha1_or_md5");
+		put("chckbxUseParallelism","use_parallelism");
+		put("chckbxCreateMissingSets","create_mode");
+		put("chckbxCreateOnlyComplete","createfull_mode");
+		put("chckbxIgnoreUnneededContainers","ignore_unneeded_containers");
+		put("chckbxIgnoreUnneededEntries","ignore_unneeded_entries");
+		put("chckbxIgnoreUnknownContainers","ignore_unknown_containers");
+		put("chckbxUseImplicitMerge","implicit_merge");
+		put("chckbxIgnoreMergeNameRoms","ignore_merge_name_roms");
+		put("chckbxIgnoreMergeNameDisks","ignore_merge_name_disks");
+		put("chckbxExcludeGames","exclude_games");
+		put("chckbxExcludeMachines","exclude_machines");
+		put("chckbxBackup","backup");
+		put("cbCompression","format");
+		put("cbbxMergeMode","merge_mode");
+		put("cbHashCollision","hash_collision_mode");
+	}};
+
 	public ScannerSettingsPanel()
 	{
+		this(null);
+	}
+	
+	@SuppressWarnings("serial")
+	public ScannerSettingsPanel(EnhJSO settings)
+	{
 		super();
+		hasSettings = settings!=null;
 		setWidth100();
 		setNumCols(4);
 		setColWidths("*","*","*","*");
@@ -31,7 +59,7 @@ public final class ScannerSettingsPanel extends DynamicForm
 			new CheckboxItem("chckbxCreateMissingSets", Client.session.getMsg("MainFrame.chckbxCreateMissingSets.text")) {{
 				addChangedHandler(event->{
 					setPropertyItemValue(getName(), "create_mode", (boolean)getValue());
-					event.getForm().getItem("chckbxCreateOnlyComplete").setDisabled(!getValueAsBoolean());
+					ScannerSettingsPanel.this.getItem("chckbxCreateOnlyComplete").setDisabled(!getValueAsBoolean());
 				});
 				setDefaultValue(true);
 			}},
@@ -117,18 +145,22 @@ public final class ScannerSettingsPanel extends DynamicForm
 				setDisabled(true);
 			}}
 		);
+		if(hasSettings)
+			initPropertyItemValues(settings);
 	}
 	
 	private void setPropertyItemValue(String field, String name, boolean value)
 	{
 		getItem(field).setValue(value);
-		Client.socket.send(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty(name, value)));
+		if(!hasSettings)
+			Q_Profile.SetProperty.instantiate().setProperty(name, value).send();
 	}
 
 	private void setPropertyItemValue(String field, String name, String value)
 	{
 		getItem(field).setValue(value);
-		Client.socket.send(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty(name, value)));
+		if(!hasSettings)
+			Q_Profile.SetProperty.instantiate().setProperty(name, value).send();
 	}
 
 	void initPropertyItemValue(String field, String name, EnhJSO jso)
@@ -168,22 +200,15 @@ public final class ScannerSettingsPanel extends DynamicForm
 	
 	void initPropertyItemValues(EnhJSO settings)
 	{
-		initPropertyItemValue("chckbxNeedSHA1", "need_sha1_or_md5", settings);
-		initPropertyItemValue("chckbxUseParallelism", "use_parallelism", settings);
-		initPropertyItemValue("chckbxCreateMissingSets", "create_mode", settings);
-		initPropertyItemValue("chckbxCreateOnlyComplete", "createfull_mode", settings);
-		initPropertyItemValue("chckbxIgnoreUnneededContainers", "ignore_unneeded_containers", settings);
-		initPropertyItemValue("chckbxIgnoreUnneededEntries", "ignore_unneeded_entries", settings);
-		initPropertyItemValue("chckbxIgnoreUnknownContainers", "ignore_unknown_containers", settings);
-		initPropertyItemValue("chckbxUseImplicitMerge", "implicit_merge", settings);
-		initPropertyItemValue("chckbxIgnoreMergeNameRoms", "ignore_merge_name_roms", settings);
-		initPropertyItemValue("chckbxIgnoreMergeNameDisks", "ignore_merge_name_disks", settings);
-		initPropertyItemValue("chckbxExcludeGames", "exclude_games", settings);
-		initPropertyItemValue("chckbxExcludeMachines", "exclude_machines", settings);
-		initPropertyItemValue("chckbxBackup", "backup", settings);
-		initPropertyItemValue("cbCompression", "format", settings);
-		initPropertyItemValue("cbbxMergeMode", "merge_mode", settings);
-		initPropertyItemValue("cbHashCollision", "hash_collision_mode", settings);
+		fname2name.forEach((fn,n)->initPropertyItemValue(fn, n, settings));
 	}
 
+	Map<String,Object> getFilteredValues()
+	{
+		Map<String,Object> values = new HashMap<>();
+		fname2name.forEach((fn,n)->{
+			values.put(n, getValue(fn));
+		});
+		return values;
+	}
 }

@@ -226,4 +226,10 @@ public class MainWindow extends Window
 		batchDirUpd8rPanel.sdr.cancelEditing();
 		batchDirUpd8rPanel.sdr.invalidateCache();
 	}
+
+
+	public void update(A_Dat2Dir.ShowSettings params)
+	{
+		batchDirUpd8rPanel.showSettings(params.getSettings(),params.getSrcs());
+	}
 }
