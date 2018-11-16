@@ -61,6 +61,21 @@ public class BatchDirUpd8rPanel extends VLayout
 			setSelectionType(SelectionStyle.MULTIPLE);
 			setCanSort(false);
 			setAutoFetchData(true);
+			setContextMenu(new Menu() {{
+				addItem(new MenuItem() {{
+					setTitle(Client.session.getMsg("MainFrame.AddSrcDir"));
+					addClickHandler(e -> new RemoteFileChooser("addDatSrc", path -> {
+						src.addData(new Record() {{
+							setAttribute("name",path);
+						}});
+					}));
+				}});
+				addItem(new MenuItem() {{
+					setTitle(Client.session.getMsg("MainFrame.DelSrcDir"));
+					setEnableIfCondition((target, menu, item) ->src.getSelectedRecords().length>0);
+					addClickHandler(e -> src.removeSelectedData());
+				}});
+			}});
 			setDataSource(new RestDataSource() {{
 				setID("BatchDat2DirSrc");
 				setDataURL("/datasources/"+getID());
@@ -68,8 +83,7 @@ public class BatchDirUpd8rPanel extends VLayout
 				setOperationBindings(
 					new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}},
 					new OperationBinding(){{setOperationType(DSOperationType.ADD);setDataProtocol(DSProtocol.POSTXML);}},
-					new OperationBinding(){{setOperationType(DSOperationType.REMOVE);setDataProtocol(DSProtocol.POSTXML);}},
-					new OperationBinding(){{setOperationType(DSOperationType.UPDATE);setDataProtocol(DSProtocol.POSTXML);}}
+					new OperationBinding(){{setOperationType(DSOperationType.REMOVE);setDataProtocol(DSProtocol.POSTXML);}}
 				);
 				setFields(
 					new DataSourceTextField("name") {{

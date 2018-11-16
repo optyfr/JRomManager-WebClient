@@ -66,6 +66,7 @@ public final class RemoteFileChooser extends Window
 					isChoose = true;
 					break;
 				case "listSrcDir":
+				case "addDatSrc":
 					isMultiple = true;
 					isChoose = true;
 					break;
@@ -73,6 +74,11 @@ public final class RemoteFileChooser extends Window
 					isMultiple = true;
 					isChoose = false;
 					break;
+				case "updDat":
+					isMultiple = false;
+					isChoose = true;
+					break;
+				case "addDat":
 				default:
 					isMultiple = false;
 					isChoose = true;
@@ -390,6 +396,7 @@ public final class RemoteFileChooser extends Window
 				isChoose = true;
 				break;
 			case "listSrcDir":
+			case "addDatSrc":
 				isDir = true;
 				isMultiple = true;
 				isChoose = true;
