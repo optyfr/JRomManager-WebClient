@@ -242,7 +242,7 @@ public class BatchDirUpd8rPanel extends VLayout
 					);
 				}});
 				setFields(
-					new ListGridField("src") {{
+					new ListGridField("src",Client.session.getMsg("BatchTableModel.SrcDats")) {{
 						setAlign(Alignment.RIGHT);
 						setCellFormatter(new CellFormatter()
 						{
@@ -255,7 +255,7 @@ public class BatchDirUpd8rPanel extends VLayout
 							}
 						});
 					}},
-					new ListGridField("dst") {{
+					new ListGridField("dst",Client.session.getMsg("BatchTableModel.DstDirs")) {{
 						setAlign(Alignment.RIGHT);
 						setCellFormatter(new CellFormatter()
 						{
@@ -268,7 +268,7 @@ public class BatchDirUpd8rPanel extends VLayout
 							}
 						});
 					}},
-					new ListGridField("result") {{
+					new ListGridField("result",Client.session.getMsg("BatchTableModel.Result")) {{
 					}},
 					new ListGridField("selected") {{
 						setWidth(20);
@@ -374,7 +374,7 @@ public class BatchDirUpd8rPanel extends VLayout
 				setWrapItemTitles(false);
 				setItems(new CheckboxItem("dry_run", Client.session.getMsg("MainFrame.cbBatchToolsDat2DirDryRun.text")) {{
 					setLabelAsTitle(true);
-					setDefaultValue(Client.session.getMsgs());
+					setDefaultValue(Client.session.getSettingAsBoolean("dry_run",true));
 					setShowLabel(false);
 					addChangedHandler(e->Client.socket.send(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("dry_run", (Boolean)e.getValue()))));
 				}});

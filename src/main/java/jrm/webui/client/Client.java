@@ -123,6 +123,15 @@ public class Client implements EntryPoint
 													case "Dat2Dir.showSettings":
 														mainwindow.update(new A_Dat2Dir.ShowSettings(a));
 														break;
+													case "TrntChk.clearResults":
+														mainwindow.update(new A_TrntChk.ClearResults(a));
+														break;
+													case "TrntChk.updateResult":
+														mainwindow.update(new A_TrntChk.UpdateResult(a));
+														break;
+													case "TrntChk.end":
+														mainwindow.update(new A_TrntChk.End(a));
+														break;
 												}
 												return false;
 											}

@@ -21,7 +21,6 @@ public class A_Session extends EnhJSO
 		return get("session");
 	}
 	
-
 	public final Map<String,String> getMsgs()
 	{
 		if (msgs_cache.size()==0)
@@ -32,6 +31,24 @@ public class A_Session extends EnhJSO
 				msgs_cache.put(props.get(i), prop_jso.get(props.get(i)));
 		}
 		return msgs_cache;
+	}
+	
+	public final String getSetting(String key, String def)
+	{
+		EnhJSO prop_jso = getJSO("settings");
+		return prop_jso.exists(key)?prop_jso.get(key):def;
+	}
+	
+	public final Boolean getSettingAsBoolean(String key, boolean def)
+	{
+		EnhJSO prop_jso = getJSO("settings");
+		return prop_jso.exists(key)?prop_jso.getBoolean(key):def;
+	}
+	
+	public final Integer getSettingAsInteger(String key, int def)
+	{
+		EnhJSO prop_jso = getJSO("settings");
+		return prop_jso.exists(key)?prop_jso.getInteger(key):def;
 	}
 	
 	public final String getMsg(String code)

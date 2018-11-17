@@ -6,7 +6,6 @@ import java.util.Map;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.RecordList;
 import com.smartgwt.client.types.TabBarControls;
-import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
 import com.smartgwt.client.widgets.events.CloseClickHandler;
@@ -14,7 +13,14 @@ import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
 
 import jrm.webui.client.Client;
-import jrm.webui.client.protocol.*;
+import jrm.webui.client.protocol.A_CatVer;
+import jrm.webui.client.protocol.A_Dat2Dir;
+import jrm.webui.client.protocol.A_NPlayers;
+import jrm.webui.client.protocol.A_Profile;
+import jrm.webui.client.protocol.A_Progress;
+import jrm.webui.client.protocol.A_Report;
+import jrm.webui.client.protocol.A_ReportLite;
+import jrm.webui.client.protocol.A_TrntChk;
 import jrm.webui.client.utils.EnhJSO;
 
 public class MainWindow extends Window
@@ -23,7 +29,7 @@ public class MainWindow extends Window
 	ProfilePanel profilePanel;
 	ScannerPanel scannerPanel;
 	BatchDirUpd8rPanel batchDirUpd8rPanel;
-	Label lblProfileinfo;
+	BatchTrrntChkPanel batchTrrntChkPanel;
 	private Progress progress = null;
 	
 	public MainWindow()
@@ -35,7 +41,6 @@ public class MainWindow extends Window
 		setAnimateMinimize(true);
 		setCanDragReposition(true);
 		setCanDragResize(true);
-		setShowFooter(true);
 		setShowHeaderIcon(true);
 		setShowMaximizeButton(true);
 		Map<String,Object> headerIconDefaults = new HashMap<>();
@@ -88,7 +93,7 @@ public class MainWindow extends Window
 					}});
 					addTab(new Tab() {{
 						setTitle(Client.session.getMsg("MainFrame.panelBatchToolsDir2Torrent.title"));
-						setPane(new BatchTrrntChkPanel());
+						setPane(batchTrrntChkPanel = new BatchTrrntChkPanel());
 					}});
 				}});
 			}});
@@ -97,7 +102,6 @@ public class MainWindow extends Window
 				setTitle(Client.session.getMsg("MainFrame.Settings"));
 			}});
 		}});
-		setFooterControls(lblProfileinfo = new Label() {{setWidth100();}});
 		centerInPage();
 		show();
 	}
@@ -110,7 +114,7 @@ public class MainWindow extends Window
 	
 	public void update(A_Profile.Loaded params)
 	{
-		lblProfileinfo.setContents(params.getSuccess()?params.getName():null);
+		scannerPanel.lblProfileinfo.setContents(params.getSuccess()?params.getName():null);
 		scannerPanel.btnScan.setDisabled(!params.getSuccess());
 		scannerPanel.btnFix.setDisabled(true);
 		if(params.getSuccess())
@@ -232,4 +236,26 @@ public class MainWindow extends Window
 	{
 		batchDirUpd8rPanel.showSettings(params.getSettings(),params.getSrcs());
 	}
+
+	public void update(A_TrntChk.ClearResults params)
+	{
+		RecordList list = batchTrrntChkPanel.sdr.getResultSet().getAllCachedRows();
+		for(int i = 0; i < list.getLength(); i++)
+			batchTrrntChkPanel.sdr.setEditValue(i, 3, "");
+	}
+
+	public void update(A_TrntChk.UpdateResult params)
+	{
+		final int row = params.getRow();
+		final String result = params.getResult();
+		batchTrrntChkPanel.sdr.setEditValue(row, 3, result);
+	}
+
+	public void update(A_TrntChk.End params)
+	{
+		batchTrrntChkPanel.sdr.cancelEditing();
+		batchTrrntChkPanel.sdr.invalidateCache();
+	}
+
+
 }

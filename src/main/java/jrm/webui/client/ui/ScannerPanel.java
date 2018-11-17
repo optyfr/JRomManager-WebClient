@@ -2,6 +2,7 @@ package jrm.webui.client.ui;
 
 import com.google.gwt.core.client.JsonUtils;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.LayoutSpacer;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -17,6 +18,7 @@ public final class ScannerPanel extends VLayout
 {
 	public ToolStripButton btnFix;
 	public ToolStripButton btnScan;
+	Label lblProfileinfo;
 	ScannerDirPanel scannerDirPanel;
 	ScannerSettingsPanel scannerSettingsPanel;
 	ScannerFiltersPanel scannerFiltersPanel;
@@ -121,6 +123,12 @@ public final class ScannerPanel extends VLayout
 						setPane(scannerAdvFiltersPanel = new ScannerAdvFiltersPanel());
 					}}
 				);
+			}},
+			lblProfileinfo = new Label() {{
+				setWidth100();
+				setHeight(20);
+				setBackgroundColor("ActiveCaption");
+				setBorder("1px inset");
 			}}
 		);
 	}
