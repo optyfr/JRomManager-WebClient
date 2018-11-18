@@ -1,27 +1,39 @@
 package jrm.webui.client.ui;
 
+import java.util.HashMap;
+import java.util.Optional;
+
 import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.i18n.client.NumberFormat;
+import com.smartgwt.client.data.DSRequest;
+import com.smartgwt.client.data.DSResponse;
 import com.smartgwt.client.data.OperationBinding;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.RestDataSource;
+import com.smartgwt.client.data.XMLTools;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
+import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DSDataFormat;
 import com.smartgwt.client.types.DSOperationType;
 import com.smartgwt.client.types.DSProtocol;
+import com.smartgwt.client.types.FetchMode;
 import com.smartgwt.client.types.SelectionStyle;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.grid.CellFormatter;
+import com.smartgwt.client.widgets.grid.HoverCustomizer;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.tree.TreeGrid;
 
 import jrm.webui.client.Client;
 import jrm.webui.client.protocol.Q_Global;
@@ -34,102 +46,243 @@ public class BatchTrrntChkPanel extends VLayout
 	public BatchTrrntChkPanel()
 	{
 		setHeight100();
-		addMember(sdr = new ListGrid() {{
-			setHeight100();;
-			setCanEdit(true);
-			setCanHover(true);
-			setHoverAutoFitWidth(true);
-			setHoverAutoFitMaxWidth("50%");
-			setSelectionType(SelectionStyle.MULTIPLE);
-			setCanSort(false);
-			setAutoFitExpandField("result");
-			setAutoFitFieldsFillViewport(true);
-			setAutoFetchData(true);
-			setCanExpandRecords(true);
-			setContextMenu(new Menu() {{
-				addItem(new MenuItem() {{
-					setTitle(Client.session.getMsg("BatchToolsTrrntChkPanel.mntmAddTorrent.text"));
-					addClickHandler(e -> new RemoteFileChooser("addTrnt", path -> {
-						sdr.addData(new Record() {{
-							setAttribute("src",path);
-						}});
-					}));
+		addMember(sdr = new ListGrid() {
+			{
+				setHeight100();;
+				setCanEdit(true);
+				setCanHover(true);
+				setHoverAutoFitWidth(true);
+				setHoverAutoFitMaxWidth("50%");
+				setSelectionType(SelectionStyle.MULTIPLE);
+				setCanSort(false);
+				setAutoFitExpandField("result");
+				setAutoFitFieldsFillViewport(true);
+				setAutoFetchData(true);
+				setCanExpandRecords(true);
+				setContextMenu(new Menu() {{
+					addItem(new MenuItem() {{
+						setTitle(Client.session.getMsg("BatchToolsTrrntChkPanel.mntmAddTorrent.text"));
+						addClickHandler(e -> new RemoteFileChooser("addTrnt", path -> {
+							sdr.addData(new Record() {{
+								setAttribute("src",path);
+							}});
+						}));
+					}});
+					addItem(new MenuItem() {{
+						setTitle("Set Destination");
+						setEnableIfCondition((target, menu, item)->sdr.getSelectedRecords().length==1);
+						addClickHandler(e -> new RemoteFileChooser("updTrnt", path -> {
+							Record record = sdr.getSelectedRecord();
+							record.setAttribute("dst", path);
+							sdr.updateData(record);
+						}));
+					}});
+					addItem(new MenuItem() {{
+						setTitle(Client.session.getMsg("BatchToolsTrrntChkPanel.mntmDelTorrent.text"));
+						setEnableIfCondition((target, menu, item)->sdr.getSelectedRecords().length>0);
+						addClickHandler(e -> sdr.removeSelectedData());
+					}});
 				}});
-				addItem(new MenuItem() {{
-					setTitle("Set Destination");
-					setEnableIfCondition((target, menu, item)->sdr.getSelectedRecords().length==1);
-					addClickHandler(e -> new RemoteFileChooser("updTrnt", path -> {
-						Record record = sdr.getSelectedRecord();
-						record.setAttribute("dst", path);
-						sdr.updateData(record);
-					}));
+				setDataSource(new RestDataSource() {{
+					setID("BatchTrntChkSDR");
+					setDataURL("/datasources/"+getID());
+					setDataFormat(DSDataFormat.XML);
+					setOperationBindings(
+						new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}},
+						new OperationBinding(){{setOperationType(DSOperationType.ADD);setDataProtocol(DSProtocol.POSTXML);}},
+						new OperationBinding(){{setOperationType(DSOperationType.REMOVE);setDataProtocol(DSProtocol.POSTXML);}},
+						new OperationBinding(){{setOperationType(DSOperationType.UPDATE);setDataProtocol(DSProtocol.POSTXML);}}
+					);
+					setFields(
+						new DataSourceTextField("src") {{
+							setPrimaryKey(true);
+							setCanEdit(false);
+						}},
+						new DataSourceTextField("dst") {{
+							setCanEdit(false);
+						}},
+						new DataSourceTextField("result") {{
+							setCanEdit(false);
+						}},
+						new DataSourceBooleanField("selected") {{
+						}}
+					);
 				}});
-				addItem(new MenuItem() {{
-					setTitle(Client.session.getMsg("BatchToolsTrrntChkPanel.mntmDelTorrent.text"));
-					setEnableIfCondition((target, menu, item)->sdr.getSelectedRecords().length>0);
-					addClickHandler(e -> sdr.removeSelectedData());
-				}});
-			}});
-			setDataSource(new RestDataSource() {{
-				setID("BatchTrntChkSDR");
-				setDataURL("/datasources/"+getID());
-				setDataFormat(DSDataFormat.XML);
-				setOperationBindings(
-					new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}},
-					new OperationBinding(){{setOperationType(DSOperationType.ADD);setDataProtocol(DSProtocol.POSTXML);}},
-					new OperationBinding(){{setOperationType(DSOperationType.REMOVE);setDataProtocol(DSProtocol.POSTXML);}},
-					new OperationBinding(){{setOperationType(DSOperationType.UPDATE);setDataProtocol(DSProtocol.POSTXML);}}
-				);
 				setFields(
-					new DataSourceTextField("src") {{
-						setPrimaryKey(true);
-						setCanEdit(false);
+					new ListGridField("src",Client.session.getMsg("MainFrame.TorrentFiles")) {{
+						setAlign(Alignment.RIGHT);
+						setCellFormatter(new CellFormatter()
+						{
+							@Override
+							public String format(Object value, ListGridRecord record, int rowNum, int colNum)
+							{
+								if(value!=null)
+									return "<div style='overflow:hidden;text-overflow:ellipsis;direction:rtl'>"+value+"</div>";
+								return null;
+							}
+						});
 					}},
-					new DataSourceTextField("dst") {{
-						setCanEdit(false);
+					new ListGridField("dst",Client.session.getMsg("MainFrame.DstDirs")) {{
+						setAlign(Alignment.RIGHT);
+						setCellFormatter(new CellFormatter()
+						{
+							@Override
+							public String format(Object value, ListGridRecord record, int rowNum, int colNum)
+							{
+								if(value!=null)
+									return "<div style='overflow:hidden;text-overflow:ellipsis;direction:rtl'>"+value+"</div>";
+								return null;
+							}
+						});
 					}},
-					new DataSourceTextField("result") {{
-						setCanEdit(false);
+					new ListGridField("result",Client.session.getMsg("MainFrame.Result")) {{
 					}},
-					new DataSourceBooleanField("selected") {{
+					new ListGridField("selected") {{
+						setWidth(20);
+						setAlign(Alignment.CENTER);
 					}}
 				);
-			}});
-			setFields(
-				new ListGridField("src",Client.session.getMsg("MainFrame.TorrentFiles")) {{
-					setAlign(Alignment.RIGHT);
-					setCellFormatter(new CellFormatter()
+			}
+
+			@SuppressWarnings("serial")
+			@Override
+			protected Canvas getExpansionComponent(ListGridRecord record)
+			{
+				return new TreeGrid()
+				{
+					Boolean showok = null;
+					
 					{
-						@Override
-						public String format(Object value, ListGridRecord record, int rowNum, int colNum)
-						{
-							if(value!=null)
-								return "<div style='overflow:hidden;text-overflow:ellipsis;direction:rtl'>"+value+"</div>";
-							return null;
-						}
-					});
-				}},
-				new ListGridField("dst",Client.session.getMsg("MainFrame.DstDirs")) {{
-					setAlign(Alignment.RIGHT);
-					setCellFormatter(new CellFormatter()
+						TreeGrid grid = this;
+						setHeight(200);
+						setCanEdit(false);
+						setCanHover(true);
+						setHoverAutoFitWidth(true);
+						setHoverAutoFitMaxWidth("50%");
+						setSelectionType(SelectionStyle.NONE);
+						setCanSort(false);
+						setShowRecordComponents(true);
+						setShowRecordComponentsByCell(true);
+						setAutoFitExpandField("title");
+						setAutoFitFieldsFillViewport(true);
+						setAutoFetchData(true);
+						setShowConnectors(true);
+						setShowOpener(true);
+						setShowOpenIcons(true);
+						setShowCustomIconOpen(true);
+						setDataFetchMode(FetchMode.PAGED);
+						setContextMenu(new Menu() {{
+							setItems(
+								new MenuItem() {{
+									setTitle(Client.session.getMsg("ReportFrame.chckbxmntmShowOkEntries.text"));
+									addClickHandler(e->{
+										grid.getDataSource().getRequestProperties().setData(new HashMap<String,String>() {{
+											put("src", record.getAttribute("src"));
+											put("showOK", Boolean.toString(!(showok==null||showok==true)));
+										}});
+										grid.invalidateCache();
+									});
+									setCheckIfCondition((target, menu, item)->showok==null||showok==true);
+								}}
+							);
+						}});
+						setDataSource(new RestDataSource() {
+							{
+								setID("BatchTrntChkReportTree");
+								setDataURL("/datasources/"+getID());
+								setDataFormat(DSDataFormat.XML);
+								setRequestProperties(new DSRequest() {{
+									setData(new HashMap<String,String>() {{
+										put("src", record.getAttribute("src"));
+										put("showOK", Boolean.toString(showok==null||showok==true));
+									}});
+								}});
+								setOperationBindings(
+									new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}}
+								);
+								setFields(
+									new DataSourceIntegerField("ID") {{
+										setPrimaryKey(true);
+										setRequired(true);
+									}},
+									new DataSourceIntegerField("ParentID") {{
+								        setRequired(true);  
+								        setForeignKey(id + ".ID");  
+								        setRootValue(0);
+									}},
+									new DataSourceTextField("title"),
+									new DataSourceIntegerField("length"),
+									new DataSourceTextField("status")
+								);
+							}
+							
+							protected void transformResponse(DSResponse dsResponse, DSRequest dsRequest, Object data)
+							{
+								if(dsResponse.getStatus()==0)
+									showok = Optional.ofNullable(XMLTools.selectString(data, "/response/showOK")).map(Boolean::valueOf).orElse(true);
+								super.transformResponse(dsResponse, dsRequest, data);
+							};
+						});
+						setFields(
+							new ListGridField("title") {{
+								setHoverCustomizer(new HoverCustomizer()
+								{
+									@Override
+									public String hoverHTML(Object value, ListGridRecord record, int rowNum, int colNum)
+									{
+										return record.getAttribute("title");
+									}
+								});
+							}},
+							new ListGridField("length") {{
+								setWidth(100);
+								setHoverCustomizer(new HoverCustomizer()
+								{
+									@Override
+									public String hoverHTML(Object value, ListGridRecord record, int rowNum, int colNum)
+									{
+										return Optional.ofNullable(record.getAttributeAsLong("length")).map(l->readableFileSize(l)).orElse(null);
+									}
+								});
+							}},
+							new ListGridField("status") {{
+								setWidth(100);
+								setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum)->{
+									if(value==null)
+										return null;
+									switch(value.toString())
+									{
+										case "OK":
+											return "<b style='color:green'>"+value+"</b>";
+										case "SIZE":
+											return "<b style='color:red'>"+value+"</b>";
+										case "SHA1":
+											return "<b style='color:red'>"+value+"</b>";
+										case "MISSING":
+											return "<span style='color:red'>"+value+"</span>";
+										case "SKIPPED":
+											return "<span style='color:orange'>"+value+"</span>";
+										case "UNKNWON":
+											return "<i style='color:gray'>"+value+"</i>";
+										default:
+											return value.toString();
+									}
+								});
+							}}
+						);
+					}
+					
+					public String readableFileSize(long size)
 					{
-						@Override
-						public String format(Object value, ListGridRecord record, int rowNum, int colNum)
-						{
-							if(value!=null)
-								return "<div style='overflow:hidden;text-overflow:ellipsis;direction:rtl'>"+value+"</div>";
-							return null;
-						}
-					});
-				}},
-				new ListGridField("result",Client.session.getMsg("MainFrame.Result")) {{
-				}},
-				new ListGridField("selected") {{
-					setWidth(20);
-					setAlign(Alignment.CENTER);
-				}}
-			);
-		}});
+					    if(size <= 0) return "0";
+					    final String[] units = new String[] { "B", "KB", "MB", "GB", "TB" };
+					    int digitGroups = (int) (Math.log10(size)/Math.log10(1024));
+					    return NumberFormat.getFormat("#,##0.#").format(size/Math.pow(1024, digitGroups)) + " " + units[digitGroups];
+					}
+
+				};
+			}
+		});
 		addMember(new DynamicForm() {{
 			setWidth100();
 			setHeight(20);
