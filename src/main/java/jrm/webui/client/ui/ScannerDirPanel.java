@@ -5,20 +5,24 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.google.gwt.core.client.JsonUtils;
 import com.smartgwt.client.core.Rectangle;
-import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ShowContextMenuEvent;
 import com.smartgwt.client.widgets.events.ShowContextMenuHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.*;
+import com.smartgwt.client.widgets.form.fields.ButtonItem;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+import com.smartgwt.client.widgets.form.fields.FormItem;
+import com.smartgwt.client.widgets.form.fields.RowSpacerItem;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.SpacerItem;
+import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.MenuItemIfFunction;
@@ -38,19 +42,6 @@ public final class ScannerDirPanel extends DynamicForm
 		setColWidths("200","*","22","20");
 		setWrapItemTitles(false);
 		setItems(
-			new ButtonItem() {{
-				setTitle("Manager files uploads");
-				setColSpan(4);
-				setAlign(Alignment.CENTER);
-				addClickHandler(new ClickHandler()
-				{
-					@Override
-					public void onClick(ClickEvent event)
-					{
-						new RemoteFileChooser("manageUploads", null);
-					}
-				});
-			}},
 			new RowSpacerItem(),
 			new TextItem("tfRomsDest",Client.session.getMsg("MainFrame.lblRomsDest.text")) {{
 				setWidth("*");
@@ -63,7 +54,7 @@ public final class ScannerDirPanel extends DynamicForm
 				setTitle(null);
 				setValueIconRightPadding(0);
 				setEndRow(false);
-				addClickHandler(event->new RemoteFileChooser("tfRomsDest", records->setPropertyItemValue("tfRomsDest", "roms_dest_dir", records[0])));
+				addClickHandler(event->new RemoteFileChooser("tfRomsDest", records->setPropertyItemValue("tfRomsDest", "roms_dest_dir", records[0].path)));
 			}},
 			new SpacerItem(),
 			new TextItem("tfDisksDest",Client.session.getMsg("MainFrame.lblDisksDest.text")) {{
@@ -79,7 +70,7 @@ public final class ScannerDirPanel extends DynamicForm
 				setDisabled(true);
 				setValueIconRightPadding(0);
 				setEndRow(false);
-				addClickHandler(event->new RemoteFileChooser("tfDisksDest", records->setPropertyItemValue("tfDisksDest", "disks_dest_dir", records[0])));
+				addClickHandler(event->new RemoteFileChooser("tfDisksDest", records->setPropertyItemValue("tfDisksDest", "disks_dest_dir", records[0].path)));
 			}},
 			new CheckboxItem("tfDisksDestCbx") {{
 				setStartRow(false);
@@ -105,7 +96,7 @@ public final class ScannerDirPanel extends DynamicForm
 				setDisabled(true);
 				setValueIconRightPadding(0);
 				setEndRow(false);
-				addClickHandler(event->new RemoteFileChooser("tfSWDest", records->setPropertyItemValue("tfSWDest", "swroms_dest_dir", records[0])));
+				addClickHandler(event->new RemoteFileChooser("tfSWDest", records->setPropertyItemValue("tfSWDest", "swroms_dest_dir", records[0].path)));
 			}},
 			new CheckboxItem("tfSWDestCbx") {{
 				setStartRow(false);
@@ -131,7 +122,7 @@ public final class ScannerDirPanel extends DynamicForm
 				setDisabled(true);
 				setValueIconRightPadding(0);
 				setEndRow(false);
-				addClickHandler(event->new RemoteFileChooser("tfSWDisksDest", records->setPropertyItemValue("tfSWDisksDest", "swdisks_dest_dir", records[0])));
+				addClickHandler(event->new RemoteFileChooser("tfSWDisksDest", records->setPropertyItemValue("tfSWDisksDest", "swdisks_dest_dir", records[0].path)));
 			}},
 			new CheckboxItem("tfSWDisksDestCbx") {{
 				setStartRow(false);
@@ -157,7 +148,7 @@ public final class ScannerDirPanel extends DynamicForm
 				setDisabled(true);
 				setValueIconRightPadding(0);
 				setEndRow(false);
-				addClickHandler(event->new RemoteFileChooser("tfSamplesDest", records->setPropertyItemValue("tfSamplesDest", "samples_dest_dir", records[0])));
+				addClickHandler(event->new RemoteFileChooser("tfSamplesDest", records->setPropertyItemValue("tfSamplesDest", "samples_dest_dir", records[0].path)));
 			}},
 			new CheckboxItem("tfSamplesDestCbx") {{
 				setStartRow(false);
@@ -247,11 +238,11 @@ public final class ScannerDirPanel extends DynamicForm
 	
 	private void addSrcDir()
 	{
-		new RemoteFileChooser("listSrcDir", (value)-> {
+		new RemoteFileChooser("listSrcDir", (path)-> {
 			SelectItem selectItem = (SelectItem)ScannerDirPanel.this.getItem("listSrcDir");
 			String[] values = selectItem.getValueMapAsArray();
 			List<String> lvalues = new ArrayList<>(Arrays.asList(values));
-			lvalues.addAll(Arrays.asList(value));
+			lvalues.addAll(Stream.of(path).map(p->p.path).collect(Collectors.toList()));
 			Client.socket.send(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty("src_dir", lvalues.stream().collect(Collectors.joining("|")))));
 			selectItem.setValueMap(lvalues.toArray(new String[0]));
 		});		

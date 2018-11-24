@@ -65,7 +65,7 @@ public final class ScannerAdvFiltersPanel extends HLayout
 					setTitle(null);
 					setValueIconRightPadding(0);
 					setEndRow(false);
-					addClickHandler(event->new RemoteFileChooser("NPlayers", path -> Client.socket.send(JsonUtils.stringify(Q_NPlayers.Load.instantiate().setPath(path[0])))));
+					addClickHandler(event->new RemoteFileChooser("NPlayers", path -> Client.socket.send(JsonUtils.stringify(Q_NPlayers.Load.instantiate().setPath(path[0].path)))));
 				}});
 			}}, nplayers_list = new ListGrid() {{
 				setSelectionAppearance(SelectionAppearance.CHECKBOX);
@@ -134,7 +134,7 @@ public final class ScannerAdvFiltersPanel extends HLayout
 						setTitle(null);
 						setValueIconRightPadding(0);
 						setEndRow(false);
-						addClickHandler(event -> new RemoteFileChooser("CatVer", path -> Client.socket.send(JsonUtils.stringify(Q_CatVer.Load.instantiate().setPath(path[0])))));
+						addClickHandler(event -> new RemoteFileChooser("CatVer", path -> Client.socket.send(JsonUtils.stringify(Q_CatVer.Load.instantiate().setPath(path[0].path)))));
 					}}
 				);
 			}}, catver_tree = new TreeGrid() {{

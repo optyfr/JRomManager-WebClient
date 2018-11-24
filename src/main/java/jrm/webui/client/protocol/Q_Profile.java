@@ -19,9 +19,10 @@ public class Q_Profile extends Q_
 			return Q_.instantiateCmd("Profile.load").cast();
 		}
 		
-		final public Load setPath(String path)
+		final public Load setPath(String parent, String file)
 		{
-			getParams().set("path",path);
+			getParams().set("parent",parent);
+			getParams().set("file",file);
 			return this;
 		}
 	}

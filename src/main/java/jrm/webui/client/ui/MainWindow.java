@@ -1,8 +1,10 @@
 package jrm.webui.client.ui;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gwt.core.client.JsArrayString;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.RecordList;
 import com.smartgwt.client.types.TabBarControls;
@@ -30,6 +32,7 @@ public class MainWindow extends Window
 	ScannerPanel scannerPanel;
 	BatchDirUpd8rPanel batchDirUpd8rPanel;
 	BatchTrrntChkPanel batchTrrntChkPanel;
+	Dir2DatPanel dir2datPanel;
 	private Progress progress = null;
 	
 	public MainWindow()
@@ -77,6 +80,7 @@ public class MainWindow extends Window
 			addTab(new Tab() {{
 				setIcon("icons/drive_go.png");
 				setTitle(Client.session.getMsg("MainFrame.Dir2Dat"));
+				setPane(dir2datPanel = new Dir2DatPanel());
 			}});
 			addTab(new Tab() {{
 				setIcon("icons/application_osx_terminal.png");
@@ -125,6 +129,13 @@ public class MainWindow extends Window
 			scannerPanel.scannerDirPanel.initPropertyItemValues(settings);
 			scannerPanel.scannerSettingsPanel.initPropertyItemValues(settings);
 			scannerPanel.scannerFiltersPanel.systems.setData(Record.convertToRecordArray(params.getSystems()));
+			JsArrayString jsarrstr = params.getYears();
+			ArrayList<String> arrlststr = new ArrayList<>();
+			for(int i = 0; i < jsarrstr.length(); i++)
+				arrlststr.add(jsarrstr.get(i));
+			String[] arrstr = arrlststr.toArray(new String[0]);
+			scannerPanel.scannerFiltersPanel.filterForm.getItem("YearMin").setValueMap(arrstr);
+			scannerPanel.scannerFiltersPanel.filterForm.getItem("YearMax").setValueMap(arrstr);
 		}
 		else
 		{

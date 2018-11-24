@@ -6,12 +6,18 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.gwt.core.client.JsonUtils;
+import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.LayoutSpacer;
+import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 
@@ -22,6 +28,7 @@ public final class ScannerFiltersPanel extends HLayout
 {
 	ListGrid systems;
 	private boolean canResetPV = true;
+	DynamicForm filterForm;
 	
 	public ScannerFiltersPanel()
 	{
@@ -29,9 +36,66 @@ public final class ScannerFiltersPanel extends HLayout
 		setWidth100();
 		setHeight100();
 		setMembers(
-			new DynamicForm() {{
-				setWidth("50%");
+			new VLayout() {{
 				setShowResizeBar(true);
+				addMember(new LayoutSpacer("*", "*"));
+				addMember(filterForm = new DynamicForm() {{
+					setWidth("80%");
+					setLayoutAlign(Alignment.CENTER);
+					setNumCols(3);
+					setColWidths("*",80,"*");
+					setItems(
+						new CheckboxItem("IncludeClones", Client.session.getMsg("MainFrame.chckbxIncludeClones.text")) {{
+							setTitleColSpan(2);
+							setLabelAsTitle(true);
+						}},
+						new CheckboxItem("IncludeDisks", Client.session.getMsg("MainFrame.chckbxIncludeDisks.text")) {{
+							setTitleColSpan(2);
+							setLabelAsTitle(true);
+						}},
+						new CheckboxItem("IncludeSamples", Client.session.getMsg("MainFrame.chckbxIncludeSamples.text")) {{
+							setTitleColSpan(2);
+							setLabelAsTitle(true);
+						}},
+						new SelectItem("MachineType", Client.session.getMsg("MainFrame.lblMachineType.text")) {{
+							setTitleColSpan(2);
+							setWidth("*");
+							setValueMap("any","upright","cocktail");
+						}},
+						new SelectItem("Orientation", Client.session.getMsg("MainFrame.lblOrientation.text")) {{
+							setTitleColSpan(2);
+							setWidth("*");
+							setValueMap("any","horizontal","vertical");
+						}},
+						new SelectItem("DriverStatus", Client.session.getMsg("MainFrame.lblDriverStatus.text")) {{
+							setTitleColSpan(2);
+							setWidth("*");
+							setValueMap("good","imperfect","preliminary");
+						}},
+						new SelectItem("SwMinSupport", Client.session.getMsg("MainFrame.lblSwMinSupport.text")) {{
+							setTitleColSpan(2);
+							setWidth("*");
+							setValueMap("no","partial","yes");
+						}},
+						new SelectItem("YearMin") {{
+							setShowTitle(false);
+							setEndRow(false);
+							setWidth("*");
+						}},
+						new StaticTextItem() {{
+							setShowTitle(false);
+							setDefaultValue(Client.session.getMsg("MainFrame.lblYear.text"));
+							setTextAlign(Alignment.CENTER);
+							setWidth("*");
+						}},
+						new SelectItem("YearMax") {{
+							setShowTitle(false);
+							setStartRow(false);
+							setWidth("*");
+						}}
+					);
+				}});
+				addMember(new LayoutSpacer("*", "*"));
 			}},
 			systems = new ListGrid() {{
 				setShowAllRecords(true);

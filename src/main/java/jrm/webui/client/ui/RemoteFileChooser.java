@@ -33,16 +33,37 @@ import jsinterop.annotations.JsPackage;
 
 public final class RemoteFileChooser extends Window
 {
-	Label parent;
+	Label parentLab;
 	Progressbar pb;
 	Label pb_text;
 	LayoutSpacer pb_spacer;
 
 	static UploadList list;
+	
+	String parent;
 
+	public class PathInfo
+	{
+		String path;
+		String parent;
+		String name;
+		
+		public PathInfo(String path, String parent, String name)
+		{
+			this.path = path;
+			this.parent = parent;
+			this.name = name;
+		}
+		
+		public PathInfo(Record record)
+		{
+			this(record.getAttribute("Path"), RemoteFileChooser.this.parent, record.getAttribute("Name"));
+		}
+	}
+	
 	public interface CallBack
 	{
-		public void apply(String[] path);
+		public void apply(PathInfo[] path);
 	}
 	
 	public class UploadList extends ListGrid
@@ -77,6 +98,10 @@ public final class RemoteFileChooser extends Window
 				case "updDat":
 				case "updTrnt":
 					isMultiple = false;
+					isChoose = true;
+					break;
+				case "importDat":
+					isMultiple = true;
 					isChoose = true;
 					break;
 				case "addDat":
@@ -129,6 +154,7 @@ public final class RemoteFileChooser extends Window
 			addRecordDoubleClickHandler(event->{
 				ListGridRecord record = event.getRecord();
 				String path = record.getAttribute("Path");
+				String name = record.getAttribute("Name");
 				if(record.getAttributeAsBoolean("isDir"))
 				{
 					getDataSource().setRequestProperties(new DSRequest() {{
@@ -143,7 +169,7 @@ public final class RemoteFileChooser extends Window
 				else if(isChoose)
 				{
 					if(cb!=null)
-						cb.apply(new String[] {path});
+						cb.apply(new PathInfo[] {new PathInfo(path, parent, name)});
 					RemoteFileChooser.this.markForDestroy();
 				}
 			});
@@ -176,8 +202,8 @@ public final class RemoteFileChooser extends Window
 				}
 				@Override
 				protected void transformResponse(DSResponse dsResponse, DSRequest dsRequest, Object data) {
-					if(dsResponse.getStatus()==0)
-						parent.setContents(XMLTools.selectString(data, "/response/parent"));
+					if (dsResponse.getStatus() == 0)
+						parentLab.setContents(parent = XMLTools.selectString(data, "/response/parent"));
 					super.transformResponse(dsResponse, dsRequest, data);
 				};
 			});
@@ -217,7 +243,7 @@ public final class RemoteFileChooser extends Window
 		@JsMethod
 		public String getParentPath()
 		{
-			return parent.getContents();
+			return parentLab.getContents();
 		}
 		
 		@JsMethod
@@ -414,6 +440,11 @@ public final class RemoteFileChooser extends Window
 				isMultiple = false;
 				isChoose = true;
 				break;
+			case "importDat":
+				isDir = false;
+				isMultiple = true;
+				isChoose = true;
+				break;
 			case "addDat":
 			case "addTrnt":
 			default:
@@ -476,7 +507,7 @@ public final class RemoteFileChooser extends Window
 				);
 			}});
 			setDetailPane(list=new UploadList(context,cb));
-			setDetailToolButtons(parent=new Label("parent") {{
+			setDetailToolButtons(parentLab=new Label("parent") {{
 				setWidth100();
 				setBorder("1px inset");
 			}});
@@ -515,14 +546,14 @@ public final class RemoteFileChooser extends Window
 						if(records.length>0)
 						{
 							if(cb != null)
-								cb.apply(Stream.of(records).map(record->record.getAttribute("Path")).collect(Collectors.toList()).toArray(new String[0]));
+								cb.apply(Stream.of(records).map(PathInfo::new).collect(Collectors.toList()).toArray(new PathInfo[0]));
 							RemoteFileChooser.this.markForDestroy();
 						}
 						else if(isDir)
 						{
-							String path = parent.getContents();
+							String path = parent;
 							if(cb != null)
-								cb.apply(new String[] {path});
+								cb.apply(new PathInfo[] {new PathInfo(path, null, null)});
 							RemoteFileChooser.this.markForDestroy();
 						}
 					});

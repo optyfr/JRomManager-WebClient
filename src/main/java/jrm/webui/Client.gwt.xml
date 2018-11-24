@@ -15,7 +15,8 @@
 
   <!-- Other module inherits                                      -->
   <inherits name="com.sksamuel.gwt.GwtWebsockets"/>
-  <inherits name="com.smartgwt.SmartGwt"/>
+  <inherits name="com.smartgwt.SmartGwtNoTheme"/>
+  <inherits name="com.smartclient.theme.enterprise.Enterprise"/>
   <inherits name="com.smartgwt.Drawing"/>
   
   <!-- Specify the app entry point class.                         -->
