@@ -15,14 +15,7 @@ import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
 
 import jrm.webui.client.Client;
-import jrm.webui.client.protocol.A_CatVer;
-import jrm.webui.client.protocol.A_Dat2Dir;
-import jrm.webui.client.protocol.A_NPlayers;
-import jrm.webui.client.protocol.A_Profile;
-import jrm.webui.client.protocol.A_Progress;
-import jrm.webui.client.protocol.A_Report;
-import jrm.webui.client.protocol.A_ReportLite;
-import jrm.webui.client.protocol.A_TrntChk;
+import jrm.webui.client.protocol.*;
 import jrm.webui.client.utils.EnhJSO;
 
 public class MainWindow extends Window
@@ -32,6 +25,7 @@ public class MainWindow extends Window
 	ScannerPanel scannerPanel;
 	BatchDirUpd8rPanel batchDirUpd8rPanel;
 	BatchTrrntChkPanel batchTrrntChkPanel;
+	BatchCompressorPanel batchCompressorPanel;
 	Dir2DatPanel dir2datPanel;
 	private Progress progress = null;
 	
@@ -98,6 +92,10 @@ public class MainWindow extends Window
 					addTab(new Tab() {{
 						setTitle(Client.session.getMsg("MainFrame.panelBatchToolsDir2Torrent.title"));
 						setPane(batchTrrntChkPanel = new BatchTrrntChkPanel());
+					}});
+					addTab(new Tab() {{
+						setTitle(Client.session.getMsg("BatchPanel.Compressor"));
+						setPane(batchCompressorPanel = new BatchCompressorPanel());
 					}});
 				}});
 			}});
