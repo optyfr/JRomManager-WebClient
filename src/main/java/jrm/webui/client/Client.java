@@ -132,6 +132,18 @@ public class Client implements EntryPoint
 													case "TrntChk.end":
 														mainwindow.update(new A_TrntChk.End(a));
 														break;
+													case "Compressor.clearResults":
+														mainwindow.update(new A_Compressor.ClearResults(a));
+														break;
+													case "Compressor.updateResult":
+														mainwindow.update(new A_Compressor.UpdateResult(a));
+														break;
+													case "Compressor.updateFile":
+														mainwindow.update(new A_Compressor.UpdateFile(a));
+														break;
+													case "Compressor.end":
+														mainwindow.update(new A_Compressor.End(a));
+														break;
 												}
 												return false;
 											}

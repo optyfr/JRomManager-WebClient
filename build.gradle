@@ -101,3 +101,13 @@ war {
     from tasks.compileGwt.outputs
 }
 */
+
+task webZip(type: Zip) {
+	from ("$buildDir/gwt/out/smartgwt")
+	into "webclient"
+	archiveName baseName + '.' + extension
+	destinationDir = file("$buildDir/distributions")
+}
+
+build.dependsOn webZip
+

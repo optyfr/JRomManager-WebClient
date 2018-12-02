@@ -15,7 +15,15 @@ import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
 
 import jrm.webui.client.Client;
-import jrm.webui.client.protocol.*;
+import jrm.webui.client.protocol.A_CatVer;
+import jrm.webui.client.protocol.A_Compressor;
+import jrm.webui.client.protocol.A_Dat2Dir;
+import jrm.webui.client.protocol.A_NPlayers;
+import jrm.webui.client.protocol.A_Profile;
+import jrm.webui.client.protocol.A_Progress;
+import jrm.webui.client.protocol.A_Report;
+import jrm.webui.client.protocol.A_ReportLite;
+import jrm.webui.client.protocol.A_TrntChk;
 import jrm.webui.client.utils.EnhJSO;
 
 public class MainWindow extends Window
@@ -266,5 +274,31 @@ public class MainWindow extends Window
 		batchTrrntChkPanel.sdr.invalidateCache();
 	}
 
+
+	public void update(A_Compressor.ClearResults params)
+	{
+		for(int i = 0; i < batchCompressorPanel.fr.getTotalRows(); i++)
+			batchCompressorPanel.fr.setEditValue(i, 1, "");
+	}
+
+	public void update(A_Compressor.UpdateResult params)
+	{
+		final int row = params.getRow();
+		final String result = params.getResult();
+		batchCompressorPanel.fr.setEditValue(row, 1, result);
+	}
+
+	public void update(A_Compressor.UpdateFile params)
+	{
+		final int row = params.getRow();
+		final String file = params.getFile();
+		batchCompressorPanel.fr.setEditValue(row, 0, file);
+	}
+
+	public void update(A_Compressor.End params)
+	{
+		batchCompressorPanel.fr.discardAllEdits();
+		batchCompressorPanel.fr.refreshData();
+	}
 
 }

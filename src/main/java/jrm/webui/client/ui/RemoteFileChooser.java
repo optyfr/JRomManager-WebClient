@@ -104,6 +104,10 @@ public final class RemoteFileChooser extends Window
 					isMultiple = true;
 					isChoose = true;
 					break;
+				case "addArc":
+					isMultiple = true;
+					isChoose = true;
+					break;
 				case "addDat":
 				case "addTrnt":
 				default:
@@ -441,6 +445,11 @@ public final class RemoteFileChooser extends Window
 				isChoose = true;
 				break;
 			case "importDat":
+				isDir = false;
+				isMultiple = true;
+				isChoose = true;
+				break;
+			case "addArc":
 				isDir = false;
 				isMultiple = true;
 				isChoose = true;
