@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.user.client.Timer;
+import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -26,9 +28,83 @@ import jrm.webui.client.protocol.Q_Profile;
 
 public final class ScannerFiltersPanel extends HLayout
 {
-	ListGrid systems;
+	Systems systems;
 	private boolean canResetPV = true;
 	DynamicForm filterForm;
+	
+	class Systems extends ListGrid
+	{
+		private boolean setproperty = true;
+		
+		public Systems()
+		{
+			setShowAllRecords(true);
+			setAlternateRecordStyles(false);
+			setSelectionProperty("selected");
+			setFields(new ListGridField("name",Client.session.getMsg("MainFrame.systemsFilter.viewportBorderTitle")));
+			setSelectionAppearance(SelectionAppearance.CHECKBOX);
+			setShowSelectedStyle(false);
+			setCanEdit(false);
+			setCanRemoveRecords(false);
+			addSelectionChangedHandler(event->{
+				if(setproperty)
+				{
+					Client.socket.send(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty(event.getRecord().getAttribute("property"), event.getState())));
+					if(canResetPV)
+						resetProfileViewer();
+				}
+			});
+			setContextMenu(new Menu() {{
+				addItem(new MenuItem() {{
+					setTitle(Client.session.getMsg("MainFrame.mnSelect.text"));
+					this.setSubmenu(new Menu() {{
+						addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmSelectAll.text")) {{
+							addClickHandler(event->resetProfileViewer(()->systems.selectAllRecords()));
+						}});
+						addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmAllBios.text")) {{
+							addClickHandler(event->resetProfileViewer(()->systems.selectRecords(Stream.of(systems.getRecords()).filter(r->r.getAttribute("type").equals("BIOS")).collect(Collectors.toList()).toArray(new ListGridRecord[0]))));
+						}});
+						addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmAllSoftwares.text")) {{
+							addClickHandler(event->resetProfileViewer(()->systems.selectRecords(Stream.of(systems.getRecords()).filter(r->r.getAttribute("type").equals("SOFTWARELIST")).collect(Collectors.toList()).toArray(new ListGridRecord[0]))));
+						}});
+					}});
+				}});
+				addItem(new MenuItem() {{
+					setTitle(Client.session.getMsg("MainFrame.mnUnselect.text"));
+					this.setSubmenu(new Menu() {{
+						addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmSelectNone.text")) {{
+							addClickHandler(event->resetProfileViewer(()->systems.deselectAllRecords()));
+						}});
+						addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmAllBios.text")) {{
+							addClickHandler(event->resetProfileViewer(()->systems.deselectRecords(Stream.of(systems.getRecords()).filter(r->r.getAttribute("type").equals("BIOS")).collect(Collectors.toList()).toArray(new ListGridRecord[0]))));
+						}});
+						addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmAllSoftwares.text")) {{
+							addClickHandler(event->resetProfileViewer(()->systems.deselectRecords(Stream.of(systems.getRecords()).filter(r->r.getAttribute("type").equals("SOFTWARELIST")).collect(Collectors.toList()).toArray(new ListGridRecord[0]))));
+						}});
+					}});
+				}});
+				addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmInvertSelection.text")) {{
+					addClickHandler(event->resetProfileViewer(()->{
+						ListGridRecord[] to_unselect = systems.getSelectedRecords();
+						List<ListGridRecord> to_unselect_list = Arrays.asList(to_unselect);
+						ListGridRecord[] to_select = Stream.of(systems.getRecords()).filter(r->!to_unselect_list.contains(r)).collect(Collectors.toList()).toArray(new ListGridRecord[0]);
+						systems.deselectRecords(to_unselect);
+						systems.selectRecords(to_select);
+					}));
+				}});
+			}});
+		}
+		
+		@Override
+		public void setData(Record[] data)
+		{
+			resetProfileViewer(()->{
+				setproperty=false;
+				super.setData(data);
+				setproperty=true;
+			});
+		}
+	}
 	
 	public ScannerFiltersPanel()
 	{
@@ -97,59 +173,7 @@ public final class ScannerFiltersPanel extends HLayout
 				}});
 				addMember(new LayoutSpacer("*", "*"));
 			}},
-			systems = new ListGrid() {{
-				setShowAllRecords(true);
-				setAlternateRecordStyles(false);
-				setSelectionProperty("selected");
-				setFields(new ListGridField("name",Client.session.getMsg("MainFrame.systemsFilter.viewportBorderTitle")));
-				setSelectionAppearance(SelectionAppearance.CHECKBOX);
-				setShowSelectedStyle(false);
-				setCanEdit(false);
-				setCanRemoveRecords(false);
-				addSelectionChangedHandler(event->{
-					Client.socket.send(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty(event.getRecord().getAttribute("property"), event.getState())));
-					resetProfileViewer();
-				});
-				setContextMenu(new Menu() {{
-					addItem(new MenuItem() {{
-						setTitle(Client.session.getMsg("MainFrame.mnSelect.text"));
-						this.setSubmenu(new Menu() {{
-							addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmSelectAll.text")) {{
-								addClickHandler(event->resetProfileViewer(()->systems.selectAllRecords()));
-							}});
-							addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmAllBios.text")) {{
-								addClickHandler(event->resetProfileViewer(()->systems.selectRecords(Stream.of(systems.getRecords()).filter(r->r.getAttribute("type").equals("BIOS")).collect(Collectors.toList()).toArray(new ListGridRecord[0]))));
-							}});
-							addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmAllSoftwares.text")) {{
-								addClickHandler(event->resetProfileViewer(()->systems.selectRecords(Stream.of(systems.getRecords()).filter(r->r.getAttribute("type").equals("SOFTWARELIST")).collect(Collectors.toList()).toArray(new ListGridRecord[0]))));
-							}});
-						}});
-					}});
-					addItem(new MenuItem() {{
-						setTitle(Client.session.getMsg("MainFrame.mnUnselect.text"));
-						this.setSubmenu(new Menu() {{
-							addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmSelectNone.text")) {{
-								addClickHandler(event->resetProfileViewer(()->systems.deselectAllRecords()));
-							}});
-							addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmAllBios.text")) {{
-								addClickHandler(event->resetProfileViewer(()->systems.deselectRecords(Stream.of(systems.getRecords()).filter(r->r.getAttribute("type").equals("BIOS")).collect(Collectors.toList()).toArray(new ListGridRecord[0]))));
-							}});
-							addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmAllSoftwares.text")) {{
-								addClickHandler(event->resetProfileViewer(()->systems.deselectRecords(Stream.of(systems.getRecords()).filter(r->r.getAttribute("type").equals("SOFTWARELIST")).collect(Collectors.toList()).toArray(new ListGridRecord[0]))));
-							}});
-						}});
-					}});
-					addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmInvertSelection.text")) {{
-						addClickHandler(event->resetProfileViewer(()->{
-							ListGridRecord[] to_unselect = systems.getSelectedRecords();
-							List<ListGridRecord> to_unselect_list = Arrays.asList(to_unselect);
-							ListGridRecord[] to_select = Stream.of(systems.getRecords()).filter(r->!to_unselect_list.contains(r)).collect(Collectors.toList()).toArray(new ListGridRecord[0]);
-							systems.deselectRecords(to_unselect);
-							systems.selectRecords(to_select);
-						}));
-					}});
-				}});
-			}}
+			systems = new Systems()
 		);
 	}
 	
@@ -168,8 +192,15 @@ public final class ScannerFiltersPanel extends HLayout
 	
 	public void resetProfileViewer()
 	{
-		if(canResetPV)
-			if(Client.mainwindow.scannerPanel.profileViewer!=null && Client.childWindows.contains(Client.mainwindow.scannerPanel.profileViewer))
-				Client.mainwindow.scannerPanel.profileViewer.anywareListList.reset();
+		new Timer()
+		{
+			@Override
+			public void run()
+			{
+				if (canResetPV)
+					if (Client.mainwindow.scannerPanel.profileViewer != null && Client.childWindows.contains(Client.mainwindow.scannerPanel.profileViewer))
+						Client.mainwindow.scannerPanel.profileViewer.anywareListList.reset();
+			}
+		}.schedule(1000);
 	}
 }
