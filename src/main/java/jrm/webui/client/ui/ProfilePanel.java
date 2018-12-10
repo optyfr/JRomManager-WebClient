@@ -1,20 +1,10 @@
 package jrm.webui.client.ui;
 
 import com.google.gwt.core.client.JsonUtils;
-import com.smartgwt.client.data.Criteria;
-import com.smartgwt.client.data.DSCallback;
-import com.smartgwt.client.data.DSRequest;
-import com.smartgwt.client.data.DSResponse;
-import com.smartgwt.client.data.OperationBinding;
-import com.smartgwt.client.data.Record;
-import com.smartgwt.client.data.RestDataSource;
-import com.smartgwt.client.data.XMLTools;
+import com.smartgwt.client.data.*;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
-import com.smartgwt.client.types.DSDataFormat;
-import com.smartgwt.client.types.DSOperationType;
-import com.smartgwt.client.types.DSProtocol;
-import com.smartgwt.client.types.PreserveOpenState;
+import com.smartgwt.client.types.*;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.grid.HoverCustomizer;
@@ -51,6 +41,7 @@ public class ProfilePanel extends VLayout
 					setShowHover(true);
 					setCanHover(true);
 					setHoverWidth(200);
+					setEditEvent(ListGridEditEvent.NONE);
 					addRecordDoubleClickHandler(new RecordDoubleClickHandler()
 					{
 						@Override
@@ -93,7 +84,8 @@ public class ProfilePanel extends VLayout
 							new MenuItem() {{
 								setTitle(Client.session.getMsg("MainFrame.mntmDropCache.text"));
 								setIcon("icons/bin.png");
-								setEnableIfCondition((Canvas target, Menu menu, MenuItem item)->listgrid.anySelected());
+								setEnableIfCondition((Canvas target, Menu menu, MenuItem item)->listgrid.getSelectedRecords().length==1);
+								addClickHandler(e->listgrid.getDataSource().performCustomOperation("DropCache",listgrid.getSelectedRecord()));
 							}}
 						);
 					}});
@@ -106,7 +98,8 @@ public class ProfilePanel extends VLayout
 								new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}},
 								new OperationBinding(){{setOperationType(DSOperationType.ADD);setDataProtocol(DSProtocol.POSTXML);}},
 								new OperationBinding(){{setOperationType(DSOperationType.UPDATE);setDataProtocol(DSProtocol.POSTXML);}},
-								new OperationBinding(){{setOperationType(DSOperationType.REMOVE);setDataProtocol(DSProtocol.POSTXML);}}
+								new OperationBinding(){{setOperationType(DSOperationType.REMOVE);setDataProtocol(DSProtocol.POSTXML);}},
+								new OperationBinding(){{setOperationType(DSOperationType.CUSTOM);setDataProtocol(DSProtocol.POSTXML);}}
 							);
 							DataSourceTextField nameField = new DataSourceTextField("Name", Client.session.getMsg("FileTableModel.Profile"));
 							nameField.setCanEdit(true);
@@ -126,6 +119,7 @@ public class ProfilePanel extends VLayout
 							setFields(nameField, parentField, fileField, verField, haveSetsField, haveRomsField, haveDisksField, createdField, scannedField, fixedField);
 						}
 						
+						@Override
 						protected void transformResponse(DSResponse dsResponse, DSRequest dsRequest, Object data)
 						{
 							if (dsResponse.getStatus() == 0)
