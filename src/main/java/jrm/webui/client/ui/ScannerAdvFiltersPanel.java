@@ -12,12 +12,7 @@ import com.smartgwt.client.data.RestDataSource;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
-import com.smartgwt.client.types.DSDataFormat;
-import com.smartgwt.client.types.DSOperationType;
-import com.smartgwt.client.types.DSProtocol;
-import com.smartgwt.client.types.OperatorId;
-import com.smartgwt.client.types.SelectionAppearance;
-import com.smartgwt.client.types.TreeModelType;
+import com.smartgwt.client.types.*;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -112,6 +107,10 @@ public final class ScannerAdvFiltersPanel extends HLayout
 								nplayers_list.deselectRecords(to_unselect);
 								nplayers_list.selectRecords(to_select);
 							});
+						}},
+						new MenuItem() {{setIsSeparator(true);}},
+						new MenuItem(Client.session.getMsg("ScannerAdvFilterPanel.mntmClear_1.text")) {{
+							addClickHandler(event->Client.socket.send(JsonUtils.stringify(Q_NPlayers.Load.instantiate().setPath(null))));
 						}}
 					);
 				}});
@@ -234,6 +233,10 @@ public final class ScannerAdvFiltersPanel extends HLayout
 								addClickHandler(event->catver_tree.deselectRecords(catver_tree.getData().findAll(new AdvancedCriteria("Name", OperatorId.ENDS_WITH, "* Mature *"))));
 							}});
 						}});
+					}});
+					addItem(new MenuItem() {{setIsSeparator(true);}});
+					addItem(new MenuItem(Client.session.getMsg("ScannerAdvFilterPanel.mntmClear.text")) {{
+						addClickHandler(event->Client.socket.send(JsonUtils.stringify(Q_CatVer.Load.instantiate().setPath(null))));
 					}});
 				}});
 			}});
