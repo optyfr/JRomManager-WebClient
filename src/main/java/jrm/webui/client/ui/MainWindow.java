@@ -140,8 +140,11 @@ public class MainWindow extends Window
 			for(int i = 0; i < jsarrstr.length(); i++)
 				arrlststr.add(jsarrstr.get(i));
 			String[] arrstr = arrlststr.toArray(new String[0]);
-			scannerPanel.scannerFiltersPanel.filterForm.getItem("YearMin").setValueMap(arrstr);
-			scannerPanel.scannerFiltersPanel.filterForm.getItem("YearMax").setValueMap(arrstr);
+			scannerPanel.scannerFiltersPanel.filterForm.getItem("cbYearMin").setValueMap(arrstr);
+			scannerPanel.scannerFiltersPanel.filterForm.getItem("cbYearMin").setDefaultValue(arrstr[0]);
+			scannerPanel.scannerFiltersPanel.filterForm.getItem("cbYearMax").setValueMap(arrstr);
+			scannerPanel.scannerFiltersPanel.filterForm.getItem("cbYearMax").setDefaultValue(arrstr[arrstr.length-1]);
+			scannerPanel.scannerFiltersPanel.filterForm.initPropertyItemValues(settings);
 		}
 		else
 		{

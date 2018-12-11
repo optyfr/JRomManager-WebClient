@@ -10,7 +10,6 @@ import com.google.gwt.user.client.Timer;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.SelectionAppearance;
-import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
@@ -25,12 +24,13 @@ import com.smartgwt.client.widgets.menu.MenuItem;
 
 import jrm.webui.client.Client;
 import jrm.webui.client.protocol.Q_Profile;
+import jrm.webui.client.utils.EnhJSO;
 
 public final class ScannerFiltersPanel extends HLayout
 {
 	Systems systems;
 	private boolean canResetPV = true;
-	DynamicForm filterForm;
+	FilterForm filterForm;
 	
 	class Systems extends ListGrid
 	{
@@ -105,6 +105,87 @@ public final class ScannerFiltersPanel extends HLayout
 			});
 		}
 	}
+
+	class FilterForm extends SettingsForm
+	{
+		public FilterForm()
+		{
+			this(null);
+		}
+		
+		public FilterForm(EnhJSO settings)
+		{
+			setWidth("80%");
+			setLayoutAlign(Alignment.CENTER);
+			setNumCols(3);
+			setColWidths("*",80,"*");
+			setItems(
+				new CheckboxItem("chckbxIncludeClones", Client.session.getMsg("MainFrame.chckbxIncludeClones.text")) {{
+					setTitleColSpan(2);
+					setLabelAsTitle(true);
+					addChangedHandler(event->resetProfileViewer(()->setPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue())));
+				}},
+				new CheckboxItem("chckbxIncludeDisks", Client.session.getMsg("MainFrame.chckbxIncludeDisks.text")) {{
+					setTitleColSpan(2);
+					setLabelAsTitle(true);
+					addChangedHandler(event->resetProfileViewer(()->setPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue())));
+				}},
+				new CheckboxItem("chckbxIncludeSamples", Client.session.getMsg("MainFrame.chckbxIncludeSamples.text")) {{
+					setTitleColSpan(2);
+					setLabelAsTitle(true);
+					addChangedHandler(event->resetProfileViewer(()->setPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue())));
+				}},
+				new SelectItem("cbMachineType", Client.session.getMsg("MainFrame.lblMachineType.text")) {{
+					setTitleColSpan(2);
+					setWidth("*");
+					setValueMap("any","upright","cocktail");
+					setDefaultValue("any");
+					addChangedHandler(event->resetProfileViewer(()->setPropertyItemValue(getName(), fname2name.get(getName()), getValue().toString())));
+				}},
+				new SelectItem("cbOrientation", Client.session.getMsg("MainFrame.lblOrientation.text")) {{
+					setTitleColSpan(2);
+					setWidth("*");
+					setValueMap("any","horizontal","vertical");
+					setDefaultValue("any");
+					addChangedHandler(event->resetProfileViewer(()->setPropertyItemValue(getName(), fname2name.get(getName()), getValue().toString())));
+				}},
+				new SelectItem("cbDriverStatus", Client.session.getMsg("MainFrame.lblDriverStatus.text")) {{
+					setTitleColSpan(2);
+					setWidth("*");
+					setValueMap("good","imperfect","preliminary");
+					setDefaultValue("preliminary");
+					addChangedHandler(event->resetProfileViewer(()->setPropertyItemValue(getName(), fname2name.get(getName()), getValue().toString())));
+				}},
+				new SelectItem("cbSwMinSupport", Client.session.getMsg("MainFrame.lblSwMinSupport.text")) {{
+					setTitleColSpan(2);
+					setWidth("*");
+					setValueMap("no","partial","yes");
+					setDefaultValue("no");
+					addChangedHandler(event->resetProfileViewer(()->setPropertyItemValue(getName(), fname2name.get(getName()), getValue().toString())));
+				}},
+				new SelectItem("cbYearMin") {{
+					setShowTitle(false);
+					setEndRow(false);
+					setWidth("*");
+					addChangedHandler(event->resetProfileViewer(()->setPropertyItemValue(getName(), fname2name.get(getName()), getValue().toString())));
+				}},
+				new StaticTextItem() {{
+					setShowTitle(false);
+					setDefaultValue(Client.session.getMsg("MainFrame.lblYear.text"));
+					setTextAlign(Alignment.CENTER);
+					setWidth("*");
+				}},
+				new SelectItem("cbYearMax") {{
+					setShowTitle(false);
+					setStartRow(false);
+					setWidth("*");
+					addChangedHandler(event->resetProfileViewer(()->setPropertyItemValue(getName(), fname2name.get(getName()), getValue().toString())));
+				}}
+			);
+			if(hasSettings)
+				initPropertyItemValues(settings);
+		}
+	}
 	
 	public ScannerFiltersPanel()
 	{
@@ -115,62 +196,7 @@ public final class ScannerFiltersPanel extends HLayout
 			new VLayout() {{
 				setShowResizeBar(true);
 				addMember(new LayoutSpacer("*", "*"));
-				addMember(filterForm = new DynamicForm() {{
-					setWidth("80%");
-					setLayoutAlign(Alignment.CENTER);
-					setNumCols(3);
-					setColWidths("*",80,"*");
-					setItems(
-						new CheckboxItem("IncludeClones", Client.session.getMsg("MainFrame.chckbxIncludeClones.text")) {{
-							setTitleColSpan(2);
-							setLabelAsTitle(true);
-						}},
-						new CheckboxItem("IncludeDisks", Client.session.getMsg("MainFrame.chckbxIncludeDisks.text")) {{
-							setTitleColSpan(2);
-							setLabelAsTitle(true);
-						}},
-						new CheckboxItem("IncludeSamples", Client.session.getMsg("MainFrame.chckbxIncludeSamples.text")) {{
-							setTitleColSpan(2);
-							setLabelAsTitle(true);
-						}},
-						new SelectItem("MachineType", Client.session.getMsg("MainFrame.lblMachineType.text")) {{
-							setTitleColSpan(2);
-							setWidth("*");
-							setValueMap("any","upright","cocktail");
-						}},
-						new SelectItem("Orientation", Client.session.getMsg("MainFrame.lblOrientation.text")) {{
-							setTitleColSpan(2);
-							setWidth("*");
-							setValueMap("any","horizontal","vertical");
-						}},
-						new SelectItem("DriverStatus", Client.session.getMsg("MainFrame.lblDriverStatus.text")) {{
-							setTitleColSpan(2);
-							setWidth("*");
-							setValueMap("good","imperfect","preliminary");
-						}},
-						new SelectItem("SwMinSupport", Client.session.getMsg("MainFrame.lblSwMinSupport.text")) {{
-							setTitleColSpan(2);
-							setWidth("*");
-							setValueMap("no","partial","yes");
-						}},
-						new SelectItem("YearMin") {{
-							setShowTitle(false);
-							setEndRow(false);
-							setWidth("*");
-						}},
-						new StaticTextItem() {{
-							setShowTitle(false);
-							setDefaultValue(Client.session.getMsg("MainFrame.lblYear.text"));
-							setTextAlign(Alignment.CENTER);
-							setWidth("*");
-						}},
-						new SelectItem("YearMax") {{
-							setShowTitle(false);
-							setStartRow(false);
-							setWidth("*");
-						}}
-					);
-				}});
+				addMember(filterForm = new FilterForm());
 				addMember(new LayoutSpacer("*", "*"));
 			}},
 			systems = new Systems()
@@ -190,17 +216,24 @@ public final class ScannerFiltersPanel extends HLayout
 		resetProfileViewer();
 	}
 	
+	private Timer resetTimer = null;
+	
 	public void resetProfileViewer()
 	{
-		new Timer()
+		if(resetTimer == null)
 		{
-			@Override
-			public void run()
+			resetTimer = new Timer()
 			{
-				if (canResetPV)
-					if (Client.mainwindow.scannerPanel.profileViewer != null && Client.childWindows.contains(Client.mainwindow.scannerPanel.profileViewer))
-						Client.mainwindow.scannerPanel.profileViewer.anywareListList.reset();
-			}
-		}.schedule(1000);
+				@Override
+				public void run()
+				{
+					if (canResetPV)
+						if (Client.mainwindow.scannerPanel.profileViewer != null && Client.childWindows.contains(Client.mainwindow.scannerPanel.profileViewer))
+							Client.mainwindow.scannerPanel.profileViewer.anywareListList.reset();
+				}
+			};
+		}
+		resetTimer.cancel();
+		resetTimer.schedule(1000);
 	}
 }

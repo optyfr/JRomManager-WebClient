@@ -1,43 +1,15 @@
 package jrm.webui.client.ui;
 
 import java.util.HashMap;
-import java.util.Map;
 
-import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
-import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 
 import jrm.webui.client.Client;
-import jrm.webui.client.protocol.Q_Profile;
 import jrm.webui.client.utils.EnhJSO;
 
-public final class ScannerSettingsPanel extends DynamicForm
+public final class ScannerSettingsPanel extends SettingsForm
 {
-	private boolean hasSettings = false;
-	
-	@SuppressWarnings("serial")
-	final static private Map<String,String> fname2name= new HashMap<String,String>() {{
-		put("chckbxNeedSHA1","need_sha1_or_md5");
-		put("chckbxUseParallelism","use_parallelism");
-		put("chckbxCreateMissingSets","create_mode");
-		put("chckbxCreateOnlyComplete","createfull_mode");
-		put("chckbxIgnoreUnneededContainers","ignore_unneeded_containers");
-		put("chckbxIgnoreUnneededEntries","ignore_unneeded_entries");
-		put("chckbxIgnoreUnknownContainers","ignore_unknown_containers");
-		put("chckbxUseImplicitMerge","implicit_merge");
-		put("chckbxIgnoreMergeNameRoms","ignore_merge_name_roms");
-		put("chckbxIgnoreMergeNameDisks","ignore_merge_name_disks");
-		put("chckbxExcludeGames","exclude_games");
-		put("chckbxExcludeMachines","exclude_machines");
-		put("chckbxBackup","backup");
-		put("cbCompression","format");
-		put("cbbxMergeMode","merge_mode");
-		put("cbHashCollision","hash_collision_mode");
-	}};
-
 	public ScannerSettingsPanel()
 	{
 		this(null);
@@ -47,7 +19,6 @@ public final class ScannerSettingsPanel extends DynamicForm
 	public ScannerSettingsPanel(EnhJSO settings)
 	{
 		super();
-		hasSettings = settings!=null;
 		setWidth100();
 		setNumCols(4);
 		setColWidths("*","*","*","*");
@@ -149,66 +120,4 @@ public final class ScannerSettingsPanel extends DynamicForm
 			initPropertyItemValues(settings);
 	}
 	
-	private void setPropertyItemValue(String field, String name, boolean value)
-	{
-		getItem(field).setValue(value);
-		if(!hasSettings)
-			Q_Profile.SetProperty.instantiate().setProperty(name, value).send();
-	}
-
-	private void setPropertyItemValue(String field, String name, String value)
-	{
-		getItem(field).setValue(value);
-		if(!hasSettings)
-			Q_Profile.SetProperty.instantiate().setProperty(name, value).send();
-	}
-
-	void initPropertyItemValue(String field, String name, EnhJSO jso)
-	{
-		if(jso.exists(name))
-		{
-			FormItem  formItem =  getItem(field);
-			if(jso.isBoolean(name))
-			{
-				if(formItem instanceof CheckboxItem)
-				{
-					CheckboxItem cbitem = (CheckboxItem)formItem;
-					cbitem.setValue(jso.getBool(name));
-					cbitem.fireEvent(new ChangedEvent(cbitem.getJsObj()){
-						@Override
-						public Object getValue() {
-							return cbitem.getValue();
-						}
-					});
-				}
-			}
-			else if(jso.isString(name))
-			{
-				if(formItem instanceof TextItem)
-					formItem.setValue(jso.get(name));
-				else if(formItem instanceof SelectItem)
-				{
-					SelectItem selitem = (SelectItem)formItem;
-					if(selitem.isMultiple())
-						selitem.setValueMap(jso.get(name).split("\\|"));
-					else
-						selitem.setValue(jso.get(name));
-				}
-			}
-		}
-	}
-	
-	void initPropertyItemValues(EnhJSO settings)
-	{
-		fname2name.forEach((fn,n)->initPropertyItemValue(fn, n, settings));
-	}
-
-	Map<String,Object> getFilteredValues()
-	{
-		Map<String,Object> values = new HashMap<>();
-		fname2name.forEach((fn,n)->{
-			values.put(n, getValue(fn));
-		});
-		return values;
-	}
 }
