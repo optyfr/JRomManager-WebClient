@@ -35,6 +35,8 @@ public class MainWindow extends Window
 	BatchTrrntChkPanel batchTrrntChkPanel;
 	BatchCompressorPanel batchCompressorPanel;
 	Dir2DatPanel dir2datPanel;
+	SettingsCompressorPanel settingsCompressorPanel;
+	SettingsDebugPanel settingsDebugPanel;
 	private Progress progress = null;
 	
 	public MainWindow()
@@ -110,6 +112,23 @@ public class MainWindow extends Window
 			addTab(new Tab() {{
 				setIcon("icons/cog.png");
 				setTitle(Client.session.getMsg("MainFrame.Settings"));
+				setPane(new TabSet() {{
+					setPaneMargin(0);
+					setTabBarControls(
+							TabBarControls.TAB_SCROLLER,
+							TabBarControls.TAB_PICKER
+						);
+					addTab(new Tab() {{
+						setIcon("icons/compress.png");
+						setTitle(Client.session.getMsg("MainFrame.Compressors"));
+						setPane(settingsCompressorPanel = new SettingsCompressorPanel());
+					}});
+					addTab(new Tab() {{
+						setIcon("icons/bug.png");
+						setTitle(Client.session.getMsg("MainFrame.Debug"));
+						setPane(settingsDebugPanel = new SettingsDebugPanel());
+					}});
+				}});
 			}});
 		}});
 		centerInPage();

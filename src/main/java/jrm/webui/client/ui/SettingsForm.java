@@ -63,6 +63,8 @@ abstract class SettingsForm extends DynamicForm
 		put("tfDir2DatEMail", "dir2dat.email"); //$NON-NLS-1$
 		put("tfDir2DatHomepage", "dir2dat.homepage"); //$NON-NLS-1$
 		put("tfDir2DatURL", "dir2dat.url"); //$NON-NLS-1$
+		put("cbZipTempThreshold", "zip_temp_threshold");
+		put("cbZipLevel", "zip_compression_level");
 	}};
 
 	public SettingsForm()
