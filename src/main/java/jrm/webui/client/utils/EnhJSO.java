@@ -265,6 +265,15 @@ public class EnhJSO extends JavaScriptObject
 		return EnhJSO.set(this, name, value);
 	}
 
+	public final Object set(final String name, final Object value)
+	{
+		if(value instanceof Boolean)
+			return EnhJSO.set(this, name, (Boolean)value);
+		if(value instanceof Integer)
+			return EnhJSO.set(this, name, (Integer)value);
+		return EnhJSO.set(this, name, (String)value);
+	}
+
 	public final JsArray<JavaScriptObject> toArray(final String name)
 	{
 		return EnhJSO.toArray(this, name);

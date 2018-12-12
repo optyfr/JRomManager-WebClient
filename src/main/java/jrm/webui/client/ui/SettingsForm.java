@@ -4,12 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.CheckboxItem;
-import com.smartgwt.client.widgets.form.fields.FormItem;
-import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.*;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 
+import jrm.webui.client.protocol.Q_Global;
 import jrm.webui.client.protocol.Q_Profile;
 import jrm.webui.client.utils.EnhJSO;
 
@@ -44,6 +42,27 @@ abstract class SettingsForm extends DynamicForm
 		put("cbSwMinSupport", "filter.MinSoftwareSupportedLevel");
 		put("cbYearMin", "filter.YearMin");
 		put("cbYearMax", "filter.YearMax");
+		put("chckbxScanSubfolders", "dir2dat.scan_subfolders");
+		put("chckbxDeepScan", "dir2dat.deep_scan");
+		put("chckbxAddMD5", "dir2dat.add_md5");
+		put("chckbxAddSHA1", "dir2dat.add_sha1");
+		put("chckbxJunkFolders", "dir2dat.junk_folders");
+		put("chckbxDoNotScanArchives", "dir2dat.do_not_scan_archives");
+		put("chckbxMatchProfile", "dir2dat.match_profile");
+		put("chckbxIncludeEmptyDirs", "dir2dat.include_empty_dirs");
+		put("txtSrcDir","dir2dat_src_dir");
+		put("txtDstDat","dir2dat_dst_file");
+		put("rgFormat","dir2dat_format");
+		put("tfDir2DatName", "dir2dat.name"); //$NON-NLS-1$
+		put("tfDir2DatDescription", "dir2dat.description"); //$NON-NLS-1$
+		put("tfDir2DatVersion", "dir2dat.version"); //$NON-NLS-1$
+		put("tfDir2DatAuthor", "dir2dat.author"); //$NON-NLS-1$
+		put("tfDir2DatComment", "dir2dat.comment"); //$NON-NLS-1$
+		put("tfDir2DatCategory", "dir2dat.category"); //$NON-NLS-1$
+		put("tfDir2DatDate", "dir2dat.date"); //$NON-NLS-1$
+		put("tfDir2DatEMail", "dir2dat.email"); //$NON-NLS-1$
+		put("tfDir2DatHomepage", "dir2dat.homepage"); //$NON-NLS-1$
+		put("tfDir2DatURL", "dir2dat.url"); //$NON-NLS-1$
 	}};
 
 	public SettingsForm()
@@ -71,6 +90,20 @@ abstract class SettingsForm extends DynamicForm
 			Q_Profile.SetProperty.instantiate().setProperty(name, value).send();
 	}
 
+	protected void setGPropertyItemValue(String field, String name, boolean value)
+	{
+		getItem(field).setValue(value);
+		if(!hasSettings)
+			Q_Global.SetProperty.instantiate().setProperty(name, value).send();
+	}
+
+	protected void setGPropertyItemValue(String field, String name, String value)
+	{
+		getItem(field).setValue(value);
+		if(!hasSettings)
+			Q_Global.SetProperty.instantiate().setProperty(name, value).send();
+	}
+
 	protected void initPropertyItemValue(String field, String name, EnhJSO jso)
 	{
 		if(jso.exists(name))
@@ -96,6 +129,8 @@ abstract class SettingsForm extends DynamicForm
 				{
 					if(formItem instanceof TextItem)
 						formItem.setValue(jso.get(name));
+					else if(formItem instanceof RadioGroupItem)
+						formItem.setValue(jso.get(name));
 					else if(formItem instanceof SelectItem)
 					{
 						SelectItem selitem = (SelectItem)formItem;
@@ -118,7 +153,8 @@ abstract class SettingsForm extends DynamicForm
 	{
 		Map<String,Object> values = new HashMap<>();
 		fname2name.forEach((fn,n)->{
-			values.put(n, getValue(fn));
+			if(getItem(fn)!=null)
+				values.put(n, getValue(fn));
 		});
 		return values;
 	}

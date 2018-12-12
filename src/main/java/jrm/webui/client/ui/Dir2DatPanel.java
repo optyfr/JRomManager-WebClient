@@ -2,22 +2,24 @@ package jrm.webui.client.ui;
 
 import java.util.HashMap;
 
-import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.*;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 import jrm.webui.client.Client;
+import jrm.webui.client.protocol.Q_Dir2Dat;
 
 public class Dir2DatPanel extends VLayout
 {
+	SettingsForm options,headers,io;
+	
 	public Dir2DatPanel()
 	{
 		setLayoutMargin(5);
 		setMembers(
 			new HLayout() {{
 				setMembers(
-					new DynamicForm() {{
+					options = new SettingsForm() {{
 						setMargin(5);
 						setBorder("1px solid WindowFrame");
 						setWidth("50%");
@@ -32,30 +34,45 @@ public class Dir2DatPanel extends VLayout
 								setShowTitle(false);
 								setColSpan(2);
 							}},
-							new CheckboxItem() {{
+							new CheckboxItem("chckbxScanSubfolders") {{
 								setTitle(Client.session.getMsg("MainFrame.chckbxScanSubfolders.text"));
-								setDefaultValue(true);
+								setDefaultValue(Client.session.getSettingAsBoolean(fname2name.get(getName()), true));
+								addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue()));
 							}},
-							new CheckboxItem() {{
+							new CheckboxItem("chckbxDeepScan") {{
 								setTitle(Client.session.getMsg("MainFrame.chckbxDeepScanFor.text"));
+								setDefaultValue(Client.session.getSettingAsBoolean(fname2name.get(getName()), false));
+								addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue()));
 							}},
-							new CheckboxItem() {{
+							new CheckboxItem("chckbxAddMD5") {{
 								setTitle(Client.session.getMsg("MainFrame.chckbxAddMd.text"));
+								setDefaultValue(Client.session.getSettingAsBoolean(fname2name.get(getName()), false));
+								addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue()));
 							}},
-							new CheckboxItem() {{
+							new CheckboxItem("chckbxAddSHA1") {{
 								setTitle(Client.session.getMsg("MainFrame.chckbxAddShamd.text"));
+								setDefaultValue(Client.session.getSettingAsBoolean(fname2name.get(getName()), false));
+								addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue()));
 							}},
-							new CheckboxItem() {{
+							new CheckboxItem("chckbxJunkFolders") {{
 								setTitle(Client.session.getMsg("MainFrame.chckbxJunkSubfolders.text"));
+								setDefaultValue(Client.session.getSettingAsBoolean(fname2name.get(getName()), false));
+								addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue()));
 							}},
-							new CheckboxItem() {{
+							new CheckboxItem("chckbxDoNotScanArchives") {{
 								setTitle(Client.session.getMsg("MainFrame.chckbxDoNotScan.text"));
+								setDefaultValue(Client.session.getSettingAsBoolean(fname2name.get(getName()), false));
+								addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue()));
 							}},
-							new CheckboxItem() {{
+							new CheckboxItem("chckbxMatchProfile") {{
 								setTitle(Client.session.getMsg("MainFrame.chckbxMatchCurrentProfile.text"));
+								setDefaultValue(Client.session.getSettingAsBoolean(fname2name.get(getName()), false));
+								addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue()));
 							}},
-							new CheckboxItem() {{
+							new CheckboxItem("chckbxIncludeEmptyDirs") {{
 								setTitle(Client.session.getMsg("MainFrame.chckbxIncludeEmptyDirs.text"));
+								setDefaultValue(Client.session.getSettingAsBoolean(fname2name.get(getName()), false));
+								addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue()));
 							}},
 							new CanvasItem() {{
 								setHeight("*");
@@ -64,7 +81,7 @@ public class Dir2DatPanel extends VLayout
 							}}
 						);
 					}},
-					new DynamicForm() {{
+					headers = new SettingsForm() {{
 						setMargin(5);
 						setBorder("1px solid WindowFrame");
 						setWidth("50%");
@@ -79,43 +96,43 @@ public class Dir2DatPanel extends VLayout
 								setShowTitle(false);
 								setColSpan(2);
 							}},
-							new TextItem() {{
+							new TextItem("tfDir2DatName") {{
 								setTitle(Client.session.getMsg("MainFrame.lblName.text"));
 								setWidth("*");
 							}},
-							new TextItem() {{
+							new TextItem("tfDir2DatDescription") {{
 								setTitle(Client.session.getMsg("MainFrame.lblDescription.text"));
 								setWidth("*");
 							}},
-							new TextItem() {{
+							new TextItem("tfDir2DatVersion") {{
 								setTitle(Client.session.getMsg("MainFrame.lblVersion.text"));
 								setWidth("*");
 							}},
-							new TextItem() {{
+							new TextItem("tfDir2DatAuthor") {{
 								setTitle(Client.session.getMsg("MainFrame.lblAuthor.text"));
 								setWidth("*");
 							}},
-							new TextItem() {{
+							new TextItem("tfDir2DatComment") {{
 								setTitle(Client.session.getMsg("MainFrame.lblComment.text"));
 								setWidth("*");
 							}},
-							new TextItem() {{
+							new TextItem("tfDir2DatCategory") {{
 								setTitle(Client.session.getMsg("MainFrame.lblCategory.text"));
 								setWidth("*");
 							}},
-							new TextItem() {{
+							new TextItem("tfDir2DatDate") {{
 								setTitle(Client.session.getMsg("MainFrame.lblDate.text"));
 								setWidth("*");
 							}},
-							new TextItem() {{
+							new TextItem("tfDir2DatEMail") {{
 								setTitle(Client.session.getMsg("MainFrame.lblEmail.text"));
 								setWidth("*");
 							}},
-							new TextItem() {{
+							new TextItem("tfDir2DatHomepage") {{
 								setTitle(Client.session.getMsg("MainFrame.lblHomepage.text"));
 								setWidth("*");
 							}},
-							new TextItem() {{
+							new TextItem("tfDir2DatURL") {{
 								setTitle(Client.session.getMsg("MainFrame.lblUrl.text"));
 								setWidth("*");
 							}},
@@ -128,7 +145,7 @@ public class Dir2DatPanel extends VLayout
 					}}
 				);
 			}},
-			new DynamicForm() {{
+			io = new SettingsForm() {{
 				setMargin(5);
 				setBorder("1px solid WindowFrame");
 				setCellPadding(1);
@@ -138,11 +155,12 @@ public class Dir2DatPanel extends VLayout
 					new HeaderItem() {{
 						setDefaultValue(Client.session.getMsg("MainFrame.IO"));
 					}},
-					new TextItem() {{
+					new TextItem("txtSrcDir") {{
 						setTitle(Client.session.getMsg("MainFrame.lblSrcDir_1.text"));
 						setWidth("*");
 						setCanEdit(false);
 						setEndRow(false);
+						setDefaultValue(Client.session.getSetting(fname2name.get(getName()), null));
 					}},
 					new ButtonItem() {{
 						setStartRow(false);
@@ -150,7 +168,10 @@ public class Dir2DatPanel extends VLayout
 						setTitle(null);
 						setValueIconRightPadding(0);
 						setEndRow(false);
-						addClickHandler(event->new RemoteFileChooser("tfDisksDest", records->{}));
+						addClickHandler(event->new RemoteFileChooser("tfDisksDest", infos->{
+							setGPropertyItemValue("txtSrcDir", fname2name.get("txtSrcDir"), infos[0].path);
+							event.getForm().getItem("txtSrcDir").setValue(infos[0].path);
+						}));
 					}},
 					new ButtonItem() {{
 						setStartRow(false);
@@ -159,28 +180,39 @@ public class Dir2DatPanel extends VLayout
 						setRowSpan(3);
 						setHeight("*");
 						setWidth("*");
-						addClickHandler(event->{});
+						addClickHandler(event->{
+							Q_Dir2Dat.Start.instantiate().
+								setOptions(options.getFilteredValues()).
+								setHeaders(headers.getFilteredValues()).
+								setIO(io.getFilteredValues()).
+								send();
+							;
+						});
 					}},
-					new TextItem() {{
+					new TextItem("txtDstDat") {{
 						setTitle(Client.session.getMsg("MainFrame.lblDstDat.text"));
 						setWidth("*");
 						setCanEdit(false);
 						setEndRow(false);
+						setDefaultValue(Client.session.getSetting(fname2name.get(getName()), null));
 					}},
 					new ButtonItem() {{
 						setStartRow(false);
 						setIcon("icons/disk.png");
 						setTitle(null);
 						setValueIconRightPadding(0);
-						addClickHandler(event->new RemoteFileChooser("tfDisksDest", records->{}));
+						addClickHandler(event->new RemoteFileChooser("tfDisksDest", infos->{
+							setGPropertyItemValue("txtDstDat", fname2name.get("txtDstDat"), infos[0].path);
+							event.getForm().getItem("txtDstDat").setValue(infos[0].path);
+						}));
 					}},
-					new RadioGroupItem() {{
+					new RadioGroupItem("rgFormat") {{
 						setTitle(Client.session.getMsg("MainFrame.lblFormat.text"));
 						setVertical(false);
 						setFillHorizontalSpace(true);
-						setDefaultValue("MAME");
 						setWidth("*");
 						setColSpan(2);
+						addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), (String)getValue()));
 						setValueMap(new HashMap<String,String>() {
 							private static final long serialVersionUID = 1L;
 							{
@@ -189,6 +221,7 @@ public class Dir2DatPanel extends VLayout
 								put("SOFTWARELIST",Client.session.getMsg("MainFrame.rdbtnSwList.text"));
 							}
 						});
+						setDefaultValue(Client.session.getSetting(fname2name.get(getName()), "MAME"));
 					}}
 				);
 			}}
