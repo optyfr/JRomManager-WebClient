@@ -40,6 +40,7 @@ import jrm.webui.client.Client;
 import jrm.webui.client.protocol.Q_Dat2Dir;
 import jrm.webui.client.protocol.Q_Global;
 import jrm.webui.client.protocol.Q_Profile;
+import jrm.webui.client.ui.RemoteFileChooser.PathInfo;
 import jrm.webui.client.utils.EnhJSO;
 
 public class BatchDirUpd8rPanel extends VLayout
@@ -65,9 +66,12 @@ public class BatchDirUpd8rPanel extends VLayout
 				addItem(new MenuItem() {{
 					setTitle(Client.session.getMsg("MainFrame.AddSrcDir"));
 					addClickHandler(e -> new RemoteFileChooser("addDatSrc", path -> {
-						src.addData(new Record() {{
-							setAttribute("name",path);
-						}});
+						for(PathInfo p : path)
+						{
+							src.addData(new Record() {{
+								setAttribute("name",p.path);
+							}});
+						}
 					}));
 				}});
 				addItem(new MenuItem() {{
