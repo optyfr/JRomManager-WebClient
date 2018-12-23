@@ -3,17 +3,30 @@ package jrm.webui.client.ui;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.i18n.client.NumberFormat;
-import com.smartgwt.client.data.*;
+import com.smartgwt.client.data.DSRequest;
+import com.smartgwt.client.data.DSResponse;
+import com.smartgwt.client.data.OperationBinding;
+import com.smartgwt.client.data.Record;
+import com.smartgwt.client.data.RestDataSource;
+import com.smartgwt.client.data.ResultSet;
+import com.smartgwt.client.data.SortSpecifier;
+import com.smartgwt.client.data.XMLTools;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceDateTimeField;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
-import com.smartgwt.client.types.*;
+import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.DSDataFormat;
+import com.smartgwt.client.types.DSOperationType;
+import com.smartgwt.client.types.DSProtocol;
+import com.smartgwt.client.types.DateDisplayFormat;
+import com.smartgwt.client.types.SelectionStyle;
+import com.smartgwt.client.types.SortDirection;
+import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Progressbar;
@@ -555,7 +568,7 @@ public final class RemoteFileChooser extends Window
 						if(records.length>0)
 						{
 							if(cb != null)
-								cb.apply(Stream.of(records).map(PathInfo::new).collect(Collectors.toList()).toArray(new PathInfo[0]));
+								cb.apply(Stream.of(records).map(PathInfo::new).toArray(PathInfo[]::new));
 							RemoteFileChooser.this.markForDestroy();
 						}
 						else if(isDir)
