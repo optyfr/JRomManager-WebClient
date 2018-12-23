@@ -65,8 +65,8 @@ public class BatchDirUpd8rPanel extends VLayout
 			setContextMenu(new Menu() {{
 				addItem(new MenuItem() {{
 					setTitle(Client.session.getMsg("MainFrame.AddSrcDir"));
-					addClickHandler(e -> new RemoteFileChooser("addDatSrc", path -> {
-						for(PathInfo p : path)
+					addClickHandler(e -> new RemoteFileChooser("addDatSrc", pi -> {
+						for(PathInfo p : pi)
 						{
 							src.addData(new Record() {{
 								setAttribute("name",p.path);
@@ -112,10 +112,13 @@ public class BatchDirUpd8rPanel extends VLayout
 				setContextMenu(new Menu() {{
 					addItem(new MenuItem() {{
 						setTitle(Client.session.getMsg("MainFrame.AddDat"));
-						addClickHandler(e -> new RemoteFileChooser("addDat", path -> {
-							sdr.addData(new Record() {{
-								setAttribute("src",path);
-							}});
+						addClickHandler(e -> new RemoteFileChooser("addDat", pi -> {
+							for(PathInfo p : pi)
+							{
+								sdr.addData(new Record() {{
+									setAttribute("src",p.path);
+								}});
+							}
 						}));
 					}});
 					addItem(new MenuItem() {{
@@ -128,9 +131,10 @@ public class BatchDirUpd8rPanel extends VLayout
 								return sdr.getSelectedRecords().length==1;
 							}
 						});
-						addClickHandler(e -> new RemoteFileChooser("updDat", path -> {
+						addClickHandler(e -> new RemoteFileChooser("updDat", pi -> {
 							Record record = sdr.getSelectedRecord();
-							record.setAttribute("dst", path);
+							for(PathInfo p : pi)
+								record.setAttribute("dst", p.path);
 							sdr.updateData(record);
 						}));
 					}});

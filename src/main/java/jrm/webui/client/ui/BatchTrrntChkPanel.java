@@ -38,6 +38,7 @@ import com.smartgwt.client.widgets.tree.TreeGrid;
 import jrm.webui.client.Client;
 import jrm.webui.client.protocol.Q_Global;
 import jrm.webui.client.protocol.Q_TrntChk;
+import jrm.webui.client.ui.RemoteFileChooser.PathInfo;
 
 public class BatchTrrntChkPanel extends VLayout
 {
@@ -62,18 +63,20 @@ public class BatchTrrntChkPanel extends VLayout
 				setContextMenu(new Menu() {{
 					addItem(new MenuItem() {{
 						setTitle(Client.session.getMsg("BatchToolsTrrntChkPanel.mntmAddTorrent.text"));
-						addClickHandler(e -> new RemoteFileChooser("addTrnt", path -> {
-							sdr.addData(new Record() {{
-								setAttribute("src",path);
-							}});
+						addClickHandler(e -> new RemoteFileChooser("addTrnt", pi -> {
+							for(PathInfo p : pi)
+								sdr.addData(new Record() {{
+									setAttribute("src",p.path);
+								}});
 						}));
 					}});
 					addItem(new MenuItem() {{
 						setTitle("Set Destination");
 						setEnableIfCondition((target, menu, item)->sdr.getSelectedRecords().length==1);
-						addClickHandler(e -> new RemoteFileChooser("updTrnt", path -> {
+						addClickHandler(e -> new RemoteFileChooser("updTrnt", pi -> {
 							Record record = sdr.getSelectedRecord();
-							record.setAttribute("dst", path);
+							for(PathInfo p : pi)
+								record.setAttribute("dst", p.path);
 							sdr.updateData(record);
 						}));
 					}});
