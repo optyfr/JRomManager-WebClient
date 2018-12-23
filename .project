@@ -48,6 +48,5 @@
 		<nature>org.eclipse.jem.workbench.JavaEMFNature</nature>
 		<nature>com.gwtplugins.gwt.eclipse.core.gwtNature</nature>
 		<nature>org.eclipse.buildship.core.gradleprojectnature</nature>
-		<nature>edu.umd.cs.findbugs.plugin.eclipse.findbugsNature</nature>
 	</natures>
 </projectDescription>
