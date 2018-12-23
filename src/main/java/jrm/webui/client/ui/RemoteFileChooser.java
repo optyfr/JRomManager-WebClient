@@ -185,8 +185,7 @@ public final class RemoteFileChooser extends Window
 				}
 				else if(isChoose)
 				{
-					if(cb!=null)
-						cb.apply(new PathInfo[] {new PathInfo(path, parent, name)});
+					processPaths(context, cb, new PathInfo[] {new PathInfo(path, parent, name)});
 					RemoteFileChooser.this.markForDestroy();
 				}
 			});
@@ -201,7 +200,8 @@ public final class RemoteFileChooser extends Window
 						new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}},
 						new OperationBinding(){{setOperationType(DSOperationType.REMOVE);setDataProtocol(DSProtocol.POSTXML);}},
 						new OperationBinding(){{setOperationType(DSOperationType.ADD);setDataProtocol(DSProtocol.POSTXML);}},
-						new OperationBinding(){{setOperationType(DSOperationType.UPDATE);setDataProtocol(DSProtocol.POSTXML);}}
+						new OperationBinding(){{setOperationType(DSOperationType.UPDATE);setDataProtocol(DSProtocol.POSTXML);}},
+						new OperationBinding(){{setOperationType(DSOperationType.CUSTOM);setDataProtocol(DSProtocol.POSTXML);}}
 					);
 					DataSourceTextField nameField = new DataSourceTextField("Name");
 					nameField.setPrimaryKey(true);
@@ -567,15 +567,12 @@ public final class RemoteFileChooser extends Window
 						ListGridRecord[] records =  list.getSelectedRecords();
 						if(records.length>0)
 						{
-							if(cb != null)
-								cb.apply(Stream.of(records).map(PathInfo::new).toArray(PathInfo[]::new));
+							processPaths(context, cb, Stream.of(records).map(PathInfo::new).toArray(PathInfo[]::new));
 							RemoteFileChooser.this.markForDestroy();
 						}
 						else if(isDir)
 						{
-							String path = parent;
-							if(cb != null)
-								cb.apply(new PathInfo[] {new PathInfo(path, null, null)});
+							processPaths(context, cb, new PathInfo[] {new PathInfo(parent, null, null)});
 							RemoteFileChooser.this.markForDestroy();
 						}
 					});
@@ -742,6 +739,30 @@ public final class RemoteFileChooser extends Window
 	{
 		Client.childWindows.remove(this);
 		super.onDestroy();
+	}
+	
+	@SuppressWarnings("serial")
+	private void processPaths(String context, CallBack cb, PathInfo[] paths)
+	{
+		switch(context)
+		{
+			case "addArc":
+			{
+				list.getDataSource().performCustomOperation("expand", null, (dsResponse, data, dsRequest)->{
+					if (cb != null)
+						cb.apply(Stream.of(dsResponse.getData()).map(PathInfo::new).toArray(PathInfo[]::new));
+				}, new DSRequest() {{
+					setData(new HashMap<String, Object>() {{
+						put("paths", Stream.of(paths).map(p->p.path).toArray());
+					}});
+				}});
+				break;
+			}
+			default:
+				if (cb != null)
+					cb.apply(paths);
+				break;
+		}
 	}
 	
 }

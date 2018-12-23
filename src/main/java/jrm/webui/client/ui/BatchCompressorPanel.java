@@ -53,11 +53,9 @@ public class BatchCompressorPanel extends VLayout
 						addClickHandler(e -> new RemoteFileChooser("addArc", pi -> {
 							RPCManager.startQueue();
 							for(PathInfo p : pi)
-							{
 								fr.addData(new Record() {{
 									setAttribute("file",p.path);
 								}});
-							}
 							RPCManager.sendQueue();
 						}));
 					}});
