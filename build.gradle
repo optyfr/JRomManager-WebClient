@@ -47,14 +47,14 @@ gwt {
 		/** Compile a report that tells the "Story of Your Compile". */
 		compileReport = true
 		/** Compile quickly with minimal optimizations. */
-		draftCompile = true
+		draftCompile = false
 		/** Include assert statements in compiled output. */
 		checkAssertions = false
 		/** Script output style. (OBF, PRETTY, DETAILED)*/
 		style = "OBF"
 		/** Sets the optimization level used by the compiler. 
 		 * 0=none 9=maximum. */
-		optimize = 0
+		optimize = 9
 		/** Fail compilation if any input file contains an error. */
 		failOnError = false
 		/** Specifies Java source level. ("1.6", "1.7")*/

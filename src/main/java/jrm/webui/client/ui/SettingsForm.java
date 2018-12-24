@@ -65,6 +65,11 @@ abstract class SettingsForm extends DynamicForm
 		put("tfDir2DatURL", "dir2dat.url"); //$NON-NLS-1$
 		put("cbZipTempThreshold", "zip_temp_threshold");
 		put("cbZipLevel", "zip_compression_level");
+		put("cbZipELevel", "zip_level");
+		put("cb7ZLevel", "7z_level");
+		put("txt7ZThreads", "7z_threads");
+		put("chkbx7ZSolid", "7z_solid");
+		put("cbDbgLevel", "debug_level");
 	}};
 
 	public SettingsForm()
@@ -93,6 +98,13 @@ abstract class SettingsForm extends DynamicForm
 	}
 
 	protected void setGPropertyItemValue(String field, String name, boolean value)
+	{
+		getItem(field).setValue(value);
+		if(!hasSettings)
+			Q_Global.SetProperty.instantiate().setProperty(name, value).send();
+	}
+
+	protected void setGPropertyItemValue(String field, String name, int value)
 	{
 		getItem(field).setValue(value);
 		if(!hasSettings)

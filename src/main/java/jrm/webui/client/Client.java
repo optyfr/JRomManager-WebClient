@@ -144,6 +144,12 @@ public class Client implements EntryPoint
 													case "Compressor.end":
 														mainwindow.update(new A_Compressor.End(a));
 														break;
+													case "Global.setMemory":
+														mainwindow.update(new A_Global.SetMemory(a));
+														break;
+													case "Global.warn":
+														SC.warn(new A_Global.Warn(a).getMsg());
+														break;
 												}
 												return false;
 											}

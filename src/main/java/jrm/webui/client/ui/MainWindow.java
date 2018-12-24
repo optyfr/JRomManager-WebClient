@@ -11,6 +11,8 @@ import com.smartgwt.client.types.TabBarControls;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
 import com.smartgwt.client.widgets.events.CloseClickHandler;
+import com.smartgwt.client.widgets.layout.LayoutSpacer;
+import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
 
@@ -18,6 +20,7 @@ import jrm.webui.client.Client;
 import jrm.webui.client.protocol.A_CatVer;
 import jrm.webui.client.protocol.A_Compressor;
 import jrm.webui.client.protocol.A_Dat2Dir;
+import jrm.webui.client.protocol.A_Global;
 import jrm.webui.client.protocol.A_NPlayers;
 import jrm.webui.client.protocol.A_Profile;
 import jrm.webui.client.protocol.A_Progress;
@@ -126,7 +129,11 @@ public class MainWindow extends Window
 					addTab(new Tab() {{
 						setIcon("icons/bug.png");
 						setTitle(Client.session.getMsg("MainFrame.Debug"));
-						setPane(settingsDebugPanel = new SettingsDebugPanel());
+						setPane(new VLayout() {{
+							addMember(new LayoutSpacer("*","*"));
+							addMember(settingsDebugPanel = new SettingsDebugPanel());
+							addMember(new LayoutSpacer("*","*"));
+						}});
 					}});
 				}});
 			}});
@@ -321,6 +328,11 @@ public class MainWindow extends Window
 	{
 		batchCompressorPanel.fr.discardAllEdits();
 		batchCompressorPanel.fr.refreshData();
+	}
+	
+	public void update(A_Global.SetMemory params)
+	{
+		settingsDebugPanel.getItem("txtDbgMemory").setValue(params.getMsg());
 	}
 
 }

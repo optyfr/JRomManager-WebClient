@@ -38,4 +38,32 @@ public class Q_Global extends Q_
 			return this;
 		}
 	}
+	
+	public static class GC extends Q_
+	{
+		protected GC()
+		{
+			super();
+		}
+
+		final public static GC instantiate()
+		{
+			return Q_.instantiateCmd("Global.GC").cast();
+		}
+		
+	}
+	
+	public static class GetMemory extends Q_
+	{
+		protected GetMemory()
+		{
+			super();
+		}
+
+		final public static GetMemory instantiate()
+		{
+			return Q_.instantiateCmd("Global.getMemory").cast();
+		}
+		
+	}
 }

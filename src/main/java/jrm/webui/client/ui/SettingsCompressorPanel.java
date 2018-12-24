@@ -4,6 +4,8 @@ import java.util.HashMap;
 
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.TabBarControls;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.layout.LayoutSpacer;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -69,12 +71,71 @@ final class SettingsCompressorPanel extends TabSet
 
 	class SettingsCompressorZipEPanel extends SettingsForm
 	{
-
+		@SuppressWarnings("serial")
+		public SettingsCompressorZipEPanel()
+		{
+			setWidth("75%");
+			setLayoutAlign(Alignment.CENTER);
+			setNumCols(2);
+			setColWidths(300,"*");
+			setItems(
+				new SelectItem("cbZipELevel") {{
+					setTitle(Client.session.getMsg("MainFrame.lblZipEArgs.text"));
+					setValueMap(new HashMap<String,String>() {{
+						put("STORE",Client.session.getMsg("ZipOptions.STORE")); //$NON-NLS-1$
+						put("FASTEST",Client.session.getMsg("ZipOptions.FASTEST")); //$NON-NLS-1$
+						put("FAST",Client.session.getMsg("ZipOptions.FAST")); //$NON-NLS-1$
+						put("NORMAL",Client.session.getMsg("ZipOptions.NORMAL")); //$NON-NLS-1$
+						put("MAXIMUM",Client.session.getMsg("ZipOptions.MAXIMUM")); //$NON-NLS-1$
+						put("ULTRA",Client.session.getMsg("ZipOptions.ULTRA")); //$NON-NLS-1$
+					}});
+					setWidth("*");
+					addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), getValueAsString()));
+					setDefaultValue(Client.session.getSetting(fname2name.get(getName()), "NORMAL"));
+				}}
+			);
+		}
 	}
 
 	class SettingsCompressor7zEPanel extends SettingsForm
 	{
-
+		@SuppressWarnings("serial")
+		public SettingsCompressor7zEPanel()
+		{
+			setWidth("75%");
+			setLayoutAlign(Alignment.CENTER);
+			setNumCols(4);
+			setColWidths(200,"*",200,"*");
+			setItems(
+				new SelectItem("cb7ZLevel") {{
+					setColSpan(3);
+					setTitle(Client.session.getMsg("MainFrame.lbl7zArgs.text"));
+					setValueMap(new HashMap<String,String>() {{
+						put("STORE",Client.session.getMsg("SevenZipOptions.STORE")); //$NON-NLS-1$
+						put("FASTEST",Client.session.getMsg("SevenZipOptions.FASTEST")); //$NON-NLS-1$
+						put("FAST",Client.session.getMsg("SevenZipOptions.FAST")); //$NON-NLS-1$
+						put("NORMAL",Client.session.getMsg("SevenZipOptions.NORMAL")); //$NON-NLS-1$
+						put("MAXIMUM",Client.session.getMsg("SevenZipOptions.MAXIMUM")); //$NON-NLS-1$
+						put("ULTRA",Client.session.getMsg("SevenZipOptions.ULTRA")); //$NON-NLS-1$
+					}});
+					setWidth("*");
+					addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), (String)getValue()));
+					setDefaultValue(Client.session.getSetting(fname2name.get(getName()), "NORMAL"));
+				}},
+				new IntegerItem("txt7ZThreads", Client.session.getMsg("MainFrame.lbl7zThreads.text")) {{
+					addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), getValueAsInteger()));
+					setDefaultValue(Client.session.getSettingAsInteger(fname2name.get(getName()), -1));
+				}},
+				new CheckboxItem("chkbx7ZSolid", Client.session.getMsg("MainFrame.ckbx7zSolid.text")) {{
+					setLabelAsTitle(true);
+					addChangedHandler(event->{
+						setGPropertyItemValue(getName(), fname2name.get(getName()), getValueAsBoolean());
+						event.getForm().getItem("cb7ZLevel").setDisabled(!getValueAsBoolean());
+					});
+					setDefaultValue(Client.session.getSettingAsBoolean(fname2name.get(getName()), true));
+				}}
+			);
+		}
 	}
 
 	public SettingsCompressorPanel()

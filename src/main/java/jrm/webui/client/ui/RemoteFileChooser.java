@@ -34,6 +34,7 @@ import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+import com.smartgwt.client.widgets.grid.SortNormalizer;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.LayoutSpacer;
 import com.smartgwt.client.widgets.layout.SplitPane;
@@ -41,6 +42,7 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 
 import jrm.webui.client.Client;
+import jrm.webui.client.protocol.Q_Global;
 import jsinterop.annotations.JsMethod;
 import jsinterop.annotations.JsPackage;
 
@@ -224,6 +226,7 @@ public final class RemoteFileChooser extends Window
 					super.transformResponse(dsResponse, dsRequest, data);
 				};
 			});
+			SortNormalizer normalizer = (record, fieldName) -> record.getAttribute("Name").equals("..") ? "\0" : record.getAttribute(fieldName);
 			setFields(
 				new ListGridField("isDir") {{
 					setWidth(20);
@@ -232,15 +235,18 @@ public final class RemoteFileChooser extends Window
 				}},
 				new ListGridField("Name") {{
 					setWidth("*");
+					setSortNormalizer(normalizer);
 				}},
 				new ListGridField("Size") {{
 					setAutoFitWidth(true);
 					setCellFormatter((value,record,rowNum,colNum)->{
 						return ((int)value)<0?"":readableFileSize((int)value);
 					});
+					setSortNormalizer(normalizer);
 				}},
 				new ListGridField("Modified") {{
 					setAutoFitWidth(true);
+					setSortNormalizer(normalizer);
 				}}
 			);
 			setDataProperties(new ResultSet() {{
@@ -744,6 +750,10 @@ public final class RemoteFileChooser extends Window
 	@SuppressWarnings("serial")
 	private void processPaths(String context, CallBack cb, PathInfo[] paths)
 	{
+		if (parent != null)
+			Q_Global.SetProperty.instantiate().setProperty("dir." + context, parent).send();
+		else if (paths != null && paths.length > 0 && paths[0].parent != null)
+			Q_Global.SetProperty.instantiate().setProperty("dir." + context, paths[0].parent).send();
 		switch(context)
 		{
 			case "addArc":
