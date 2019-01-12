@@ -5,6 +5,7 @@ import com.smartgwt.client.data.*;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 import com.smartgwt.client.types.*;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.grid.HoverCustomizer;
@@ -16,6 +17,7 @@ import com.smartgwt.client.widgets.grid.events.RecordDoubleClickEvent;
 import com.smartgwt.client.widgets.grid.events.RecordDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.SplitPane;
 import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.menu.IMenuButton;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.tree.TreeGrid;
@@ -244,11 +246,19 @@ public class ProfilePanel extends VLayout
 							}
 						}));
 					}},
-					new IButton(Client.session.getMsg("MainFrame.btnImportSL.text")) {{
+					new IMenuButton() {{
+						setTitle(Canvas.imgHTML("icons/application_go.png")+" Import from Mame");
 						setAutoFit(true);
-						setDisabled(true);
-						setShowDisabledIcon(false);
-						setIcon("icons/application_go.png");
+						setMenu(new Menu() {{
+							addItem(new MenuItem() {{
+								setTitle("without Software list");
+								addClickHandler(e->SC.say(getTitle()));
+							}});
+							addItem(new MenuItem() {{
+								setTitle("with Software list");
+								addClickHandler(e->SC.say(getTitle()));
+							}});
+						}});
 					}}
 				);
 				setDetailPane(listgrid);
