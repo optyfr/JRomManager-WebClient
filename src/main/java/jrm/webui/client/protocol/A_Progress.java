@@ -53,6 +53,27 @@ public class A_Progress extends A_
 		}
 	}
 
+	public static class CanCancel extends A_
+	{
+		private EnhJSO params;
+		
+		public CanCancel(final A_ a)
+		{
+			this(a.response);
+		}
+		
+		public CanCancel(final EnhJSO response)
+		{
+			super(response);
+			params = response.getJSO("params");
+		}
+		
+		final public boolean canCancel()
+		{
+			return params.getBool("canCancel");
+		}
+	}
+
 	public static class ClearInfos extends A_
 	{
 		public ClearInfos(final A_ a)

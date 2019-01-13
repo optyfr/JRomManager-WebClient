@@ -203,6 +203,11 @@ public class MainWindow extends Window
 		progress.setInfos(params.getThreadCnt(), params.getMultipleSubInfos());		
 	}
 	
+	public void update(A_Progress.CanCancel params)
+	{
+		progress.canCancel(params.canCancel());		
+	}
+	
 	public void update(A_Progress.ClearInfos params)
 	{
 		progress.clearInfos();		
@@ -335,4 +340,14 @@ public class MainWindow extends Window
 		settingsDebugPanel.getItem("txtDbgMemory").setValue(params.getMsg());
 	}
 
+	
+	public void update(A_Profile.Imported params)
+	{
+		Record record = new Record() {{
+			setAttribute("Src", params.getPath());
+			setAttribute("Parent", params.getParent());
+			setAttribute("File", params.getName());
+		}};
+		profilePanel.listgrid.addData(record, (dsResponse, data, dsRequest) -> profilePanel.listgrid.selectRecord(record));
+	}
 }

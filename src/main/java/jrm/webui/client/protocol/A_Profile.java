@@ -86,5 +86,36 @@ public class A_Profile extends A_
 		}
 	}
 
+	public static class Imported extends A_
+	{
+		private EnhJSO params;
+		
+		public Imported(final A_ a)
+		{
+			this(a.response);
+		}
+		
+		public Imported(final EnhJSO response)
+		{
+			super(response);
+			params = response.getJSO("params");
+		}
+		
+		final public String getPath()
+		{
+			return params.getString("path");
+		}
+		
+		final public String getParent()
+		{
+			return params.getString("parent");
+		}
+		
+		final public String getName()
+		{
+			return params.getString("name");
+		}
+	}
+
 	
 }

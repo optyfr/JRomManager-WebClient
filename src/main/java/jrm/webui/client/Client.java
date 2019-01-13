@@ -81,6 +81,9 @@ public class Client implements EntryPoint
 													case "Progress.close":
 														mainwindow.update(new A_Progress.Close(a));
 														break;
+													case "Progress.canCancel":
+														mainwindow.update(new A_Progress.CanCancel(a));
+														break;
 													case "Progress.setInfos":
 														mainwindow.update(new A_Progress.SetInfos(a));
 														break;
@@ -98,6 +101,9 @@ public class Client implements EntryPoint
 														break;
 													case "Profile.scanned":
 														mainwindow.update(new A_Profile.Scanned(a));
+														break;
+													case "Profile.imported":
+														mainwindow.update(new A_Profile.Imported(a));
 														break;
 													case "CatVer.loaded":
 														mainwindow.update(new A_CatVer.Loaded(a));

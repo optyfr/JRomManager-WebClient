@@ -1,11 +1,20 @@
 package jrm.webui.client.ui;
 
-import com.google.gwt.core.client.JsonUtils;
-import com.smartgwt.client.data.*;
+import com.smartgwt.client.data.Criteria;
+import com.smartgwt.client.data.DSCallback;
+import com.smartgwt.client.data.DSRequest;
+import com.smartgwt.client.data.DSResponse;
+import com.smartgwt.client.data.OperationBinding;
+import com.smartgwt.client.data.Record;
+import com.smartgwt.client.data.RestDataSource;
+import com.smartgwt.client.data.XMLTools;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
-import com.smartgwt.client.types.*;
-import com.smartgwt.client.util.SC;
+import com.smartgwt.client.types.DSDataFormat;
+import com.smartgwt.client.types.DSOperationType;
+import com.smartgwt.client.types.DSProtocol;
+import com.smartgwt.client.types.ListGridEditEvent;
+import com.smartgwt.client.types.PreserveOpenState;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.grid.HoverCustomizer;
@@ -49,7 +58,7 @@ public class ProfilePanel extends VLayout
 						@Override
 						public void onRecordDoubleClick(RecordDoubleClickEvent event)
 						{
-							Client.socket.send(JsonUtils.stringify(Q_Profile.Load.instantiate().setPath(event.getRecord().getAttribute("Parent"),event.getRecord().getAttribute("File"))));
+							Q_Profile.Load.instantiate().setPath(event.getRecord().getAttribute("Parent"),event.getRecord().getAttribute("File")).send();
 						}
 					});
 					setContextMenu(new Menu() {{
@@ -238,11 +247,12 @@ public class ProfilePanel extends VLayout
 						addClickHandler(e->new RemoteFileChooser("importDat", path->{
 							for(PathInfo p : path)
 							{
-								listgrid.addData(new Record() {{
+								Record record = new Record() {{
 									setAttribute("Src", p.path);
 									setAttribute("Parent", parent);
 									setAttribute("File", p.name);
-								}});
+								}};
+								listgrid.addData(record, (dsResponse, data, dsRequest) -> listgrid.selectRecord(record));
 							}
 						}));
 					}},
@@ -252,11 +262,11 @@ public class ProfilePanel extends VLayout
 						setMenu(new Menu() {{
 							addItem(new MenuItem() {{
 								setTitle("without Software list");
-								addClickHandler(e->SC.say(getTitle()));
+								addClickHandler(e->Q_Profile.Import.instantiate().setParent(parent).setSL(false).send());
 							}});
 							addItem(new MenuItem() {{
 								setTitle("with Software list");
-								addClickHandler(e->SC.say(getTitle()));
+								addClickHandler(e->Q_Profile.Import.instantiate().setParent(parent).setSL(true).send());
 							}});
 						}});
 					}}

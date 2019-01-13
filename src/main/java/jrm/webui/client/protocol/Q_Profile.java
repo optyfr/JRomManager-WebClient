@@ -7,6 +7,31 @@ public class Q_Profile extends Q_
 		super();
 	}
 	
+	public static class Import extends Q_
+	{
+		protected Import()
+		{
+			super();
+		}
+		
+		final public static Import instantiate()
+		{
+			return Q_.instantiateCmd("Profile.import").cast();
+		}
+		
+		final public Import setSL(boolean sl)
+		{
+			getParams().set("sl", sl);
+			return this;
+		}
+		
+		final public Import setParent(String parent)
+		{
+			getParams().set("parent", parent);
+			return this;
+		}
+	}
+	
 	public static class Load extends Q_
 	{
 		protected Load()

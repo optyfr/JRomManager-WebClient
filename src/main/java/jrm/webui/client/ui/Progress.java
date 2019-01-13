@@ -348,4 +348,9 @@ public class Progress extends Window
 	{
 		markForDestroy();
 	}
+	
+	public void canCancel(boolean canCancel)
+	{
+		btnCancel.setDisabled(!canCancel);
+	}
 }
