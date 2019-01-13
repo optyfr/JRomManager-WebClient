@@ -30,6 +30,14 @@ dependencies {
 	compile group: 'com.sksamuel.gwt', name: 'gwt-websockets', version: '1.0.4'
 }
 
+sourceSets {
+	main {
+		java {
+			srcDirs = ["src/main/java"]
+		}
+	}
+}
+
 gwt {
     module 'jrm.webui.Client'
 	/** GWT version */
