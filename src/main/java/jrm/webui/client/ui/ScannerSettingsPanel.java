@@ -18,7 +18,7 @@ public final class ScannerSettingsPanel extends SettingsForm
 	@SuppressWarnings("serial")
 	public ScannerSettingsPanel(EnhJSO settings)
 	{
-		super();
+		super(settings);
 		setWidth100();
 		setNumCols(4);
 		setColWidths("*","*","*","*");

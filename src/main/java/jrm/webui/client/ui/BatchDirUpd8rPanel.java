@@ -432,8 +432,10 @@ public class BatchDirUpd8rPanel extends VLayout
 				addMember(new IButton("OK", e-> {
 					Q_Profile.SetProperty props = Q_Profile.SetProperty.instantiate();
 					Map<String, Object> values = settings_panel.getFilteredValues();
-					SC.logWarn("size="+values.size());
-					values.forEach((k, v) -> props.setProperty(k, v));
+					values.forEach((k, v) -> {
+						if (v != null)
+							props.setProperty(k, v);
+					});
 					for(int i = 0; i < srcs.length(); i++)
 					{
 						SC.logWarn(i+":"+srcs.get(i));
