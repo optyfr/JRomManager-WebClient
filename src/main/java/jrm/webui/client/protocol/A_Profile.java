@@ -84,6 +84,10 @@ public class A_Profile extends A_
 		{
 			return params.getInteger("actions");
 		}
+		final public boolean hasReport()
+		{
+			return params.getBool("report");
+		}
 	}
 
 	public static class Imported extends A_

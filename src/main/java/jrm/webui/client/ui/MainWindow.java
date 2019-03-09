@@ -240,6 +240,16 @@ public class MainWindow extends Window
 		if(params.getSuccess())
 		{
 			scannerPanel.btnFix.setDisabled(params.getActions()==null || params.getActions()==0);
+			if(params.hasReport())
+			{
+				if(scannerPanel.reportViewer==null || !Client.childWindows.contains(scannerPanel.reportViewer))
+					scannerPanel.reportViewer = new ReportViewer();
+				else if(scannerPanel.reportViewer.isVisible())
+					scannerPanel.reportViewer.bringToFront();
+				else
+					scannerPanel.reportViewer.show();
+				
+			}
 			if(Client.mainwindow.scannerPanel.profileViewer!=null && Client.childWindows.contains(Client.mainwindow.scannerPanel.profileViewer))
 			{
 				Client.mainwindow.scannerPanel.profileViewer.anywareListList.refreshData();

@@ -23,6 +23,7 @@ public final class ScannerPanel extends VLayout
 	ScannerSettingsPanel scannerSettingsPanel;
 	ScannerFiltersPanel scannerFiltersPanel;
 	ScannerAdvFiltersPanel scannerAdvFiltersPanel;
+	ScannerAutomationPanel scannerAutomationPanel;
 	ProfileViewer profileViewer;
 	ReportViewer reportViewer;
 
@@ -121,6 +122,21 @@ public final class ScannerPanel extends VLayout
 					new Tab() {{
 						setTitle(Client.session.getMsg("MainFrame.AdvFilters"));
 						setPane(scannerAdvFiltersPanel = new ScannerAdvFiltersPanel());
+					}},
+					new Tab() {{
+						setTitle(Client.session.getMsg("MainFrame.scannerSettingsPanel.title"));
+						setPane(new HLayout() {{
+							addMember(new LayoutSpacer("25%","*"));
+							addMember(new VLayout() {
+
+							{
+								setHeight100();
+								addMember(new LayoutSpacer("100%","*"));
+								addMember(scannerAutomationPanel = new ScannerAutomationPanel());
+								addMember(new LayoutSpacer("100%","*"));
+							}});
+							addMember(new LayoutSpacer("25%","*"));
+						}});
 					}}
 				);
 			}},
