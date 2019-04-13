@@ -1,15 +1,18 @@
+buildscript {
+	repositories {
+		jcenter()
+	}
+	dependencies {
+		classpath 'de.undercouch:gradle-download-task:3.4.3'
+	}
+}
+
 plugins {
-    id "de.esoco.gwt" version "1.0.6"
+	id "de.esoco.gwt" version "1.0.9"
 }
 
 repositories {
-    mavenCentral()
-	ivy {
-		url "https://www.smartclient.com/builds/SmartGWT"
-		layout 'pattern', {
-            artifact '[revision]/LGPL/latest/[module].[ext]'
-        }
-	}
+	mavenCentral()
 }
 
 apply plugin: 'eclipse'
@@ -18,16 +21,40 @@ eclipse {
 	classpath {
 		downloadJavadoc = true
 		downloadSources = true
+		containers 'com.gwtplugins.gwt.eclipse.core.GWT_CONTAINER',
+		           'org.eclipse.buildship.core.gradleclasspathcontainer'
+	//	defaultOutputDir = file('war/WEB-INF/classes')
 	}
+}
+
+apply plugin: 'de.undercouch.download'
+
+task downloadSmartGWT(type: Download) {
+	src([
+		'https://www.smartclient.com/builds/SmartGWT/12.0p/LGPL/latest/smartgwt.jar',
+		'https://www.smartclient.com/builds/SmartGWT/12.0p/LGPL/latest/smartgwt-skins.jar'
+	])
+	dest "$buildDir/SmartGWT"
+	onlyIfModified true
+}
+
+task SmartGWT {
+	dependsOn downloadSmartGWT
+	outputs.file "$buildDir/SmartGWT/smartgwt.jar" 
+}
+
+task SmartGWTSkins {
+	dependsOn downloadSmartGWT
+	outputs.file "$buildDir/SmartGWT/smartgwt-skins.jar" 
 }
 
 //apply plugin: 'war'
 apply plugin: 'de.esoco.gwt'
 
 dependencies {
-	compile group:'smartgwt', name: 'smartgwt', version: '12.0p'
-	compile group: 'smartgwt', name: 'smartgwt-skins', version: '12.0p'
-	compile group: 'com.sksamuel.gwt', name: 'gwt-websockets', version: '1.0.4'
+	compile files(SmartGWT)
+	compile files(SmartGWTSkins)
+	compile group: 'com.sksamuel.gwt', name: 'gwt-websockets', version: '1.+'
 }
 
 sourceSets {
@@ -84,6 +111,7 @@ gwt {
         strict = false
 
 		/** Java args */
+		javaArgs=["-Dfile.encoding": 'UTF-8']
 		maxHeapSize="1024m"
 		minHeapSize="512m"
 //		maxPermSize="128m"
