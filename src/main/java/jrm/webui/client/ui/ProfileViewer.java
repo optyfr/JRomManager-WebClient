@@ -2,12 +2,29 @@ package jrm.webui.client.ui;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
-import com.smartgwt.client.data.*;
+import com.google.gwt.http.client.URL;
+import com.smartgwt.client.data.Criteria;
+import com.smartgwt.client.data.DSCallback;
+import com.smartgwt.client.data.DSRequest;
+import com.smartgwt.client.data.DSResponse;
+import com.smartgwt.client.data.DataSource;
+import com.smartgwt.client.data.OperationBinding;
+import com.smartgwt.client.data.Record;
+import com.smartgwt.client.data.RestDataSource;
+import com.smartgwt.client.data.XMLTools;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
-import com.smartgwt.client.types.*;
+import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.DSDataFormat;
+import com.smartgwt.client.types.DSOperationType;
+import com.smartgwt.client.types.DSProtocol;
+import com.smartgwt.client.types.SelectionStyle;
+import com.smartgwt.client.types.SelectionType;
+import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Dialog;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -358,13 +375,46 @@ public class ProfileViewer extends Window
 			super();
 			setCanEdit(false);
 			setCanRemoveRecords(false);
-			setSelectionType(SelectionStyle.NONE);
+			setSelectionType(SelectionStyle.SINGLE);
 			setCanHover(true);
 			setHoverAutoFitWidth(true);
 			setHoverAutoFitMaxWidth("50%");
 			setAlternateRecordStyles(true);
 			setCanSort(false);
-			setContextMenu(new Menu());
+			setContextMenu(new Menu() {{
+				Dialog dialog = new Dialog();
+				dialog.setWidth(350);
+				setItems(
+					new MenuItem("Copy CRC") {{
+						addClickHandler(event->{
+							final Record record = Anyware.this.getSelectedRecord();
+							if(record!=null)
+								SC.askforValue("Copy", "Select and Copy the text below", record.getAttribute("crc"), v->{}, dialog);
+						});
+					}},
+					new MenuItem("Copy SHA1") {{
+						addClickHandler(event->{
+							final Record record = Anyware.this.getSelectedRecord();
+							if(record!=null)
+								SC.askforValue("Copy", "Select and Copy the text below", record.getAttribute("sha1"), v->{}, dialog);
+						});
+					}},
+					new MenuItem("Copy Name") {{
+						addClickHandler(event->{
+							final Record record = Anyware.this.getSelectedRecord();
+							if(record!=null)
+								SC.askforValue("Copy", "Select and Copy the text below", record.getAttribute("name"), v->{}, dialog);
+						});
+					}},
+					new MenuItem("Search on the Web") {{
+						addClickHandler(event->{
+							final Record record = Anyware.this.getSelectedRecord();
+							if(record!=null)
+								com.google.gwt.user.client.Window.open("https://google.com/search?q="+URL.encodeQueryString('"'+record.getAttribute("name")+'"')+'+'+Optional.ofNullable(record.getAttribute("crc")).orElse(record.getAttribute("sha1")), "_blank", null);
+						});
+					}}
+				);
+			}});
 			addDataArrivedHandler(event->{
 				getDataSource().setRequestProperties(new DSRequest());
 			});
