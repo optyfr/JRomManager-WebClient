@@ -2,8 +2,10 @@ package jrm.webui.client.ui;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Optional;
 
 import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.http.client.URL;
 import com.smartgwt.client.data.DSRequest;
 import com.smartgwt.client.data.OperationBinding;
 import com.smartgwt.client.data.Record;
@@ -15,6 +17,8 @@ import com.smartgwt.client.types.DSDataFormat;
 import com.smartgwt.client.types.DSOperationType;
 import com.smartgwt.client.types.DSProtocol;
 import com.smartgwt.client.types.FetchMode;
+import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Dialog;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.tree.TreeGrid;
@@ -38,20 +42,6 @@ final class ReportTree extends TreeGrid
 		setShowOpenIcons(true);
 		setShowCustomIconOpen(true);
 		setDataFetchMode(FetchMode.PAGED);
-		setContextMenu(new Menu() {{
-			setItems(
-				new MenuItem() {{
-					setTitle(Client.session.getMsg("ReportFrame.chckbxmntmShowOkEntries.text"));
-					addClickHandler(e->Client.socket.send(JsonUtils.stringify(Q_Report.SetFilter.instantiate(src!=null).setFilter("SHOWOK",  !(filters.containsKey("SHOWOK")&&filters.get("SHOWOK"))))));
-					setCheckIfCondition((target, menu, item)->filters.containsKey("SHOWOK")&&filters.get("SHOWOK"));
-				}},
-				new MenuItem() {{
-					setTitle(Client.session.getMsg("ReportFrame.chckbxmntmHideFullyMissing.text"));
-					addClickHandler(e->Client.socket.send(JsonUtils.stringify(Q_Report.SetFilter.instantiate(src!=null).setFilter("HIDEMISSING", !(filters.containsKey("HIDEMISSING")&&filters.get("HIDEMISSING"))))));
-					setCheckIfCondition((target, menu, item)->filters.containsKey("HIDEMISSING")&&filters.get("HIDEMISSING"));
-				}}
-			);
-		}});
 		setDataSource(
 			new RestDataSource() {{
 				setID("Report");
@@ -59,7 +49,8 @@ final class ReportTree extends TreeGrid
 				if(src!=null)
 					setRequestProperties(new DSRequest() {{setData(Collections.singletonMap("src", src));}});
 				setOperationBindings(
-					new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}}
+					new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}},
+					new OperationBinding(){{setOperationType(DSOperationType.CUSTOM);setDataProtocol(DSProtocol.POSTXML);}}
 				);
 				setDataFormat(DSDataFormat.XML);
 				setDataURL("/datasources/"+getID());
@@ -81,6 +72,70 @@ final class ReportTree extends TreeGrid
 			}},
 			new TreeGridField("title")
 		);
+		setContextMenu(new Menu() {{
+			Dialog dialog = new Dialog();
+			dialog.setWidth(350);
+			setItems(
+				new MenuItem() {{
+					setTitle(Client.session.getMsg("ReportFrame.chckbxmntmShowOkEntries.text"));
+					addClickHandler(e->Client.socket.send(JsonUtils.stringify(Q_Report.SetFilter.instantiate(src!=null).setFilter("SHOWOK",  !(filters.containsKey("SHOWOK")&&filters.get("SHOWOK"))))));
+					setCheckIfCondition((target, menu, item)->filters.containsKey("SHOWOK")&&filters.get("SHOWOK"));
+				}},
+				new MenuItem() {{
+					setTitle(Client.session.getMsg("ReportFrame.chckbxmntmHideFullyMissing.text"));
+					addClickHandler(e->Client.socket.send(JsonUtils.stringify(Q_Report.SetFilter.instantiate(src!=null).setFilter("HIDEMISSING", !(filters.containsKey("HIDEMISSING")&&filters.get("HIDEMISSING"))))));
+					setCheckIfCondition((target, menu, item)->filters.containsKey("HIDEMISSING")&&filters.get("HIDEMISSING"));
+				}},
+				new MenuItem() {{
+					setIsSeparator(true);
+				}},
+				new MenuItem("Detail") {{
+					addClickHandler(event->{
+						ReportTree.this.getDataSource().performCustomOperation("detail", ReportTree.this.getSelectedRecord(), (dsResponse, data, dsRequest) -> {
+							Record[] records = dsResponse.getData();
+							if(records!=null && records.length>0)
+								SC.say("<pre>"+records[0].getAttribute("Detail")+"</pre>");
+						});
+					});
+				}},
+				new MenuItem("Copy CRC") {{
+					addClickHandler(event->{
+						ReportTree.this.getDataSource().performCustomOperation("detail", ReportTree.this.getSelectedRecord(), (dsResponse, data, dsRequest) -> {
+							Record[] records = dsResponse.getData();
+							if(records!=null && records.length>0)
+								SC.askforValue("Copy", "Select and Copy the text below", records[0].getAttribute("CRC"), v->{}, dialog);
+						});
+					});
+				}},
+				new MenuItem("Copy SHA1") {{
+					addClickHandler(event->{
+						ReportTree.this.getDataSource().performCustomOperation("detail", ReportTree.this.getSelectedRecord(), (dsResponse, data, dsRequest) -> {
+							Record[] records = dsResponse.getData();
+							if(records!=null && records.length>0)
+								SC.askforValue("Copy", "Select and Copy the text below", records[0].getAttribute("SHA1"), v->{}, dialog);
+						});
+					});
+				}},
+				new MenuItem("Copy Name") {{
+					addClickHandler(event->{
+						ReportTree.this.getDataSource().performCustomOperation("detail", ReportTree.this.getSelectedRecord(), (dsResponse, data, dsRequest) -> {
+							Record[] records = dsResponse.getData();
+							if(records!=null && records.length>0)
+								SC.askforValue("Copy", "Select and Copy the text below", records[0].getAttribute("Name"), v->{}, dialog);
+						});
+					});
+				}},
+				new MenuItem("Search on the Web") {{
+					addClickHandler(event->{
+						ReportTree.this.getDataSource().performCustomOperation("detail", ReportTree.this.getSelectedRecord(), (dsResponse, data, dsRequest) -> {
+							Record[] records = dsResponse.getData();
+							if(records!=null && records.length>0)
+								com.google.gwt.user.client.Window.open("https://google.com/search?q="+URL.encodeQueryString('"'+records[0].getAttribute("Name")+'"')+'+'+Optional.ofNullable(records[0].getAttribute("CRC")).orElse(records[0].getAttribute("SHA1")), "_blank", null);
+						});
+					});
+				}}
+			);
+		}});
 	}
 	
 	@Override

@@ -391,6 +391,7 @@ public class ProfileViewer extends Window
 							if(record!=null)
 								SC.askforValue("Copy", "Select and Copy the text below", record.getAttribute("crc"), v->{}, dialog);
 						});
+						setEnableIfCondition((target,menu,item)->Anyware.this.getSelectedRecord()!=null);
 					}},
 					new MenuItem("Copy SHA1") {{
 						addClickHandler(event->{
@@ -398,6 +399,7 @@ public class ProfileViewer extends Window
 							if(record!=null)
 								SC.askforValue("Copy", "Select and Copy the text below", record.getAttribute("sha1"), v->{}, dialog);
 						});
+						setEnableIfCondition((target,menu,item)->Anyware.this.getSelectedRecord()!=null);
 					}},
 					new MenuItem("Copy Name") {{
 						addClickHandler(event->{
@@ -405,6 +407,7 @@ public class ProfileViewer extends Window
 							if(record!=null)
 								SC.askforValue("Copy", "Select and Copy the text below", record.getAttribute("name"), v->{}, dialog);
 						});
+						setEnableIfCondition((target,menu,item)->Anyware.this.getSelectedRecord()!=null);
 					}},
 					new MenuItem("Search on the Web") {{
 						addClickHandler(event->{
@@ -412,6 +415,7 @@ public class ProfileViewer extends Window
 							if(record!=null)
 								com.google.gwt.user.client.Window.open("https://google.com/search?q="+URL.encodeQueryString('"'+record.getAttribute("name")+'"')+'+'+Optional.ofNullable(record.getAttribute("crc")).orElse(record.getAttribute("sha1")), "_blank", null);
 						});
+						setEnableIfCondition((target,menu,item)->Anyware.this.getSelectedRecord()!=null);
 					}}
 				);
 			}});
