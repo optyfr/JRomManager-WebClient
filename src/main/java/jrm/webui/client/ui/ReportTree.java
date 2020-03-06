@@ -97,6 +97,7 @@ final class ReportTree extends TreeGrid
 								SC.say("<pre>"+records[0].getAttribute("Detail")+"</pre>");
 						});
 					});
+					setEnableIfCondition((target, menu, item)->Optional.ofNullable(ReportTree.this.getSelectedRecord()).map(r->r.getAttributeAsInt("ParentID")).orElse(0)!=0);
 				}},
 				new MenuItem("Copy CRC") {{
 					addClickHandler(event->{
@@ -106,6 +107,7 @@ final class ReportTree extends TreeGrid
 								SC.askforValue("Copy", "Select and Copy the text below", records[0].getAttribute("CRC"), v->{}, dialog);
 						});
 					});
+					setEnableIfCondition((target, menu, item)->Optional.ofNullable(ReportTree.this.getSelectedRecord()).map(r->r.getAttributeAsInt("ParentID")).orElse(0)!=0);
 				}},
 				new MenuItem("Copy SHA1") {{
 					addClickHandler(event->{
@@ -115,6 +117,7 @@ final class ReportTree extends TreeGrid
 								SC.askforValue("Copy", "Select and Copy the text below", records[0].getAttribute("SHA1"), v->{}, dialog);
 						});
 					});
+					setEnableIfCondition((target, menu, item)->Optional.ofNullable(ReportTree.this.getSelectedRecord()).map(r->r.getAttributeAsInt("ParentID")).orElse(0)!=0);
 				}},
 				new MenuItem("Copy Name") {{
 					addClickHandler(event->{
@@ -124,15 +127,23 @@ final class ReportTree extends TreeGrid
 								SC.askforValue("Copy", "Select and Copy the text below", records[0].getAttribute("Name"), v->{}, dialog);
 						});
 					});
+					setEnableIfCondition((target, menu, item)->Optional.ofNullable(ReportTree.this.getSelectedRecord()).map(r->r.getAttributeAsInt("ParentID")).orElse(0)!=0);
 				}},
 				new MenuItem("Search on the Web") {{
 					addClickHandler(event->{
 						ReportTree.this.getDataSource().performCustomOperation("detail", ReportTree.this.getSelectedRecord(), (dsResponse, data, dsRequest) -> {
 							Record[] records = dsResponse.getData();
-							if(records!=null && records.length>0)
-								com.google.gwt.user.client.Window.open("https://google.com/search?q="+URL.encodeQueryString('"'+records[0].getAttribute("Name")+'"')+'+'+Optional.ofNullable(records[0].getAttribute("CRC")).orElse(records[0].getAttribute("SHA1")), "_blank", null);
+							if (records != null && records.length > 0)
+							{
+								final String name = records[0].getAttribute("Name");
+								final String crc = records[0].getAttribute("CRC");
+								final String sha1 = records[0].getAttribute("SHA1");
+								final String hash = Optional.ofNullable(Optional.ofNullable(crc).orElse(sha1)).map(h -> '+' + h).orElse("");
+								com.google.gwt.user.client.Window.open("https://google.com/search?q=" + URL.encodeQueryString('"' + name + '"') + hash, "_blank", null);
+							}
 						});
 					});
+					setEnableIfCondition((target, menu, item)->Optional.ofNullable(ReportTree.this.getSelectedRecord()).map(r->r.getAttributeAsInt("ParentID")).orElse(0)!=0);
 				}}
 			);
 		}});

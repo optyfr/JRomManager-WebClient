@@ -413,7 +413,13 @@ public class ProfileViewer extends Window
 						addClickHandler(event->{
 							final Record record = Anyware.this.getSelectedRecord();
 							if(record!=null)
-								com.google.gwt.user.client.Window.open("https://google.com/search?q="+URL.encodeQueryString('"'+record.getAttribute("name")+'"')+'+'+Optional.ofNullable(record.getAttribute("crc")).orElse(record.getAttribute("sha1")), "_blank", null);
+							{
+								final String name = record.getAttribute("name");
+								final String crc = record.getAttribute("crc");
+								final String sha1 = record.getAttribute("sha1");
+								final String hash = Optional.ofNullable(Optional.ofNullable(crc).orElse(sha1)).map(h -> '+' + h).orElse("");
+								com.google.gwt.user.client.Window.open("https://google.com/search?q=" + URL.encodeQueryString('"' + name + '"') + hash, "_blank", null);
+							}
 						});
 						setEnableIfCondition((target,menu,item)->Anyware.this.getSelectedRecord()!=null);
 					}}
