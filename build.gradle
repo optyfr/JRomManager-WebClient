@@ -51,7 +51,7 @@ task SmartGWTSkins {
 	outputs.file "$buildDir/SmartGWT/smartgwt-skins.jar" 
 }
 
-//apply plugin: 'war'
+apply plugin: 'war'
 apply plugin: 'de.esoco.gwt'
 
 dependencies {
@@ -150,3 +150,21 @@ task webZip(type: Zip) {
 
 build.dependsOn webZip
 
+gwtCompile {
+	doLast {
+		delete {
+			delete "war/webclient/deferredjs"
+			delete fileTree("war").matching {
+				include "**/*.cache.js"
+				include "**/*.cache.js.gz"
+			}
+		}
+		copy {
+			from "$buildDir/gwt/out"
+			into "war"
+		}
+	}
+}
+
+war {
+}
