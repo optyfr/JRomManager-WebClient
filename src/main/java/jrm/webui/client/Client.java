@@ -167,8 +167,11 @@ public class Client implements EntryPoint
 			{
 				if(response.getHttpResponseCode() == 200)
 				{
+					processCmd(rawData.toString());
 					lprTimer.schedule(100);
 				}
+				else if(response.getHttpResponseCode() == 401)	// Session lost => reload page
+					com.google.gwt.user.client.Window.Location.reload();
 				else
 					lprTimer.schedule(500);
 			}
@@ -182,7 +185,7 @@ public class Client implements EntryPoint
 	}
 	
 	private native boolean canWS() /*-{
-		return $wnd.jrm_no_ws !== false;
+		return $wnd.jrm_no_ws !== true;
 	}-*/;
 	
 	
