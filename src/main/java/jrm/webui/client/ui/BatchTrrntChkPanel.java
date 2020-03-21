@@ -298,31 +298,31 @@ public class BatchTrrntChkPanel extends VLayout
 					setTitle(Client.session.getMsg("BatchToolsTrrntChkPanel.lblCheckMode.text"));
 					setDefaultValue(Client.session.getSetting("trntchk.mode","FILENAME"));
 					addChangedHandler(e->{
-						Client.socket.send(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("trntchk.mode", (String)e.getValue())));
+						Client.sendMsg(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("trntchk.mode", (String)e.getValue())));
 						e.getForm().getItem("remove_wrong_sized_files").setDisabled("FILENAME".equals(e.getValue()));
 					});
 				}},
 				new CheckboxItem() {{
 					setTitle(Client.session.getMsg("BatchTrrntChkPanel.chckbxDetectArchivedFolder.text"));
 					setDefaultValue(Client.session.getSettingAsBoolean("trntchk.detect_archived_folders",true));
-					addChangedHandler(e->Client.socket.send(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("trntchk.detect_archived_folders", (Boolean)e.getValue()))));
+					addChangedHandler(e->Client.sendMsg(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("trntchk.detect_archived_folders", (Boolean)e.getValue()))));
 				}},
 				new CheckboxItem() {{
 					setTitle(Client.session.getMsg("BatchToolsTrrntChkPanel.chckbxRemoveUnknownFiles.text"));
 					setDefaultValue(Client.session.getSettingAsBoolean("trntchk.remove_unknown_files",false));
-					addChangedHandler(e->Client.socket.send(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("trntchk.remove_unknown_files", (Boolean)e.getValue()))));
+					addChangedHandler(e->Client.sendMsg(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("trntchk.remove_unknown_files", (Boolean)e.getValue()))));
 				}},
 				new CheckboxItem("remove_wrong_sized_files") {{
 					setTitle(Client.session.getMsg("BatchToolsTrrntChkPanel.chckbxRemoveWrongSized.text"));
 					setDefaultValue(Client.session.getSettingAsBoolean("trntchk.remove_wrong_sized_files",false));
 					setDisabled("FILENAME".equals(Client.session.getSetting("trntchk.mode","FILENAME")));
-					addChangedHandler(e->Client.socket.send(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("trntchk.remove_wrong_sized_files", (Boolean)e.getValue()))));
+					addChangedHandler(e->Client.sendMsg(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("trntchk.remove_wrong_sized_files", (Boolean)e.getValue()))));
 				}},
 				new ButtonItem() {{
 					setTitle(Client.session.getMsg("BatchToolsTrrntChkPanel.TrntCheckStart.text"));
 					setAlign(Alignment.RIGHT);
 					setStartRow(false);
-					addClickHandler(e->Client.socket.send(JsonUtils.stringify(Q_TrntChk.Start.instantiate())));
+					addClickHandler(e->Client.sendMsg(JsonUtils.stringify(Q_TrntChk.Start.instantiate())));
 				}}
 			);
 		}});

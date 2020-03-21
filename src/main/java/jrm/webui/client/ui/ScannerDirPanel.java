@@ -80,7 +80,7 @@ public final class ScannerDirPanel extends DynamicForm
 					boolean selected = (boolean)event.getValue();
 					ScannerDirPanel.this.getField("tfDisksDestBtn").setDisabled(!selected);
 					ScannerDirPanel.this.getField("tfDisksDest").setDisabled(!selected);
-					Client.socket.send(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty("disks_dest_dir_enabled", selected)));
+					Client.sendMsg(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty("disks_dest_dir_enabled", selected)));
 				});
 			}},
 			new TextItem("tfSWDest",Client.session.getMsg("MainFrame.chckbxSoftwareDest.text")) {{
@@ -106,7 +106,7 @@ public final class ScannerDirPanel extends DynamicForm
 					boolean selected = (boolean)event.getValue();
 					ScannerDirPanel.this.getField("tfSWDestBtn").setDisabled(!selected);
 					ScannerDirPanel.this.getField("tfSWDest").setDisabled(!selected);
-					Client.socket.send(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty("swroms_dest_dir_enabled", selected)));
+					Client.sendMsg(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty("swroms_dest_dir_enabled", selected)));
 				});
 			}},
 			new TextItem("tfSWDisksDest",Client.session.getMsg("MainFrame.chckbxSwdisksdest.text")) {{
@@ -132,7 +132,7 @@ public final class ScannerDirPanel extends DynamicForm
 					boolean selected = (boolean)event.getValue();
 					ScannerDirPanel.this.getField("tfSWDisksDestBtn").setDisabled(!selected);
 					ScannerDirPanel.this.getField("tfSWDisksDest").setDisabled(!selected);
-					Client.socket.send(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty("swdisks_dest_dir_enabled", selected)));
+					Client.sendMsg(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty("swdisks_dest_dir_enabled", selected)));
 				});
 			}},
 			new TextItem("tfSamplesDest",Client.session.getMsg("MainFrame.lblSamplesDest.text")) {{
@@ -158,7 +158,7 @@ public final class ScannerDirPanel extends DynamicForm
 					boolean selected = (boolean)event.getValue();
 					ScannerDirPanel.this.getField("tfSamplesDestBtn").setDisabled(!selected);
 					ScannerDirPanel.this.getField("tfSamplesDest").setDisabled(!selected);
-					Client.socket.send(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty("samples_dest_dir_enabled", selected)));
+					Client.sendMsg(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty("samples_dest_dir_enabled", selected)));
 				});
 			}},
 			new SelectItem("listSrcDir",Client.session.getMsg("MainFrame.lblSrcDir.text")) {{
@@ -243,7 +243,7 @@ public final class ScannerDirPanel extends DynamicForm
 			String[] values = selectItem.getValueMapAsArray();
 			List<String> lvalues = new ArrayList<>(Arrays.asList(values));
 			lvalues.addAll(Stream.of(path).map(p->p.path).collect(Collectors.toList()));
-			Client.socket.send(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty("src_dir", lvalues.stream().collect(Collectors.joining("|")))));
+			Client.sendMsg(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty("src_dir", lvalues.stream().collect(Collectors.joining("|")))));
 			selectItem.setValueMap(lvalues.toArray(new String[0]));
 		});		
 	}
@@ -254,14 +254,14 @@ public final class ScannerDirPanel extends DynamicForm
 		String[] values = selectItem.getValueMapAsArray();
 		List<String> lvalues = new ArrayList<>(Arrays.asList(values));
 		lvalues.removeAll(Arrays.asList(selectItem.getValues()));
-		Client.socket.send(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty("src_dir", lvalues.stream().collect(Collectors.joining("|")))));
+		Client.sendMsg(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty("src_dir", lvalues.stream().collect(Collectors.joining("|")))));
 		selectItem.setValueMap(lvalues.toArray(new String[0]));
 	}
 	
 	private void setPropertyItemValue(String field, String name, String value)
 	{
 		getItem(field).setValue(value);
-		Client.socket.send(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty(name, value)));
+		Client.sendMsg(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty(name, value)));
 	}
 
 	void initPropertyItemValue(String field, String name, EnhJSO jso)

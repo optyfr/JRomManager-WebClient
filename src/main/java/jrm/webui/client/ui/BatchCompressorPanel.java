@@ -116,14 +116,14 @@ public class BatchCompressorPanel extends VLayout
 					setWidth(100);
 					setTitle("Format");
 					setDefaultValue(Client.session.getSetting("compressor.format","TZIP"));
-					addChangedHandler(e->Client.socket.send(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("compressor.format", (String)e.getValue()))));
+					addChangedHandler(e->Client.sendMsg(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("compressor.format", (String)e.getValue()))));
 				}},
 				new CheckboxItem("force") {{
 					setTitle("Force");
 					setShowTitle(false);
 					setWidth("*");
 					setDefaultValue(Client.session.getSettingAsBoolean("compressor.force",false));
-					addChangedHandler(e->Client.socket.send(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("compressor.force", (Boolean)e.getValue()))));
+					addChangedHandler(e->Client.sendMsg(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("compressor.force", (Boolean)e.getValue()))));
 				}},
 				new ButtonItem() {{
 					setTitle("Clear");
@@ -138,7 +138,7 @@ public class BatchCompressorPanel extends VLayout
 					setAlign(Alignment.RIGHT);
 					setStartRow(false);
 					setWidth("*");
-					addClickHandler(e->Client.socket.send(JsonUtils.stringify(Q_Compressor.Start.instantiate())));
+					addClickHandler(e->Client.sendMsg(JsonUtils.stringify(Q_Compressor.Start.instantiate())));
 				}}
 			);
 		}});

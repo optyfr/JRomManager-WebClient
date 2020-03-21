@@ -49,7 +49,7 @@ public final class ScannerFiltersPanel extends HLayout
 			addSelectionChangedHandler(event->{
 				if(setproperty)
 				{
-					Client.socket.send(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty(event.getRecord().getAttribute("property"), event.getState())));
+					Client.sendMsg(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty(event.getRecord().getAttribute("property"), event.getState())));
 					if(canResetPV)
 						resetProfileViewer();
 				}

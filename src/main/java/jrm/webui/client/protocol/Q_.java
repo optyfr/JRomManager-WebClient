@@ -39,7 +39,7 @@ public class Q_ extends EnhJSO
 	
 	final public void send()
 	{
-		Client.socket.send(JsonUtils.stringify(this));
+		Client.sendMsg(JsonUtils.stringify(this));
 	}
 	
 }

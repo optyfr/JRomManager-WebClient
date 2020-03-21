@@ -185,7 +185,7 @@ public class BatchDirUpd8rPanel extends VLayout
 											settings.setProperty("merge_mode", "NOMERGE"); //$NON-NLS-1$
 											settings.setProperty("archives_and_chd_as_roms", false); //$NON-NLS-1$
 											for(ListGridRecord record : sdr.getSelectedRecords())
-												Client.socket.send(JsonUtils.stringify(settings.setProfile(record.getAttribute("src"))));
+												Client.sendMsg(JsonUtils.stringify(settings.setProfile(record.getAttribute("src"))));
 										});
 									}});
 									addItem(new MenuItem() {{
@@ -209,7 +209,7 @@ public class BatchDirUpd8rPanel extends VLayout
 											settings.setProperty("merge_mode", "NOMERGE"); //$NON-NLS-1$
 											settings.setProperty("archives_and_chd_as_roms", true); //$NON-NLS-1$
 											for(ListGridRecord record : sdr.getSelectedRecords())
-												Client.socket.send(JsonUtils.stringify(settings.setProfile(record.getAttribute("src"))));
+												Client.sendMsg(JsonUtils.stringify(settings.setProfile(record.getAttribute("src"))));
 										});
 									}});
 								}});
@@ -384,12 +384,12 @@ public class BatchDirUpd8rPanel extends VLayout
 					setLabelAsTitle(true);
 					setDefaultValue(Client.session.getSettingAsBoolean("dry_run",true));
 					setShowLabel(false);
-					addChangedHandler(e->Client.socket.send(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("dry_run", (Boolean)e.getValue()))));
+					addChangedHandler(e->Client.sendMsg(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("dry_run", (Boolean)e.getValue()))));
 				}});
 			}});
 			addMember(new IButton(Client.session.getMsg("MainFrame.btnStart.text"), e->{
 				Client.mainwindow.mainPane.disableTab(1);
-				Client.socket.send(JsonUtils.stringify(Q_Dat2Dir.Start.instantiate()));
+				Client.sendMsg(JsonUtils.stringify(Q_Dat2Dir.Start.instantiate()));
 			}));
 		}});
 	}

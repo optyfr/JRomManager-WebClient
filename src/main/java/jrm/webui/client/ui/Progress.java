@@ -267,7 +267,7 @@ public class Progress extends Window
 	{
 		btnCancel.setDisabled(true);
 		btnCancel.setTitle("Canceling"); //$NON-NLS-1$
-		Client.socket.send(JsonUtils.stringify(Q_Progress.Cancel.instantiate()));
+		Client.sendMsg(JsonUtils.stringify(Q_Progress.Cancel.instantiate()));
 	}
 
 	private int pb2_val, pb2_max;

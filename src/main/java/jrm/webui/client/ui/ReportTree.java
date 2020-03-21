@@ -78,12 +78,12 @@ final class ReportTree extends TreeGrid
 			setItems(
 				new MenuItem() {{
 					setTitle(Client.session.getMsg("ReportFrame.chckbxmntmShowOkEntries.text"));
-					addClickHandler(e->Client.socket.send(JsonUtils.stringify(Q_Report.SetFilter.instantiate(src!=null).setFilter("SHOWOK",  !(filters.containsKey("SHOWOK")&&filters.get("SHOWOK"))))));
+					addClickHandler(e->Client.sendMsg(JsonUtils.stringify(Q_Report.SetFilter.instantiate(src!=null).setFilter("SHOWOK",  !(filters.containsKey("SHOWOK")&&filters.get("SHOWOK"))))));
 					setCheckIfCondition((target, menu, item)->filters.containsKey("SHOWOK")&&filters.get("SHOWOK"));
 				}},
 				new MenuItem() {{
 					setTitle(Client.session.getMsg("ReportFrame.chckbxmntmHideFullyMissing.text"));
-					addClickHandler(e->Client.socket.send(JsonUtils.stringify(Q_Report.SetFilter.instantiate(src!=null).setFilter("HIDEMISSING", !(filters.containsKey("HIDEMISSING")&&filters.get("HIDEMISSING"))))));
+					addClickHandler(e->Client.sendMsg(JsonUtils.stringify(Q_Report.SetFilter.instantiate(src!=null).setFilter("HIDEMISSING", !(filters.containsKey("HIDEMISSING")&&filters.get("HIDEMISSING"))))));
 					setCheckIfCondition((target, menu, item)->filters.containsKey("HIDEMISSING")&&filters.get("HIDEMISSING"));
 				}},
 				new MenuItem() {{

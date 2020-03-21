@@ -60,7 +60,7 @@ public final class ScannerAdvFiltersPanel extends HLayout
 					setTitle(null);
 					setValueIconRightPadding(0);
 					setEndRow(false);
-					addClickHandler(event->new RemoteFileChooser("NPlayers", path -> Client.socket.send(JsonUtils.stringify(Q_NPlayers.Load.instantiate().setPath(path[0].path)))));
+					addClickHandler(event->new RemoteFileChooser("NPlayers", path -> Client.sendMsg(JsonUtils.stringify(Q_NPlayers.Load.instantiate().setPath(path[0].path)))));
 				}});
 			}}, nplayers_list = new ListGrid() {{
 				setSelectionAppearance(SelectionAppearance.CHECKBOX);
@@ -71,7 +71,7 @@ public final class ScannerAdvFiltersPanel extends HLayout
 				setAlternateRecordStyles(false);
 				setCanEdit(false);
 				setCanRemoveRecords(false);
-				addSelectionChangedHandler(event -> Client.socket.send(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty(event.getRecord().getAttribute("ID"), event.getState()))));
+				addSelectionChangedHandler(event -> Client.sendMsg(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty(event.getRecord().getAttribute("ID"), event.getState()))));
 				setDataSource(new RestDataSource() {{
 					setID("NPlayers");
 					setDataURL("/datasources/"+getID());
@@ -110,7 +110,7 @@ public final class ScannerAdvFiltersPanel extends HLayout
 						}},
 						new MenuItem() {{setIsSeparator(true);}},
 						new MenuItem(Client.session.getMsg("ScannerAdvFilterPanel.mntmClear_1.text")) {{
-							addClickHandler(event->Client.socket.send(JsonUtils.stringify(Q_NPlayers.Load.instantiate().setPath(null))));
+							addClickHandler(event->Client.sendMsg(JsonUtils.stringify(Q_NPlayers.Load.instantiate().setPath(null))));
 						}}
 					);
 				}});
@@ -133,7 +133,7 @@ public final class ScannerAdvFiltersPanel extends HLayout
 						setTitle(null);
 						setValueIconRightPadding(0);
 						setEndRow(false);
-						addClickHandler(event -> new RemoteFileChooser("CatVer", path -> Client.socket.send(JsonUtils.stringify(Q_CatVer.Load.instantiate().setPath(path[0].path)))));
+						addClickHandler(event -> new RemoteFileChooser("CatVer", path -> Client.sendMsg(JsonUtils.stringify(Q_CatVer.Load.instantiate().setPath(path[0].path)))));
 					}}
 				);
 			}}, catver_tree = new TreeGrid() {{
@@ -161,7 +161,7 @@ public final class ScannerAdvFiltersPanel extends HLayout
 				setTreeFieldTitle(Client.session.getMsg("MainFrame.Categories"));
 				setNodeIcon(null);
 				setFolderIcon(null);
-				addSelectionChangedHandler(event -> Client.socket.send(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty(event.getRecord().getAttribute("ID"), !isPartiallySelected(event.getRecord()) && event.getState()))));
+				addSelectionChangedHandler(event -> Client.sendMsg(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty(event.getRecord().getAttribute("ID"), !isPartiallySelected(event.getRecord()) && event.getState()))));
 				addDataArrivedHandler(new DataArrivedHandler()
 				{
 					@Override
@@ -236,7 +236,7 @@ public final class ScannerAdvFiltersPanel extends HLayout
 					}});
 					addItem(new MenuItem() {{setIsSeparator(true);}});
 					addItem(new MenuItem(Client.session.getMsg("ScannerAdvFilterPanel.mntmClear.text")) {{
-						addClickHandler(event->Client.socket.send(JsonUtils.stringify(Q_CatVer.Load.instantiate().setPath(null))));
+						addClickHandler(event->Client.sendMsg(JsonUtils.stringify(Q_CatVer.Load.instantiate().setPath(null))));
 					}});
 				}});
 			}});

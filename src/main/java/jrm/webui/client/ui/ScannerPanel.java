@@ -55,7 +55,7 @@ public final class ScannerPanel extends VLayout
 						setTitle(Client.session.getMsg("MainFrame.btnScan.text"));
 						setIcon("icons/magnifier.png");
 						addClickHandler(event->{
-							Client.socket.send(JsonUtils.stringify(Q_Profile.Scan.instantiate()));
+							Client.sendMsg(JsonUtils.stringify(Q_Profile.Scan.instantiate()));
 						});
 					}}
 				);
@@ -81,7 +81,7 @@ public final class ScannerPanel extends VLayout
 						setIcon("icons/tick.png");
 						setDisabled(true);
 						addClickHandler(event->{
-							Client.socket.send(JsonUtils.stringify(Q_Profile.Fix.instantiate()));
+							Client.sendMsg(JsonUtils.stringify(Q_Profile.Fix.instantiate()));
 						});
 					}}
 				);
