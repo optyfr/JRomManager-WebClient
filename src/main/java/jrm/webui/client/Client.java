@@ -6,6 +6,7 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.RepeatingCommand;
+import com.google.gwt.user.client.Timer;
 import com.sksamuel.gwt.websockets.Websocket;
 import com.sksamuel.gwt.websockets.WebsocketListener;
 import com.smartgwt.client.rpc.RPCCallback;
@@ -34,16 +35,42 @@ import jrm.webui.client.ui.MainWindow;
 
 public class Client implements EntryPoint
 {
-	public static A_Session session;
-	public static Websocket socket;
-	public static MainWindow mainwindow;
+	public static A_Session session = null;
+	public static Websocket socket = null;
+	public static MainWindow mainwindow = null;
 	public static HashSet<Window> childWindows = new HashSet<>();
+	
+	public static Timer lprTimer;
 
 	public Client()
 	{
 		super();
 	}
 
+	private void lpr()
+	{
+		if(mainwindow == null) mainwindow = new MainWindow();
+		RPCRequest request = new RPCRequest();
+		request.setActionURL("/actions/lpr");
+		request.setContentType("application/json");
+		request.setUseSimpleHttp(true); // obligatoire car sinon on s'adresse à un serveur rpc smartclient, et ce n'est pas le cas ici
+		request.setHttpMethod("GET"); // on simplifie le plus possible la requête (POST est plus complexe pour le protocole HTTP et nécessite 2 aller-retour)
+		request.setWillHandleError(true); // on gère les status d'erreur nous même
+		RPCManager.sendRequest(request, new RPCCallback()
+		{
+			@Override
+			public void execute(RPCResponse response, Object rawData, RPCRequest request)
+			{
+				if(response.getHttpResponseCode() == 200)
+				{
+					lprTimer.schedule(100);
+				}
+				else
+					lprTimer.schedule(500);
+			}
+		});
+	}
+	
 	@Override
 	public void onModuleLoad()
 	{
@@ -56,6 +83,8 @@ public class Client implements EntryPoint
 			}
 		}.draw();
 		Page.setTitle("JRomManager");
+		
+		
 		RPCManager.sendRequest(
 			new RPCRequest() {{
 				setActionURL("/session");
@@ -196,7 +225,16 @@ public class Client implements EntryPoint
 							socket.open();
 						}
 						else
-							SC.say("Error", "Your browser does not support websockets!");
+						{
+							(lprTimer = new Timer()
+							{
+								@Override
+								public void run()
+								{
+									lpr();
+								}
+							}).schedule(1);
+						}
 					}
 				}
 			}
