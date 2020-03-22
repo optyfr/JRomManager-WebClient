@@ -49,6 +49,8 @@ public class Client implements EntryPoint
 
 	private void processCmd(String msg)
 	{
+		if(msg==null || msg.trim().length()==0)
+			return;
 		try
 		{
 			Scheduler.get().scheduleIncremental(new RepeatingCommand()
@@ -151,11 +153,11 @@ public class Client implements EntryPoint
 		}
 	}
 	
-	private void lpr()
+	private void lpr(boolean init)
 	{
 		if(mainwindow == null) mainwindow = new MainWindow();
 		RPCRequest request = new RPCRequest();
-		request.setActionURL("/actions/lpr");
+		request.setActionURL(init?"/actions/init":"/actions/lpr");
 		request.setContentType("application/json");
 		request.setUseSimpleHttp(true); // obligatoire car sinon on s'adresse à un serveur rpc smartclient, et ce n'est pas le cas ici
 		request.setHttpMethod("GET"); // on simplifie le plus possible la requête (POST est plus complexe pour le protocole HTTP et nécessite 2 aller-retour)
@@ -180,8 +182,20 @@ public class Client implements EntryPoint
 	
 	public static void sendMsg(String msg)
 	{
+		SC.logWarn(msg);
 		if (socket != null)
 			socket.send(msg);
+		else
+		{
+			RPCRequest request = new RPCRequest();
+			request.setActionURL("/actions/cmd");
+			SC.logWarn(request.getActionURL());
+			request.setContentType("application/json");
+			request.setUseSimpleHttp(true); // obligatoire car sinon on s'adresse à un serveur rpc smartclient, et ce n'est pas le cas ici
+			request.setHttpMethod("POST"); // on simplifie le plus possible la requête (POST est plus complexe pour le protocole HTTP et nécessite 2 aller-retour)
+			request.setData(msg);
+			RPCManager.sendRequest(request);
+		}
 	}
 	
 	private native boolean canWS() /*-{
@@ -246,10 +260,13 @@ public class Client implements EntryPoint
 						{
 							(lprTimer = new Timer()
 							{
+								boolean init = true;
+								
 								@Override
 								public void run()
 								{
-									lpr();
+									lpr(init);
+									init = false;
 								}
 							}).schedule(1);
 						}
