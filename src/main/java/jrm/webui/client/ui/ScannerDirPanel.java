@@ -54,7 +54,7 @@ public final class ScannerDirPanel extends DynamicForm
 				setTitle(null);
 				setValueIconRightPadding(0);
 				setEndRow(false);
-				addClickHandler(event->new RemoteFileChooser("tfRomsDest", records->setPropertyItemValue("tfRomsDest", "roms_dest_dir", records[0].path)));
+				addClickHandler(event->new RemoteFileChooser("tfRomsDest", null, records->setPropertyItemValue("tfRomsDest", "roms_dest_dir", records[0].path)));
 			}},
 			new SpacerItem(),
 			new TextItem("tfDisksDest",Client.session.getMsg("MainFrame.lblDisksDest.text")) {{
@@ -70,7 +70,7 @@ public final class ScannerDirPanel extends DynamicForm
 				setDisabled(true);
 				setValueIconRightPadding(0);
 				setEndRow(false);
-				addClickHandler(event->new RemoteFileChooser("tfDisksDest", records->setPropertyItemValue("tfDisksDest", "disks_dest_dir", records[0].path)));
+				addClickHandler(event->new RemoteFileChooser("tfDisksDest", null, records->setPropertyItemValue("tfDisksDest", "disks_dest_dir", records[0].path)));
 			}},
 			new CheckboxItem("tfDisksDestCbx") {{
 				setStartRow(false);
@@ -96,7 +96,7 @@ public final class ScannerDirPanel extends DynamicForm
 				setDisabled(true);
 				setValueIconRightPadding(0);
 				setEndRow(false);
-				addClickHandler(event->new RemoteFileChooser("tfSWDest", records->setPropertyItemValue("tfSWDest", "swroms_dest_dir", records[0].path)));
+				addClickHandler(event->new RemoteFileChooser("tfSWDest", null, records->setPropertyItemValue("tfSWDest", "swroms_dest_dir", records[0].path)));
 			}},
 			new CheckboxItem("tfSWDestCbx") {{
 				setStartRow(false);
@@ -122,7 +122,7 @@ public final class ScannerDirPanel extends DynamicForm
 				setDisabled(true);
 				setValueIconRightPadding(0);
 				setEndRow(false);
-				addClickHandler(event->new RemoteFileChooser("tfSWDisksDest", records->setPropertyItemValue("tfSWDisksDest", "swdisks_dest_dir", records[0].path)));
+				addClickHandler(event->new RemoteFileChooser("tfSWDisksDest", null, records->setPropertyItemValue("tfSWDisksDest", "swdisks_dest_dir", records[0].path)));
 			}},
 			new CheckboxItem("tfSWDisksDestCbx") {{
 				setStartRow(false);
@@ -148,7 +148,7 @@ public final class ScannerDirPanel extends DynamicForm
 				setDisabled(true);
 				setValueIconRightPadding(0);
 				setEndRow(false);
-				addClickHandler(event->new RemoteFileChooser("tfSamplesDest", records->setPropertyItemValue("tfSamplesDest", "samples_dest_dir", records[0].path)));
+				addClickHandler(event->new RemoteFileChooser("tfSamplesDest", null, records->setPropertyItemValue("tfSamplesDest", "samples_dest_dir", records[0].path)));
 			}},
 			new CheckboxItem("tfSamplesDestCbx") {{
 				setStartRow(false);
@@ -238,7 +238,7 @@ public final class ScannerDirPanel extends DynamicForm
 	
 	private void addSrcDir()
 	{
-		new RemoteFileChooser("listSrcDir", (path)-> {
+		new RemoteFileChooser("listSrcDir", null, (path)-> {
 			SelectItem selectItem = (SelectItem)ScannerDirPanel.this.getItem("listSrcDir");
 			String[] values = selectItem.getValueMapAsArray();
 			List<String> lvalues = new ArrayList<>(Arrays.asList(values));

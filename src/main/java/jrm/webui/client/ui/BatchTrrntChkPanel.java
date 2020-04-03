@@ -63,7 +63,7 @@ public class BatchTrrntChkPanel extends VLayout
 				setContextMenu(new Menu() {{
 					addItem(new MenuItem() {{
 						setTitle(Client.session.getMsg("BatchToolsTrrntChkPanel.mntmAddTorrent.text"));
-						addClickHandler(e -> new RemoteFileChooser("addTrnt", pi -> {
+						addClickHandler(e -> new RemoteFileChooser("addTrnt", null, pi -> {
 							for(PathInfo p : pi)
 								sdr.addData(new Record() {{
 									setAttribute("src",p.path);
@@ -73,7 +73,7 @@ public class BatchTrrntChkPanel extends VLayout
 					addItem(new MenuItem() {{
 						setTitle("Set Destination");
 						setEnableIfCondition((target, menu, item)->sdr.getSelectedRecords().length==1);
-						addClickHandler(e -> new RemoteFileChooser("updTrnt", pi -> {
+						addClickHandler(e -> new RemoteFileChooser("updTrnt", null, pi -> {
 							Record record = sdr.getSelectedRecord();
 							for(PathInfo p : pi)
 								record.setAttribute("dst", p.path);

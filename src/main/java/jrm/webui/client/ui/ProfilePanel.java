@@ -66,7 +66,7 @@ public class ProfilePanel extends VLayout
 							new MenuItem() {{
 								setTitle(Client.session.getMsg("MainFrame.btnImportDat.text"));
 								setIcon("icons/script_go.png");
-								addClickHandler(e->new RemoteFileChooser("importDat", path->{
+								addClickHandler(e->new RemoteFileChooser("importDat", null, path->{
 									for(PathInfo p : path)
 									{
 										listgrid.addData(new Record() {{
@@ -239,12 +239,12 @@ public class ProfilePanel extends VLayout
 					new IButton("Manage files uploads") {{
 						setAutoFit(true);
 						setIcon("icons/page_add.png");
-						addClickHandler(e->new RemoteFileChooser("manageUploads", null));
+						addClickHandler(e->new RemoteFileChooser("manageUploads", null, null));
 					}},
 					new IButton(Client.session.getMsg("MainFrame.btnImportDat.text")) {{
 						setAutoFit(true);
 						setIcon("icons/script_go.png");
-						addClickHandler(e->new RemoteFileChooser("importDat", path->{
+						addClickHandler(e->new RemoteFileChooser("importDat", null, path->{
 							for(PathInfo p : path)
 							{
 								Record record = new Record() {{
