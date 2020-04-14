@@ -252,29 +252,9 @@ public class BatchDirUpd8rPanel extends VLayout
 				setFields(
 					new ListGridField("src",Client.session.getMsg("BatchTableModel.SrcDats")) {{
 						setAlign(Alignment.RIGHT);
-						setCellFormatter(new CellFormatter()
-						{
-							@Override
-							public String format(Object value, ListGridRecord record, int rowNum, int colNum)
-							{
-								if(value!=null)
-									return "<div style='overflow:hidden;text-overflow:ellipsis;direction:rtl'>"+value+"</div>";
-								return null;
-							}
-						});
 					}},
 					new ListGridField("dst",Client.session.getMsg("BatchTableModel.DstDirs")) {{
 						setAlign(Alignment.RIGHT);
-						setCellFormatter(new CellFormatter()
-						{
-							@Override
-							public String format(Object value, ListGridRecord record, int rowNum, int colNum)
-							{
-								if(value!=null)
-									return "<div style='overflow:hidden;text-overflow:ellipsis;direction:rtl'>"+value+"</div>";
-								return null;
-							}
-						});
 					}},
 					new ListGridField("result",Client.session.getMsg("BatchTableModel.Result")) {{
 					}},

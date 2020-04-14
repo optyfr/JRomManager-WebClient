@@ -15,10 +15,8 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
-import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
@@ -89,16 +87,6 @@ public class BatchCompressorPanel extends VLayout
 				setFields(
 					new ListGridField("file","Archives") {{
 						setAlign(Alignment.RIGHT);
-						setCellFormatter(new CellFormatter()
-						{
-							@Override
-							public String format(Object value, ListGridRecord record, int rowNum, int colNum)
-							{
-								if(value!=null)
-									return "<div style='overflow:hidden;text-overflow:ellipsis;direction:rtl'>"+value+"</div>";
-								return null;
-							}
-						});
 					}},
 					new ListGridField("result","Result") {{
 					}}
