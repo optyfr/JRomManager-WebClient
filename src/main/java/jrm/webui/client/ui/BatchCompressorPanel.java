@@ -78,18 +78,13 @@ public class BatchCompressorPanel extends VLayout
 						new DataSourceTextField("id") {{
 							setPrimaryKey(true);
 						}},
-						new DataSourceTextField("file") {{
-						}},
-						new DataSourceTextField("result") {{
-						}}
+						new DataSourceTextField("file"),
+						new DataSourceTextField("result")
 					);
 				}});
 				setFields(
-					new ListGridField("file","Archives") {{
-						setAlign(Alignment.RIGHT);
-					}},
-					new ListGridField("result","Result") {{
-					}}
+					new ListGridField("file","Archives"),
+					new ListGridField("result","Result")
 				);
 			}
 		});

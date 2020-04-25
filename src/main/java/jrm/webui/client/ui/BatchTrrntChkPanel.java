@@ -98,26 +98,23 @@ public class BatchTrrntChkPanel extends VLayout
 					setFields(
 						new DataSourceTextField("src") {{
 							setPrimaryKey(true);
-							setCanEdit(false);
 						}},
-						new DataSourceTextField("dst") {{
-							setCanEdit(false);
-						}},
-						new DataSourceTextField("result") {{
-							setCanEdit(false);
-						}},
-						new DataSourceBooleanField("selected") {{
-						}}
+						new DataSourceTextField("dst"),
+						new DataSourceTextField("result"),
+						new DataSourceBooleanField("selected")
 					);
 				}});
 				setFields(
 					new ListGridField("src",Client.session.getMsg("MainFrame.TorrentFiles")) {{
-						setAlign(Alignment.RIGHT);
+						setWidth("35%");
+						setCanEdit(false);
 					}},
 					new ListGridField("dst",Client.session.getMsg("MainFrame.DstDirs")) {{
-						setAlign(Alignment.RIGHT);
+						setCanEdit(false);
 					}},
 					new ListGridField("result",Client.session.getMsg("MainFrame.Result")) {{
+						setWidth("35%");
+						setCanEdit(false);
 					}},
 					new ListGridField("selected") {{
 						setWidth(20);

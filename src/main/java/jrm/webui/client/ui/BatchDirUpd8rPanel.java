@@ -236,26 +236,23 @@ public class BatchDirUpd8rPanel extends VLayout
 					setFields(
 						new DataSourceTextField("src") {{
 							setPrimaryKey(true);
-							setCanEdit(false);
 						}},
-						new DataSourceTextField("dst") {{
-							setCanEdit(false);
-						}},
-						new DataSourceTextField("result") {{
-							setCanEdit(false);
-						}},
-						new DataSourceBooleanField("selected") {{
-						}}
+						new DataSourceTextField("dst"),
+						new DataSourceTextField("result"),
+						new DataSourceBooleanField("selected")
 					);
 				}});
 				setFields(
 					new ListGridField("src",Client.session.getMsg("BatchTableModel.SrcDats")) {{
-						setAlign(Alignment.RIGHT);
+						setCanEdit(false);
+						setWidth("35%");
 					}},
 					new ListGridField("dst",Client.session.getMsg("BatchTableModel.DstDirs")) {{
-						setAlign(Alignment.RIGHT);
+						setCanEdit(false);
 					}},
 					new ListGridField("result",Client.session.getMsg("BatchTableModel.Result")) {{
+						setCanEdit(false);
+						setWidth("35%");
 					}},
 					new ListGridField("selected") {{
 						setWidth(20);
