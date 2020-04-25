@@ -8,8 +8,7 @@ import java.util.Map;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window.Location;
-import com.smartgwt.client.data.Record;
-import com.smartgwt.client.data.RecordList;
+import com.smartgwt.client.data.*;
 import com.smartgwt.client.rpc.RPCCallback;
 import com.smartgwt.client.rpc.RPCManager;
 import com.smartgwt.client.rpc.RPCRequest;
@@ -18,6 +17,7 @@ import com.smartgwt.client.types.TabBarControls;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
 import com.smartgwt.client.widgets.events.CloseClickHandler;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.LayoutSpacer;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
@@ -304,7 +304,17 @@ public class MainWindow extends Window
 	public void update(A_Dat2Dir.End params)
 	{
 		batchDirUpd8rPanel.sdr.cancelEditing();
-		batchDirUpd8rPanel.sdr.invalidateCache();
+		batchDirUpd8rPanel.sdr.refreshData(new DSCallback()
+		{
+
+			@Override
+			public void execute(DSResponse dsResponse, Object data, DSRequest dsRequest)
+			{
+				ListGridRecord[] records = batchDirUpd8rPanel.sdr.getExpandedRecords();
+				batchDirUpd8rPanel.sdr.collapseRecords(records);
+				batchDirUpd8rPanel.sdr.expandRecords(records);
+			}
+		});
 	}
 
 
@@ -330,7 +340,17 @@ public class MainWindow extends Window
 	public void update(A_TrntChk.End params)
 	{
 		batchTrrntChkPanel.sdr.cancelEditing();
-		batchTrrntChkPanel.sdr.invalidateCache();
+		batchTrrntChkPanel.sdr.refreshData(new DSCallback()
+		{
+
+			@Override
+			public void execute(DSResponse dsResponse, Object data, DSRequest dsRequest)
+			{
+				ListGridRecord[] records = batchTrrntChkPanel.sdr.getExpandedRecords();
+				batchTrrntChkPanel.sdr.collapseRecords(records);
+				batchTrrntChkPanel.sdr.expandRecords(records);
+			}
+		});
 	}
 
 
