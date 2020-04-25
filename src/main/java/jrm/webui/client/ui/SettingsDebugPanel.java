@@ -13,10 +13,10 @@ final class SettingsDebugPanel extends SettingsForm
 {
 	public SettingsDebugPanel()
 	{
-		setWidth("75%");
+		setWidth("80%");
 		setLayoutAlign(Alignment.CENTER);
 		setNumCols(3);
-		setColWidths(200,"*",150);
+		setColWidths(150,"*",150);
 		setItems(
 			new SelectItem("cbDbgLevel") {{
 				setColSpan(2);

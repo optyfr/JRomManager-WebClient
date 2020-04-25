@@ -25,7 +25,6 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -237,46 +236,23 @@ public class BatchDirUpd8rPanel extends VLayout
 					setFields(
 						new DataSourceTextField("src") {{
 							setPrimaryKey(true);
-							setCanEdit(false);
 						}},
-						new DataSourceTextField("dst") {{
-							setCanEdit(false);
-						}},
-						new DataSourceTextField("result") {{
-							setCanEdit(false);
-						}},
-						new DataSourceBooleanField("selected") {{
-						}}
+						new DataSourceTextField("dst"),
+						new DataSourceTextField("result"),
+						new DataSourceBooleanField("selected")
 					);
 				}});
 				setFields(
 					new ListGridField("src",Client.session.getMsg("BatchTableModel.SrcDats")) {{
-						setAlign(Alignment.RIGHT);
-						setCellFormatter(new CellFormatter()
-						{
-							@Override
-							public String format(Object value, ListGridRecord record, int rowNum, int colNum)
-							{
-								if(value!=null)
-									return "<div style='overflow:hidden;text-overflow:ellipsis;direction:rtl'>"+value+"</div>";
-								return null;
-							}
-						});
+						setCanEdit(false);
+						setWidth("35%");
 					}},
 					new ListGridField("dst",Client.session.getMsg("BatchTableModel.DstDirs")) {{
-						setAlign(Alignment.RIGHT);
-						setCellFormatter(new CellFormatter()
-						{
-							@Override
-							public String format(Object value, ListGridRecord record, int rowNum, int colNum)
-							{
-								if(value!=null)
-									return "<div style='overflow:hidden;text-overflow:ellipsis;direction:rtl'>"+value+"</div>";
-								return null;
-							}
-						});
+						setCanEdit(false);
 					}},
 					new ListGridField("result",Client.session.getMsg("BatchTableModel.Result")) {{
+						setCanEdit(false);
+						setWidth("35%");
 					}},
 					new ListGridField("selected") {{
 						setWidth(20);
@@ -313,39 +289,38 @@ public class BatchDirUpd8rPanel extends VLayout
 								new DataSourceTextField("src","Dat/XML") {{
 									setPrimaryKey(true);
 									setForeignKey(sdr.getDataSource().getID()+".src");
-									setCanEdit(false);
 								}},
-								new DataSourceIntegerField("have") {{
-									setCanEdit(false);
-								}},
-								new DataSourceIntegerField("miss") {{
-									setCanEdit(false);
-								}},
-								new DataSourceIntegerField("total") {{
-									setCanEdit(false);
-								}}
+								new DataSourceIntegerField("have"),
+								new DataSourceIntegerField("create"),
+								new DataSourceIntegerField("fix"),
+								new DataSourceIntegerField("miss"),
+								new DataSourceIntegerField("total")
 							);
 						}});
 						setFields(
 							new ListGridField("src") {{
 								setAlign(Alignment.RIGHT);
-								setCellFormatter(new CellFormatter()
-								{
-									@Override
-									public String format(Object value, ListGridRecord record, int rowNum, int colNum)
-									{
-										return "<div style='overflow:hidden;text-overflow:ellipsis;direction:rtl'>"+value+"</div>";
-									}
-								});
+								setCanEdit(false);
 							}},
 							new ListGridField("have") {{
 								setWidth(70);
+								setCanEdit(false);
+							}},
+							new ListGridField("create") {{
+								setWidth(70);
+								setCanEdit(false);
+							}},
+							new ListGridField("fix") {{
+								setWidth(70);
+								setCanEdit(false);
 							}},
 							new ListGridField("miss") {{
 								setWidth(70);
+								setCanEdit(false);
 							}},
 							new ListGridField("total") {{
 								setWidth(70);
+								setCanEdit(false);
 							}},
 							new ListGridField("report") {{
 								setAlign(Alignment.CENTER);

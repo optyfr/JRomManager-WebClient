@@ -25,7 +25,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.HoverCustomizer;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -99,46 +98,23 @@ public class BatchTrrntChkPanel extends VLayout
 					setFields(
 						new DataSourceTextField("src") {{
 							setPrimaryKey(true);
-							setCanEdit(false);
 						}},
-						new DataSourceTextField("dst") {{
-							setCanEdit(false);
-						}},
-						new DataSourceTextField("result") {{
-							setCanEdit(false);
-						}},
-						new DataSourceBooleanField("selected") {{
-						}}
+						new DataSourceTextField("dst"),
+						new DataSourceTextField("result"),
+						new DataSourceBooleanField("selected")
 					);
 				}});
 				setFields(
 					new ListGridField("src",Client.session.getMsg("MainFrame.TorrentFiles")) {{
-						setAlign(Alignment.RIGHT);
-						setCellFormatter(new CellFormatter()
-						{
-							@Override
-							public String format(Object value, ListGridRecord record, int rowNum, int colNum)
-							{
-								if(value!=null)
-									return "<div style='overflow:hidden;text-overflow:ellipsis;direction:rtl'>"+value+"</div>";
-								return null;
-							}
-						});
+						setWidth("35%");
+						setCanEdit(false);
 					}},
 					new ListGridField("dst",Client.session.getMsg("MainFrame.DstDirs")) {{
-						setAlign(Alignment.RIGHT);
-						setCellFormatter(new CellFormatter()
-						{
-							@Override
-							public String format(Object value, ListGridRecord record, int rowNum, int colNum)
-							{
-								if(value!=null)
-									return "<div style='overflow:hidden;text-overflow:ellipsis;direction:rtl'>"+value+"</div>";
-								return null;
-							}
-						});
+						setCanEdit(false);
 					}},
 					new ListGridField("result",Client.session.getMsg("MainFrame.Result")) {{
+						setWidth("35%");
+						setCanEdit(false);
 					}},
 					new ListGridField("selected") {{
 						setWidth(20);

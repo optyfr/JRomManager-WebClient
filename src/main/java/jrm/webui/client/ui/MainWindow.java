@@ -62,26 +62,23 @@ public class MainWindow extends Window
 			@Override
 			public void onCloseClick(CloseClickEvent event)
 			{
-				if(Client.session.isAuthenticated())
+				RPCRequest request = new RPCRequest();
+				String logout = Location.getProtocol() + "//logout:logout@" + Location.getHost() + Location.getPath();
+				request.setActionURL(logout);
+				request.setSendNoQueue(true);
+				request.setHttpHeaders(Collections.singletonMap("Authorization", "Basic AAAAAAAAAAAAAAAAAAA="));
+				request.setWillHandleError(true);
+				RPCManager.sendRequest(request,new RPCCallback()
 				{
-					RPCRequest request = new RPCRequest();
-					String logout = Location.getProtocol() + "//logout:logout@" + Location.getHost() + Location.getPath();
-					request.setActionURL(logout);
-					request.setSendNoQueue(true);
-					request.setHttpHeaders(Collections.singletonMap("Authorization", "Basic AAAAAAAAAAAAAAAAAAA="));
-					request.setWillHandleError(true);
-					RPCManager.sendRequest(request,new RPCCallback()
+					@Override
+					public void execute(RPCResponse response, Object rawData, RPCRequest request)
 					{
-						@Override
-						public void execute(RPCResponse response, Object rawData, RPCRequest request)
-						{
-							Cookies.removeCookie("JSESSIONID");
-							String logout2 = Location.getHref();
-							Location.replace(logout);
-							Location.replace(logout2);
-						}
-					});
-				}
+						Cookies.removeCookie("JSESSIONID");
+						String logout2 = Location.getHref();
+						Location.replace(logout);
+						Location.replace(logout2);
+					}
+				});
 				close();
 			}
 		});

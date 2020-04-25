@@ -547,7 +547,7 @@ public final class RemoteFileChooser extends Window
 		
 
 		@JsMethod
-		public native void upload_file(int i, JavaScriptObject file) /*-{
+		public native JavaScriptObject upload_file(int i, JavaScriptObject file) /*-{
 			var self = this;
 			var data = {
 				xhr:new XMLHttpRequest(),
@@ -619,7 +619,7 @@ public final class RemoteFileChooser extends Window
 			data.xhr.setRequestHeader("X-File-Type", file.type);
 			self.upload_result(data);
 			data.xhr.send();
-
+			return data;
 		}-*/;
 
 		@JsMethod
