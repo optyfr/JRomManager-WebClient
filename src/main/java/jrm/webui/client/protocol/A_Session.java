@@ -2,6 +2,7 @@ package jrm.webui.client.protocol;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import com.google.gwt.core.client.JsArrayString;
 
@@ -19,6 +20,11 @@ public class A_Session extends EnhJSO
 	public final String getSession()
 	{
 		return get("session");
+	}
+	
+	public final boolean isAuthenticated()
+	{
+		return Optional.ofNullable(getBoolean("authenticated")).orElse(false);
 	}
 	
 	public final Map<String,String> getMsgs()

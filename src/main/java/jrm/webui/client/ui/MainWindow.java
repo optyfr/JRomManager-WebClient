@@ -1,12 +1,19 @@
 package jrm.webui.client.ui;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.user.client.Cookies;
+import com.google.gwt.user.client.Window.Location;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.RecordList;
+import com.smartgwt.client.rpc.RPCCallback;
+import com.smartgwt.client.rpc.RPCManager;
+import com.smartgwt.client.rpc.RPCRequest;
+import com.smartgwt.client.rpc.RPCResponse;
 import com.smartgwt.client.types.TabBarControls;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
@@ -17,16 +24,7 @@ import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
 
 import jrm.webui.client.Client;
-import jrm.webui.client.protocol.A_CatVer;
-import jrm.webui.client.protocol.A_Compressor;
-import jrm.webui.client.protocol.A_Dat2Dir;
-import jrm.webui.client.protocol.A_Global;
-import jrm.webui.client.protocol.A_NPlayers;
-import jrm.webui.client.protocol.A_Profile;
-import jrm.webui.client.protocol.A_Progress;
-import jrm.webui.client.protocol.A_Report;
-import jrm.webui.client.protocol.A_ReportLite;
-import jrm.webui.client.protocol.A_TrntChk;
+import jrm.webui.client.protocol.*;
 import jrm.webui.client.utils.EnhJSO;
 
 public class MainWindow extends Window
@@ -64,6 +62,26 @@ public class MainWindow extends Window
 			@Override
 			public void onCloseClick(CloseClickEvent event)
 			{
+				if(Client.session.isAuthenticated())
+				{
+					RPCRequest request = new RPCRequest();
+					String logout = Location.getProtocol() + "//logout:logout@" + Location.getHost() + Location.getPath();
+					request.setActionURL(logout);
+					request.setSendNoQueue(true);
+					request.setHttpHeaders(Collections.singletonMap("Authorization", "Basic AAAAAAAAAAAAAAAAAAA="));
+					request.setWillHandleError(true);
+					RPCManager.sendRequest(request,new RPCCallback()
+					{
+						@Override
+						public void execute(RPCResponse response, Object rawData, RPCRequest request)
+						{
+							Cookies.removeCookie("JSESSIONID");
+							String logout2 = Location.getHref();
+							Location.replace(logout);
+							Location.replace(logout2);
+						}
+					});
+				}
 				close();
 			}
 		});
