@@ -150,6 +150,13 @@ public class MainWindow extends Window
 							addMember(new LayoutSpacer("*","*"));
 						}});
 					}});
+					if(Client.session.isAdmin())
+					{
+						addTab(new Tab() {{
+							setTitle("Admin");
+							setPane(new SettingsAdminPanel());
+						}});
+					}
 				}});
 			}});
 		}});

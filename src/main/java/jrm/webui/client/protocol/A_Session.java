@@ -27,6 +27,11 @@ public class A_Session extends EnhJSO
 		return Optional.ofNullable(getBoolean("authenticated")).orElse(false);
 	}
 	
+	public final boolean isAdmin()
+	{
+		return Optional.ofNullable(getBoolean("admin")).orElse(false);
+	}
+	
 	public final Map<String,String> getMsgs()
 	{
 		if (msgs_cache.size()==0)

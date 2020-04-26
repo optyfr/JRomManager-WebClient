@@ -124,7 +124,7 @@ public final class ScannerPanel extends VLayout
 						setPane(scannerAdvFiltersPanel = new ScannerAdvFiltersPanel());
 					}},
 					new Tab() {{
-						setTitle(Client.session.getMsg("MainFrame.scannerSettingsPanel.title"));
+						setTitle(Client.session.getMsg("MainFrame.Automation"));
 						setPane(new HLayout() {{
 							addMember(new LayoutSpacer("25%","*"));
 							addMember(new VLayout() {
