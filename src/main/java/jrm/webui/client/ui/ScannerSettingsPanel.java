@@ -72,11 +72,12 @@ public final class ScannerSettingsPanel extends SettingsForm
 			}},
 			new SelectItem("cbCompression", Client.session.getMsg("MainFrame.lblCompression.text")) {{
 				setValueMap(new HashMap<String, String>() {{
-					put("DIR", Client.session.getMsg("FormatOptions.Directories"));
 					put("ZIP", Client.session.getMsg("FormatOptions.Zip"));
 					put("ZIPE", Client.session.getMsg("FormatOptions.ZipExternal"));
 					put("SEVENZIP", Client.session.getMsg("FormatOptions.SevenZip"));
 					put("TZIP", Client.session.getMsg("FormatOptions.TorrentZip"));
+					put("DIR", Client.session.getMsg("FormatOptions.Directories"));
+					put("FAKE", Client.session.getMsg("FormatOptions.SingleFile"));
 				}});
 				setDefaultValue("ZIP");
 				addChangedHandler(event->setPropertyItemValue(getName(), "format", getValue().toString()));
