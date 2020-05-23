@@ -71,7 +71,7 @@ sourceSets {
 gwt {
     module 'jrm.webui.Client'
 	/** GWT version */
-	gwtVersion = '2.8.2'
+	gwtVersion = '2.9.0'
 	/** Add the gwt-servlet lib */
 	gwtServletLib = false
 	/** Add the gwt-elemental lib */
