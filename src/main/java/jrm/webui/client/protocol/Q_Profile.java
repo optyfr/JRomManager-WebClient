@@ -78,6 +78,44 @@ public class Q_Profile extends Q_
 		}
 	}
 	
+	public static class ImportSettings extends Q_
+	{
+		protected ImportSettings()
+		{
+			super();
+		}
+		
+		final public static ImportSettings instantiate()
+		{
+			return Q_.instantiateCmd("Profile.importSettings").cast();
+		}
+		
+		final public ImportSettings setPath(String path)
+		{
+			getParams().set("path",path);
+			return this;
+		}
+	}
+	
+	public static class ExportSettings extends Q_
+	{
+		protected ExportSettings()
+		{
+			super();
+		}
+		
+		final public static ExportSettings instantiate()
+		{
+			return Q_.instantiateCmd("Profile.exportSettings").cast();
+		}
+
+		final public ExportSettings setPath(String path)
+		{
+			getParams().set("path",path);
+			return this;
+		}
+	}
+	
 	public static class SetProperty extends Q_
 	{
 		protected SetProperty()

@@ -2,6 +2,7 @@ package jrm.webui.client.ui;
 
 import com.google.gwt.core.client.JsonUtils;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.LayoutSpacer;
@@ -49,6 +50,7 @@ public final class ScannerPanel extends VLayout
 						});
 					}}
 				);
+				addSeparator();
 				addButton(
 					btnScan = new ToolStripButton() {{
 						setAutoFit(true);
@@ -82,6 +84,25 @@ public final class ScannerPanel extends VLayout
 						setDisabled(true);
 						addClickHandler(event->{
 							Client.sendMsg(JsonUtils.stringify(Q_Profile.Fix.instantiate()));
+						});
+					}}
+				);
+				addSeparator();
+				addButton(
+					new ToolStripButton() {{
+						setAutoFit(true);
+						setTitle("Import Settings");
+						addClickHandler(event -> {
+							new RemoteFileChooser("importSettings", null, path -> Client.sendMsg(JsonUtils.stringify(Q_Profile.ImportSettings.instantiate().setPath(path[0].path))));
+						});
+					}}
+				);
+				addButton(
+					new ToolStripButton() {{
+						setAutoFit(true);
+						setTitle("Export Settings");
+						addClickHandler(event -> {
+							SC.askforValue("Export Preset", "Choose a preset name", s -> Client.sendMsg(JsonUtils.stringify(Q_Profile.ExportSettings.instantiate().setPath("%presets/" + s))));
 						});
 					}}
 				);
