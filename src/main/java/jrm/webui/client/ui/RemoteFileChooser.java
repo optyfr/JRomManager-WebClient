@@ -1,5 +1,6 @@
 package jrm.webui.client.ui;
 
+import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.stream.Stream;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.user.client.ui.Hidden;
 import com.smartgwt.client.data.DSCallback;
 import com.smartgwt.client.data.DSRequest;
 import com.smartgwt.client.data.DSResponse;
@@ -28,6 +30,7 @@ import com.smartgwt.client.types.DSDataFormat;
 import com.smartgwt.client.types.DSOperationType;
 import com.smartgwt.client.types.DSProtocol;
 import com.smartgwt.client.types.DateDisplayFormat;
+import com.smartgwt.client.types.FormMethod;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.types.VerticalAlignment;
@@ -35,6 +38,8 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Progressbar;
 import com.smartgwt.client.widgets.Window;
+import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.HiddenItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -266,6 +271,24 @@ public final class RemoteFileChooser extends Window
 						setTitle("Delete selection");
 						addClickHandler(event -> UploadList.this.removeSelectedData());
 						setEnableIfCondition((target, menu, item) -> !options.isChoose && UploadList.this.getSelectedRecords().length > 0);
+					}},
+					new MenuItem() {{
+						setTitle("Download selection");
+						addClickHandler(event -> {
+							Record record = UploadList.this.getSelectedRecord();
+							DynamicForm form = new DynamicForm();
+							form.setAction("/download/");
+							HiddenItem item = new HiddenItem("path");
+							item.setDefaultValue(record.getAttribute("Path"));
+							form.setItems(item);
+							form.setTarget("_blank");
+							form.setMethod(FormMethod.POST);
+							form.setCanSubmit(true);
+							form.draw();
+							form.submitForm();
+							form.destroy();
+						});
+						setEnableIfCondition((target, menu, item) -> !options.isChoose && UploadList.this.getSelectedRecords().length == 1);
 					}},
 					new MenuItem() {{
 						setTitle("Archive");
