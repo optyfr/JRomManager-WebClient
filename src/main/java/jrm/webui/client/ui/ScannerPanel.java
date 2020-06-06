@@ -92,6 +92,7 @@ public final class ScannerPanel extends VLayout
 					new ToolStripButton() {{
 						setAutoFit(true);
 						setTitle("Import Settings");
+						setIcon("icons/table_refresh.png");
 						addClickHandler(event -> {
 							new RemoteFileChooser("importSettings", null, path -> Client.sendMsg(JsonUtils.stringify(Q_Profile.ImportSettings.instantiate().setPath(path[0].path))));
 						});
@@ -101,6 +102,7 @@ public final class ScannerPanel extends VLayout
 					new ToolStripButton() {{
 						setAutoFit(true);
 						setTitle("Export Settings");
+						setIcon("icons/table_save.png");
 						addClickHandler(event -> {
 							SC.askforValue("Export Preset", "Choose a preset name", s -> Client.sendMsg(JsonUtils.stringify(Q_Profile.ExportSettings.instantiate().setPath("%presets/" + s))));
 						});
@@ -112,6 +114,7 @@ public final class ScannerPanel extends VLayout
 				setTabs(
 					new Tab() {{
 						setTitle(Client.session.getMsg("MainFrame.scannerDirectories.title"));
+						setIcon("icons/folder.png");
 						setPane(new HLayout() {{
 							addMember(new LayoutSpacer("5%","*"));
 							addMember(new VLayout() {{
@@ -125,6 +128,7 @@ public final class ScannerPanel extends VLayout
 					}},
 					new Tab() {{
 						setTitle(Client.session.getMsg("MainFrame.scannerSettingsPanel.title"));
+						setIcon("icons/cog.png");
 						setPane(new HLayout() {{
 							addMember(new LayoutSpacer("5%","*"));
 							addMember(new VLayout() {{
@@ -138,14 +142,17 @@ public final class ScannerPanel extends VLayout
 					}},
 					new Tab() {{
 						setTitle(Client.session.getMsg("MainFrame.Filters"));
+						setIcon("icons/arrow_join.png");
 						setPane(scannerFiltersPanel = new ScannerFiltersPanel());
 					}},
 					new Tab() {{
 						setTitle(Client.session.getMsg("MainFrame.AdvFilters"));
+						setIcon("icons/arrow_in.png");
 						setPane(scannerAdvFiltersPanel = new ScannerAdvFiltersPanel());
 					}},
 					new Tab() {{
 						setTitle(Client.session.getMsg("MainFrame.Automation"));
+						setIcon("icons/link.png");
 						setPane(new HLayout() {{
 							addMember(new LayoutSpacer("25%","*"));
 							addMember(new VLayout() {

@@ -266,7 +266,7 @@ public class BatchTrrntChkPanel extends VLayout
 			setWidth100();
 			setHeight(20);
 			setNumCols(9);
-			setColWidths("*",100,10,"*",10,"*",10,"*","*");
+			setColWidths("*",90,10,"*",10,"*",10,"*",100);
 			setItems(
 				new SelectItem() {{
 					setValueMap("FILENAME","FILESIZE","SHA1");
@@ -296,8 +296,10 @@ public class BatchTrrntChkPanel extends VLayout
 				}},
 				new ButtonItem() {{
 					setTitle(Client.session.getMsg("BatchToolsTrrntChkPanel.TrntCheckStart.text"));
+					setIcon("icons/bullet_go.png");
 					setAlign(Alignment.RIGHT);
 					setStartRow(false);
+					setWidth("*");
 					addClickHandler(e->Client.sendMsg(JsonUtils.stringify(Q_TrntChk.Start.instantiate())));
 				}}
 			);

@@ -115,14 +115,17 @@ public class MainWindow extends Window
 						);
 					addTab(new Tab() {{
 						setTitle(Client.session.getMsg("MainFrame.panelBatchToolsDat2Dir.title"));
+						setIcon("icons/application_cascade.png");
 						setPane(batchDirUpd8rPanel = new BatchDirUpd8rPanel());
 					}});
 					addTab(new Tab() {{
 						setTitle(Client.session.getMsg("MainFrame.panelBatchToolsDir2Torrent.title"));
+						setIcon("icons/drive_web.png");
 						setPane(batchTrrntChkPanel = new BatchTrrntChkPanel());
 					}});
 					addTab(new Tab() {{
 						setTitle(Client.session.getMsg("BatchPanel.Compressor"));
+						setIcon("icons/compress.png");
 						setPane(batchCompressorPanel = new BatchCompressorPanel());
 					}});
 				}});

@@ -47,7 +47,7 @@ public class BatchCompressorPanel extends VLayout
 				setAutoFetchData(true);
 				setContextMenu(new Menu() {{
 					addItem(new MenuItem() {{
-						setTitle("Add archive");
+						setTitle(Client.session.getMsg("BatchCompressorPanel.AddArchive")); //$NON-NLS-1$
 						addClickHandler(e -> new RemoteFileChooser("addArc", null, pi -> {
 							RPCManager.startQueue();
 							for(PathInfo p : pi)
@@ -58,7 +58,7 @@ public class BatchCompressorPanel extends VLayout
 						}));
 					}});
 					addItem(new MenuItem() {{
-						setTitle("Delete selection");
+						setTitle(Client.session.getMsg("BatchCompressorPanel.DeleteSelection")); //$NON-NLS-1$
 						setEnableIfCondition((target, menu, item)->fr.getSelectedRecords().length>0);
 						addClickHandler(e -> fr.removeSelectedData());
 					}});
@@ -83,8 +83,8 @@ public class BatchCompressorPanel extends VLayout
 					);
 				}});
 				setFields(
-					new ListGridField("file","Archives"),
-					new ListGridField("result","Result")
+					new ListGridField("file",Client.session.getMsg("BatchCompressorPanel.Archives")), //$NON-NLS-2$
+					new ListGridField("result",Client.session.getMsg("BatchCompressorPanel.Result")) //$NON-NLS-2$
 				);
 			}
 		});
@@ -92,24 +92,25 @@ public class BatchCompressorPanel extends VLayout
 			setWidth100();
 			setHeight(20);
 			setNumCols(5);
-			setColWidths("*",100,75,75,75);
+			setColWidths("*",100,75,100,100);
 			setItems(
 				new SelectItem() {{
 					setValueMap("ZIP","TZIP","SEVENZIP");
 					setWidth(100);
-					setTitle("Format");
+					setTitle(Client.session.getMsg("BatchCompressorPanel.Format")); //$NON-NLS-1$
 					setDefaultValue(Client.session.getSetting("compressor.format","TZIP"));
 					addChangedHandler(e->Client.sendMsg(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("compressor.format", (String)e.getValue()))));
 				}},
 				new CheckboxItem("force") {{
-					setTitle("Force");
+					setTitle(Client.session.getMsg("BatchCompressorPanel.Force")); //$NON-NLS-1$
 					setShowTitle(false);
 					setWidth("*");
 					setDefaultValue(Client.session.getSettingAsBoolean("compressor.force",false));
 					addChangedHandler(e->Client.sendMsg(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("compressor.force", (Boolean)e.getValue()))));
 				}},
 				new ButtonItem() {{
-					setTitle("Clear");
+					setTitle(Client.session.getMsg("BatchCompressorPanel.Clear")); //$NON-NLS-1$
+					setIcon("icons/bin.png");
 					setAlign(Alignment.RIGHT);
 					setStartRow(false);
 					setEndRow(false);
@@ -117,7 +118,8 @@ public class BatchCompressorPanel extends VLayout
 					addClickHandler(e -> fr.getDataSource().performCustomOperation("clear", null, (dsResponse, data, dsRequest) -> fr.invalidateCache()));
 				}},
 				new ButtonItem() {{
-					setTitle("Start");
+					setTitle(Client.session.getMsg("BatchCompressorPanel.Start")); //$NON-NLS-1$
+					setIcon("icons/bullet_go.png");
 					setAlign(Alignment.RIGHT);
 					setStartRow(false);
 					setWidth("*");

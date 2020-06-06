@@ -362,10 +362,12 @@ public class BatchDirUpd8rPanel extends VLayout
 					addChangedHandler(e->Client.sendMsg(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("dry_run", (Boolean)e.getValue()))));
 				}});
 			}});
-			addMember(new IButton(Client.session.getMsg("MainFrame.btnStart.text"), e->{
+			IButton start = new IButton(Client.session.getMsg("MainFrame.btnStart.text"), e->{
 				Client.mainwindow.mainPane.disableTab(1);
 				Client.sendMsg(JsonUtils.stringify(Q_Dat2Dir.Start.instantiate()));
-			}));
+			});
+			start.setIcon("icons/bullet_go.png");
+			addMember(start);
 		}});
 	}
 	
