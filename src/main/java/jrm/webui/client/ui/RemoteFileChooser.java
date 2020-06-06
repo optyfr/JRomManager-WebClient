@@ -1,6 +1,5 @@
 package jrm.webui.client.ui;
 
-import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,7 +10,6 @@ import java.util.stream.Stream;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.i18n.client.NumberFormat;
-import com.google.gwt.user.client.ui.Hidden;
 import com.smartgwt.client.data.DSCallback;
 import com.smartgwt.client.data.DSRequest;
 import com.smartgwt.client.data.DSResponse;
@@ -334,6 +332,7 @@ public final class RemoteFileChooser extends Window
 			});
 			addRecordDoubleClickHandler(event->{
 				ListGridRecord record = event.getRecord();
+				@SuppressWarnings("unused")
 				String path = record.getAttribute("Path");
 				String relpath = record.getAttribute("RelPath");
 				String name = record.getAttribute("Name");

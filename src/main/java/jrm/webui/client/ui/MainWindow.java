@@ -248,12 +248,14 @@ public class MainWindow extends Window
 	public void update(A_CatVer.Loaded params)
 	{
 		scannerPanel.scannerAdvFiltersPanel.catver_path.setValue(params.getPath());
+		scannerPanel.scannerAdvFiltersPanel.catver_tree.enableEvents = false;
 		scannerPanel.scannerAdvFiltersPanel.catver_tree.invalidateCache();
 	}
 	
 	public void update(A_NPlayers.Loaded params)
 	{
 		scannerPanel.scannerAdvFiltersPanel.nplayers_path.setValue(params.getPath());
+		scannerPanel.scannerAdvFiltersPanel.nplayers_list.enableEvents = false;
 		scannerPanel.scannerAdvFiltersPanel.nplayers_list.invalidateCache();
 	}
 
