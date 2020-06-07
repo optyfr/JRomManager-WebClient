@@ -17,6 +17,7 @@ import com.smartgwt.client.types.TabBarControls;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
 import com.smartgwt.client.widgets.events.CloseClickHandler;
+import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.LayoutSpacer;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -43,7 +44,11 @@ public class MainWindow extends Window
 	public MainWindow()
 	{
 		super();
-		setTitle("JRomManager Web Client");
+		ListGrid.setDefaultProperties(new ListGrid() {{
+			setEmptyMessage(Client.session.getMsg("MainWindow.NoItemsToShow")); //$NON-NLS-1$
+			setLoadingDataMessage(Client.session.getMsg("MainWindow.LoadingData")); //$NON-NLS-1$
+		}});
+		setTitle(Client.session.getMsg("MainWindow.Title")); //$NON-NLS-1$
 		setWidth(1000);
 		setHeight(600);
 		setAnimateMinimize(true);
@@ -52,9 +57,9 @@ public class MainWindow extends Window
 		setShowHeaderIcon(true);
 		setShowMaximizeButton(true);
 		Map<String,Object> headerIconDefaults = new HashMap<>();
-		headerIconDefaults.put("width", 16);
-		headerIconDefaults.put("height", 16);
-		headerIconDefaults.put("src", "rom.png");
+		headerIconDefaults.put("width", 16); //$NON-NLS-1$
+		headerIconDefaults.put("height", 16); //$NON-NLS-1$
+		headerIconDefaults.put("src", "rom.png"); //$NON-NLS-1$ //$NON-NLS-2$
 		setHeaderIconDefaults(headerIconDefaults);
 		setShowHeaderIcon(true);
 		addCloseClickHandler(new CloseClickHandler()
@@ -63,17 +68,17 @@ public class MainWindow extends Window
 			public void onCloseClick(CloseClickEvent event)
 			{
 				RPCRequest request = new RPCRequest();
-				String logout = Location.getProtocol() + "//logout:logout@" + Location.getHost() + Location.getPath();
+				String logout = Location.getProtocol() + "//logout:logout@" + Location.getHost() + Location.getPath(); //$NON-NLS-1$
 				request.setActionURL(logout);
 				request.setSendNoQueue(true);
-				request.setHttpHeaders(Collections.singletonMap("Authorization", "Basic AAAAAAAAAAAAAAAAAAA="));
+				request.setHttpHeaders(Collections.singletonMap("Authorization", "Basic AAAAAAAAAAAAAAAAAAA=")); //$NON-NLS-1$ //$NON-NLS-2$
 				request.setWillHandleError(true);
 				RPCManager.sendRequest(request,new RPCCallback()
 				{
 					@Override
 					public void execute(RPCResponse response, Object rawData, RPCRequest request)
 					{
-						Cookies.removeCookie("JSESSIONID");
+						Cookies.removeCookie("JSESSIONID"); //$NON-NLS-1$
 						String logout2 = Location.getHref();
 						Location.replace(logout);
 						Location.replace(logout2);
@@ -89,24 +94,24 @@ public class MainWindow extends Window
 				TabBarControls.TAB_PICKER
 			);
 			addTab(new Tab() {{
-				setIcon("icons/script.png");
-				setTitle(Client.session.getMsg("MainFrame.Profiles"));
+				setIcon("icons/script.png"); //$NON-NLS-1$
+				setTitle(Client.session.getMsg("MainFrame.Profiles")); //$NON-NLS-1$
 				setPane(profilePanel = new ProfilePanel());
 			}});
 			addTab(new Tab() {{
-				setIcon("icons/drive_magnify.png");
-				setTitle(Client.session.getMsg("MainFrame.Scanner"));
+				setIcon("icons/drive_magnify.png"); //$NON-NLS-1$
+				setTitle(Client.session.getMsg("MainFrame.Scanner")); //$NON-NLS-1$
 				setDisabled(true);
 				setPane(scannerPanel = new ScannerPanel());
 			}});
 			addTab(new Tab() {{
-				setIcon("icons/drive_go.png");
-				setTitle(Client.session.getMsg("MainFrame.Dir2Dat"));
+				setIcon("icons/drive_go.png"); //$NON-NLS-1$
+				setTitle(Client.session.getMsg("MainFrame.Dir2Dat")); //$NON-NLS-1$
 				setPane(dir2datPanel = new Dir2DatPanel());
 			}});
 			addTab(new Tab() {{
-				setIcon("icons/application_osx_terminal.png");
-				setTitle(Client.session.getMsg("MainFrame.BatchTools"));
+				setIcon("icons/application_osx_terminal.png"); //$NON-NLS-1$
+				setTitle(Client.session.getMsg("MainFrame.BatchTools")); //$NON-NLS-1$
 				setPane(new TabSet() {{
 					setPaneMargin(0);
 					setTabBarControls(
@@ -114,25 +119,25 @@ public class MainWindow extends Window
 							TabBarControls.TAB_PICKER
 						);
 					addTab(new Tab() {{
-						setTitle(Client.session.getMsg("MainFrame.panelBatchToolsDat2Dir.title"));
-						setIcon("icons/application_cascade.png");
+						setTitle(Client.session.getMsg("MainFrame.panelBatchToolsDat2Dir.title")); //$NON-NLS-1$
+						setIcon("icons/application_cascade.png"); //$NON-NLS-1$
 						setPane(batchDirUpd8rPanel = new BatchDirUpd8rPanel());
 					}});
 					addTab(new Tab() {{
-						setTitle(Client.session.getMsg("MainFrame.panelBatchToolsDir2Torrent.title"));
-						setIcon("icons/drive_web.png");
+						setTitle(Client.session.getMsg("MainFrame.panelBatchToolsDir2Torrent.title")); //$NON-NLS-1$
+						setIcon("icons/drive_web.png"); //$NON-NLS-1$
 						setPane(batchTrrntChkPanel = new BatchTrrntChkPanel());
 					}});
 					addTab(new Tab() {{
-						setTitle(Client.session.getMsg("BatchPanel.Compressor"));
-						setIcon("icons/compress.png");
+						setTitle(Client.session.getMsg("BatchPanel.Compressor")); //$NON-NLS-1$
+						setIcon("icons/compress.png"); //$NON-NLS-1$
 						setPane(batchCompressorPanel = new BatchCompressorPanel());
 					}});
 				}});
 			}});
 			addTab(new Tab() {{
-				setIcon("icons/cog.png");
-				setTitle(Client.session.getMsg("MainFrame.Settings"));
+				setIcon("icons/cog.png"); //$NON-NLS-1$
+				setTitle(Client.session.getMsg("MainFrame.Settings")); //$NON-NLS-1$
 				setPane(new TabSet() {{
 					setPaneMargin(0);
 					setTabBarControls(
@@ -140,23 +145,24 @@ public class MainWindow extends Window
 							TabBarControls.TAB_PICKER
 						);
 					addTab(new Tab() {{
-						setIcon("icons/compress.png");
-						setTitle(Client.session.getMsg("MainFrame.Compressors"));
+						setIcon("icons/compress.png"); //$NON-NLS-1$
+						setTitle(Client.session.getMsg("MainFrame.Compressors")); //$NON-NLS-1$
 						setPane(settingsCompressorPanel = new SettingsCompressorPanel());
 					}});
 					addTab(new Tab() {{
-						setIcon("icons/bug.png");
-						setTitle(Client.session.getMsg("MainFrame.Debug"));
+						setIcon("icons/bug.png"); //$NON-NLS-1$
+						setTitle(Client.session.getMsg("MainFrame.Debug")); //$NON-NLS-1$
 						setPane(new VLayout() {{
-							addMember(new LayoutSpacer("*","*"));
+							addMember(new LayoutSpacer("*","*")); //$NON-NLS-1$ //$NON-NLS-2$
 							addMember(settingsDebugPanel = new SettingsDebugPanel());
-							addMember(new LayoutSpacer("*","*"));
+							addMember(new LayoutSpacer("*","*")); //$NON-NLS-1$ //$NON-NLS-2$
 						}});
 					}});
 					if(Client.session.isAdmin())
 					{
 						addTab(new Tab() {{
-							setTitle("Admin");
+							setTitle(Client.session.getMsg("MainWindow.Admin")); //$NON-NLS-1$
+							setIcon("icons/user.png"); //$NON-NLS-1$
 							setPane(new SettingsAdminPanel());
 						}});
 					}
@@ -191,10 +197,10 @@ public class MainWindow extends Window
 			for(int i = 0; i < jsarrstr.length(); i++)
 				arrlststr.add(jsarrstr.get(i));
 			String[] arrstr = arrlststr.toArray(new String[0]);
-			scannerPanel.scannerFiltersPanel.filterForm.getItem("cbYearMin").setValueMap(arrstr);
-			scannerPanel.scannerFiltersPanel.filterForm.getItem("cbYearMin").setDefaultValue(arrstr[0]);
-			scannerPanel.scannerFiltersPanel.filterForm.getItem("cbYearMax").setValueMap(arrstr);
-			scannerPanel.scannerFiltersPanel.filterForm.getItem("cbYearMax").setDefaultValue(arrstr[arrstr.length-1]);
+			scannerPanel.scannerFiltersPanel.filterForm.getItem("cbYearMin").setValueMap(arrstr); //$NON-NLS-1$
+			scannerPanel.scannerFiltersPanel.filterForm.getItem("cbYearMin").setDefaultValue(arrstr[0]); //$NON-NLS-1$
+			scannerPanel.scannerFiltersPanel.filterForm.getItem("cbYearMax").setValueMap(arrstr); //$NON-NLS-1$
+			scannerPanel.scannerFiltersPanel.filterForm.getItem("cbYearMax").setDefaultValue(arrstr[arrstr.length-1]); //$NON-NLS-1$
 			scannerPanel.scannerFiltersPanel.filterForm.initPropertyItemValues(settings);
 		}
 		else
@@ -303,7 +309,7 @@ public class MainWindow extends Window
 	{
 		RecordList list = batchDirUpd8rPanel.sdr.getResultSet().getAllCachedRows();
 		for(int i = 0; i < list.getLength(); i++)
-			batchDirUpd8rPanel.sdr.setEditValue(i, 3, "");
+			batchDirUpd8rPanel.sdr.setEditValue(i, 3, ""); //$NON-NLS-1$
 	}
 
 	public void update(A_Dat2Dir.UpdateResult params)
@@ -339,7 +345,7 @@ public class MainWindow extends Window
 	{
 		RecordList list = batchTrrntChkPanel.sdr.getResultSet().getAllCachedRows();
 		for(int i = 0; i < list.getLength(); i++)
-			batchTrrntChkPanel.sdr.setEditValue(i, 3, "");
+			batchTrrntChkPanel.sdr.setEditValue(i, 3, ""); //$NON-NLS-1$
 	}
 
 	public void update(A_TrntChk.UpdateResult params)
@@ -369,7 +375,7 @@ public class MainWindow extends Window
 	public void update(A_Compressor.ClearResults params)
 	{
 		for(int i = 0; i < batchCompressorPanel.fr.getTotalRows(); i++)
-			batchCompressorPanel.fr.setEditValue(i, 1, "");
+			batchCompressorPanel.fr.setEditValue(i, 1, ""); //$NON-NLS-1$
 	}
 
 	public void update(A_Compressor.UpdateResult params)
@@ -394,16 +400,16 @@ public class MainWindow extends Window
 	
 	public void update(A_Global.SetMemory params)
 	{
-		settingsDebugPanel.getItem("txtDbgMemory").setValue(params.getMsg());
+		settingsDebugPanel.getItem("txtDbgMemory").setValue(params.getMsg()); //$NON-NLS-1$
 	}
 
 	
 	public void update(A_Profile.Imported params)
 	{
 		Record record = new Record() {{
-			setAttribute("Src", params.getPath());
-			setAttribute("Parent", params.getParent());
-			setAttribute("File", params.getName());
+			setAttribute("Src", params.getPath()); //$NON-NLS-1$
+			setAttribute("Parent", params.getParent()); //$NON-NLS-1$
+			setAttribute("File", params.getName()); //$NON-NLS-1$
 		}};
 		profilePanel.listgrid.addData(record, (dsResponse, data, dsRequest) -> profilePanel.listgrid.selectRecord(record));
 	}

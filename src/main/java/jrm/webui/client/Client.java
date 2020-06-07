@@ -206,6 +206,7 @@ public class Client implements EntryPoint
 	@Override
 	public void onModuleLoad()
 	{
+		
 		new Label()
 		{
 			{

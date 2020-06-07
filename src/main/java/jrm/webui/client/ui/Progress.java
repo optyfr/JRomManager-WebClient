@@ -74,6 +74,7 @@ public class Progress extends Window
 		headerIconDefaults.put("height", 16);
 		headerIconDefaults.put("src", "rom.png");
 		setHeaderIconDefaults(headerIconDefaults);
+		setShowHeaderIcon(true);
 		setShowCloseButton(false);
 		
 		panel = new VLayout() {{
@@ -118,6 +119,7 @@ public class Progress extends Window
 				}
 			});
 		}};
+		btnCancel.setIcon("icons/stop.png");
 
 		addItem(new VLayout() {{
 			setWidth100();
