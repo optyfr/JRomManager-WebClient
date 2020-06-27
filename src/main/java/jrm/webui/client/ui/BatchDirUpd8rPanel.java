@@ -357,9 +357,9 @@ public class BatchDirUpd8rPanel extends VLayout
 				setWrapItemTitles(false);
 				setItems(new CheckboxItem("dry_run", Client.session.getMsg("MainFrame.cbBatchToolsDat2DirDryRun.text")) {{
 					setLabelAsTitle(true);
-					setDefaultValue(Client.session.getSettingAsBoolean("dry_run",true));
+					setDefaultValue(Client.session.getSettingAsBoolean("dat2dir.dry_run",true));
 					setShowLabel(false);
-					addChangedHandler(e->Client.sendMsg(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("dry_run", (Boolean)e.getValue()))));
+					addChangedHandler(e->Client.sendMsg(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("dat2dir.dry_run", (Boolean)e.getValue()))));
 				}});
 			}});
 			IButton start = new IButton(Client.session.getMsg("MainFrame.btnStart.text"), e->{
