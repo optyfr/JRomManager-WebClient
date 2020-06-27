@@ -51,6 +51,7 @@ import com.smartgwt.client.widgets.menu.MenuItem;
 
 import jrm.webui.client.Client;
 import jrm.webui.client.protocol.Q_Global;
+import jrm.webui.client.ui.RemoteFileChooser.Options.SelMode;
 import jrm.webui.client.utils.CaseInsensitiveString;
 import jsinterop.annotations.JsMethod;
 import jsinterop.annotations.JsPackage;
@@ -71,10 +72,16 @@ public final class RemoteFileChooser extends Window
 	private String parent, relparent;
 	private String root;
 
-	class Options
+	static class Options
 	{
+		enum SelMode
+		{
+			NONE, FILE, DIR, FILE_DIR;
+		}
+		
 		public final String context, initialPath;
-		public final boolean isDir, isMultiple, isChoose;
+		public final SelMode selMode;
+		public final boolean isMultiple, isChoose;
 		
 		public Options(String context, String initialPath)
 		{
@@ -87,41 +94,49 @@ public final class RemoteFileChooser extends Window
 				case "tfSWDest":
 				case "tfSWDisksDest":
 				case "tfSamplesDest":
-					isDir = true;
+					selMode = SelMode.DIR;
 					isMultiple = false;
 					isChoose = true;
 					break;
 				case "listSrcDir":
 				case "addDatSrc":
-					isDir = true;
+					selMode = SelMode.DIR;
 					isMultiple = true;
 					isChoose = true;
 					break;
 				case "manageUploads":
-					isDir = false;
+					selMode = SelMode.NONE;
 					isMultiple = true;
 					isChoose = false;
 					break;
 				case "updDat":
 				case "updTrnt":
-					isDir = true;
+					selMode = SelMode.DIR;
 					isMultiple = false;
 					isChoose = true;
 					break;
 				case "importDat":
-					isDir = false;
+					selMode = SelMode.FILE;
 					isMultiple = true;
 					isChoose = true;
 					break;
 				case "addArc":
-					isDir = false;
+					selMode = SelMode.FILE;
 					isMultiple = true;
 					isChoose = true;
 					break;
 				case "addDat":
+					selMode = SelMode.FILE_DIR;
+					isMultiple = false;
+					isChoose = true;
+					break;
 				case "addTrnt":
+					selMode = SelMode.FILE;
+					isMultiple = false;
+					isChoose = true;
+					break;
 				default:
-					isDir = false;
+					selMode = SelMode.FILE;
 					isMultiple = false;
 					isChoose = true;
 					break;
@@ -686,11 +701,11 @@ public final class RemoteFileChooser extends Window
 		setAutoCenter(true);
 		setIsModal(true);
 		if(!options.isChoose)
-			setTitle(options.isDir?"Manage directories":"Manage files");
+			setTitle(options.selMode==SelMode.DIR?"Manage directories":"Manage files");
 		else if(options.isMultiple)
-			setTitle(options.isDir?"Choose directories":"Choose files");
+			setTitle(options.selMode==SelMode.DIR?"Choose directories":"Choose files");
 		else
-			setTitle(options.isDir?"Choose a directory":"Choose a file");
+			setTitle(options.selMode==SelMode.DIR?"Choose a directory":"Choose a file");
 		setCanDragResize(true);
 		setShowMaximizeButton(true);
 		setShowModalMask(true);
@@ -748,7 +763,7 @@ public final class RemoteFileChooser extends Window
 					ListGridRecord[] records =  list.getSelectedRecords();
 					if(records.length>0)
 					{
-						if(!options.isDir)
+						if(options.selMode==SelMode.FILE)
 						{
 							if(records.length==1)
 							{
@@ -764,7 +779,7 @@ public final class RemoteFileChooser extends Window
 						processPaths(context, cb, Stream.of(records).map(PathInfo::new).toArray(PathInfo[]::new));
 						RemoteFileChooser.this.markForDestroy();
 					}
-					else if(options.isDir)
+					else if(options.selMode==SelMode.DIR || options.selMode==SelMode.FILE_DIR)
 					{
 						processPaths(context, cb, new PathInfo[] {new PathInfo(relparent, null, null)});
 						RemoteFileChooser.this.markForDestroy();
