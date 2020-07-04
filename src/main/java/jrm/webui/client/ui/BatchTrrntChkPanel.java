@@ -1,5 +1,6 @@
 package jrm.webui.client.ui;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -32,6 +33,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.MenuItemStringFunction;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 
 import jrm.webui.client.Client;
@@ -61,22 +63,74 @@ public class BatchTrrntChkPanel extends VLayout
 				setCanExpandRecords(true);
 				setContextMenu(new Menu() {{
 					addItem(new MenuItem() {{
-						setTitle(Client.session.getMsg("BatchToolsTrrntChkPanel.mntmAddTorrent.text"));
-						addClickHandler(e -> new RemoteFileChooser("addTrnt", Client.session.getSetting("dir.addTrnt", null), pi -> {
-							for(PathInfo p : pi)
-								sdr.addData(new Record() {{
-									setAttribute("src",p.path);
-								}});
+						setDynamicTitleFunction(new MenuItemStringFunction()
+						{
+							@Override
+							public String execute(Canvas target, Menu menu, MenuItem item)
+							{
+								return Client.session.getMsg(sdr.getSelectedRecords().length==1?"BatchToolsTrrntChkPanel.mntmUpdTorrent.text":"BatchToolsTrrntChkPanel.mntmAddTorrent.text");
+							}
+						});
+						addClickHandler(e -> new RemoteFileChooser("addTrnt", Client.session.getSetting("dir.addTrnt", null), new RemoteFileChooser.CallBack()
+						{
+							private void addData(PathInfo[] pi, int i)
+							{
+								if (i < pi.length)
+								{
+									Record record = new Record(Collections.singletonMap("src", pi[i].path));
+									sdr.addData(record, (dsResponse, data, dsRequest) -> addData(pi, i + 1));
+								}
+							}
+							
+							private void updData(PathInfo[] pi, int start, int i)
+							{
+								if (i < pi.length)
+								{
+									if (start + i < sdr.getTotalRows())
+									{
+										Record record = sdr.getRecord(start + i);
+										record.setAttribute("src", pi[i].path);
+										sdr.updateData(record, (dsResponse, data, dsRequest) -> updData(pi, start, i + 1));
+									}
+									else
+										addData(pi, i);
+								}
+							}
+							
+							@Override
+							public void apply(PathInfo[] pi)
+							{
+								Record record = sdr.getSelectedRecord();
+								if(record != null)
+									updData(pi, sdr.getRecordIndex(record), 0);
+								else
+									addData(pi, 0);
+							}
 						}));
 					}});
 					addItem(new MenuItem() {{
 						setTitle("Set Destination");
 						setEnableIfCondition((target, menu, item)->sdr.getSelectedRecords().length==1);
-						addClickHandler(e -> new RemoteFileChooser("updTrnt", Client.session.getSetting("dir.updTrnt", null), pi -> {
-							Record record = sdr.getSelectedRecord();
-							for(PathInfo p : pi)
-								record.setAttribute("dst", p.path);
-							sdr.updateData(record);
+						addClickHandler(e -> new RemoteFileChooser("updTrnt", Client.session.getSetting("dir.updTrnt", null), new RemoteFileChooser.CallBack()
+						{
+							private void updData(PathInfo[] pi, int start, int i)
+							{
+								if (i < pi.length)
+								{
+									if(start + i < sdr.getTotalRows())
+									{
+										Record record = sdr.getRecord(start + i);
+										record.setAttribute("dst", pi[i].path);
+										sdr.updateData(record, (dsResponse, data, dsRequest) -> updData(pi, start, i + 1));
+									}
+								}
+							}
+							
+							@Override
+							public void apply(PathInfo[] pi)
+							{
+								updData(pi, sdr.getRecordIndex(sdr.getSelectedRecord()), 0);
+							}
 						}));
 					}});
 					addItem(new MenuItem() {{
@@ -96,9 +150,10 @@ public class BatchTrrntChkPanel extends VLayout
 						new OperationBinding(){{setOperationType(DSOperationType.UPDATE);setDataProtocol(DSProtocol.POSTXML);}}
 					);
 					setFields(
-						new DataSourceTextField("src") {{
+						new DataSourceTextField("id") {{
 							setPrimaryKey(true);
 						}},
+						new DataSourceTextField("src"),
 						new DataSourceTextField("dst"),
 						new DataSourceTextField("result"),
 						new DataSourceBooleanField("selected")

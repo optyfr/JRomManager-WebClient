@@ -112,7 +112,7 @@ public final class RemoteFileChooser extends Window
 				case "updDat":
 				case "updTrnt":
 					selMode = SelMode.DIR;
-					isMultiple = false;
+					isMultiple = true;
 					isChoose = true;
 					break;
 				case "importDat":
@@ -127,12 +127,12 @@ public final class RemoteFileChooser extends Window
 					break;
 				case "addDat":
 					selMode = SelMode.FILE_DIR;
-					isMultiple = false;
+					isMultiple = true;
 					isChoose = true;
 					break;
 				case "addTrnt":
 					selMode = SelMode.FILE;
-					isMultiple = false;
+					isMultiple = true;
 					isChoose = true;
 					break;
 				default:
