@@ -1,5 +1,10 @@
 package jrm.webui.client.protocol;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.google.gwt.core.client.JsArrayString;
+
 import jrm.webui.client.utils.EnhJSO;
 
 public class A_Global extends A_
@@ -32,6 +37,33 @@ public class A_Global extends A_
 		final public String getMsg()
 		{
 			return params.getString("msg");
+		}
+	}
+
+	public static class UpdateProperty extends A_
+	{
+		private Map<String,String> params = new HashMap<>();
+		
+		public UpdateProperty(final A_ a)
+		{
+			this(a.response);
+		}
+		
+		public UpdateProperty(final EnhJSO response)
+		{
+			super(response);
+			EnhJSO p = response.getJSO("params");
+			JsArrayString keys = EnhJSO.getProperties(p);
+			for(int i = 0; i < keys.length(); i++)
+			{
+				String name = keys.get(i);
+				params.put(name, p.get(name));
+			}
+		}
+		
+		final public Map<String,String> getProperties()
+		{
+			return params;
 		}
 	}
 

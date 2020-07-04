@@ -48,7 +48,7 @@ public class EnhJSO extends JavaScriptObject
         return jso[name];
 	}-*/;;
 
-	protected static native JsArrayString getProperties(JavaScriptObject jso) /*-{
+	public static native JsArrayString getProperties(JavaScriptObject jso) /*-{
 		return Object.keys(jso);
 	}-*/;;
 

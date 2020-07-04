@@ -62,6 +62,30 @@ public class A_Session extends EnhJSO
 		return prop_jso.exists(key)?prop_jso.getInteger(key):def;
 	}
 	
+	public final void setSetting(String key, EnhJSO val)
+	{
+		EnhJSO prop_jso = getJSO("settings");
+		prop_jso.set(key, val);
+	}
+	
+	public final void setSetting(String key, String val)
+	{
+		EnhJSO prop_jso = getJSO("settings");
+		prop_jso.set(key, val);
+	}
+	
+	public final void setSetting(String key, boolean val)
+	{
+		EnhJSO prop_jso = getJSO("settings");
+		prop_jso.set(key, val);
+	}
+	
+	public final void setSetting(String key, int val)
+	{
+		EnhJSO prop_jso = getJSO("settings");
+		prop_jso.set(key, val);
+	}
+	
 	public final String getMsg(String code)
 	{
 		return getMsgs().get(code);
