@@ -16,8 +16,8 @@ repositories {
 }
 
 apply plugin: 'java'
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 apply plugin: 'eclipse'
 
 eclipse {
@@ -96,7 +96,7 @@ gwt {
 		/** Fail compilation if any input file contains an error. */
 		failOnError = false
 		/** Specifies Java source level. ("1.6", "1.7")*/
-		sourceLevel = "1.8"
+		sourceLevel = "11"
 		/** The number of local workers for compiling permutations. */
 		localWorkers = 2
 		/** The maximum memory to be used by local workers. */
