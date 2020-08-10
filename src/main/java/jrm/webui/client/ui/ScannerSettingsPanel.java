@@ -40,7 +40,6 @@ public final class ScannerSettingsPanel extends SettingsForm
 			}},
 			new CheckboxItem("chckbxCreateOnlyComplete", Client.session.getMsg("MainFrame.chckbxCreateOnlyComplete.text")) {{
 				addChangedHandler(event->setPropertyItemValue(getName(), "createfull_mode", (boolean)getValue()));
-				setDefaultValue(true);
 			}},
 			new CheckboxItem("chckbxIgnoreUnneededContainers", Client.session.getMsg("MainFrame.chckbxIgnoreUnneededContainers.text")) {{
 				addChangedHandler(event->setPropertyItemValue(getName(), "ignore_unneeded_containers", (boolean)getValue()));

@@ -124,16 +124,19 @@ public final class ScannerFiltersPanel extends HLayout
 					setTitleColSpan(2);
 					setLabelAsTitle(true);
 					addChangedHandler(event->resetProfileViewer(()->setPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue())));
+					setDefaultValue(true);
 				}},
 				new CheckboxItem("chckbxIncludeDisks", Client.session.getMsg("MainFrame.chckbxIncludeDisks.text")) {{
 					setTitleColSpan(2);
 					setLabelAsTitle(true);
 					addChangedHandler(event->resetProfileViewer(()->setPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue())));
+					setDefaultValue(true);
 				}},
 				new CheckboxItem("chckbxIncludeSamples", Client.session.getMsg("MainFrame.chckbxIncludeSamples.text")) {{
 					setTitleColSpan(2);
 					setLabelAsTitle(true);
 					addChangedHandler(event->resetProfileViewer(()->setPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue())));
+					setDefaultValue(true);
 				}},
 				new SelectItem("cbMachineType", Client.session.getMsg("MainFrame.lblMachineType.text")) {{
 					setTitleColSpan(2);
