@@ -99,6 +99,7 @@ public class MainWindow extends Window
 				setPane(profilePanel = new ProfilePanel());
 			}});
 			addTab(new Tab() {{
+				setName("scanner");
 				setIcon("icons/drive_magnify.png"); //$NON-NLS-1$
 				setTitle(Client.session.getMsg("MainFrame.Scanner")); //$NON-NLS-1$
 				setDisabled(true);
@@ -186,8 +187,8 @@ public class MainWindow extends Window
 		scannerPanel.btnFix.setDisabled(true);
 		if(params.getSuccess())
 		{
-			mainPane.enableTab(1);
-			mainPane.selectTab(1);
+			mainPane.enableTab("scanner");
+			mainPane.selectTab("scanner");
 			EnhJSO settings = params.getSettings();
 			scannerPanel.scannerDirPanel.initPropertyItemValues(settings);
 			scannerPanel.scannerSettingsPanel.initPropertyItemValues(settings);
@@ -207,7 +208,7 @@ public class MainWindow extends Window
 		{
 			if(mainPane.getSelectedTabNumber()==1)
 				mainPane.selectTab(0);
-			mainPane.disableTab(1);
+			mainPane.disableTab("scanner");
 		}
 		profilePanel.refreshListGrid();
 	}
@@ -287,6 +288,20 @@ public class MainWindow extends Window
 		}
 	}
 
+	public void update(A_Profile.Fixed params)
+	{
+		if(params.getSuccess())
+		{
+			scannerPanel.btnFix.setDisabled(params.getActions()==null || params.getActions()==0);
+			if(Client.mainwindow.scannerPanel.profileViewer!=null && Client.childWindows.contains(Client.mainwindow.scannerPanel.profileViewer))
+			{
+				Client.mainwindow.scannerPanel.profileViewer.anywareListList.refreshData();
+				Client.mainwindow.scannerPanel.profileViewer.anywareList.refreshData();
+				Client.mainwindow.scannerPanel.profileViewer.anyware.refreshData();
+			}
+		}
+	}
+
 	public void update(A_Report.ApplyFilter params)
 	{
 		params.forEachParams((k, v) -> scannerPanel.reportViewer.applyFilter(k,v));
@@ -316,6 +331,7 @@ public class MainWindow extends Window
 
 	public void update(A_Dat2Dir.End params)
 	{
+		mainPane.disableTab("scanner");
 		batchDirUpd8rPanel.sdr.cancelEditing();
 		batchDirUpd8rPanel.sdr.refreshData(new DSCallback()
 		{

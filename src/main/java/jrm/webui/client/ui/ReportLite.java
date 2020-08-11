@@ -10,7 +10,7 @@ import com.smartgwt.client.widgets.layout.LayoutSpacer;
 import jrm.webui.client.Client;
 
 @SuppressWarnings("serial")
-final public class ReportLite extends Window
+final public class ReportLite extends Window implements ReportStatus
 {
 	private ReportTree tree;
 	
@@ -29,6 +29,8 @@ final public class ReportLite extends Window
 		setCanDragResize(true);
 		setShowHeaderIcon(true);
 		setShowMaximizeButton(true);
+		setShowStatusBar(true);
+		setShowFooter(true);
 		setHeaderIconDefaults(new HashMap<String,Object>() {{
 			put("width", 16);
 			put("height", 16);
@@ -36,7 +38,7 @@ final public class ReportLite extends Window
 		}});
 		setShowHeaderIcon(true);
 		addCloseClickHandler(event->ReportLite.this.markForDestroy());
-		addItem(tree = new ReportTree(src));
+		addItem(tree = new ReportTree(src,this));
 		addItem(new HLayout() {{
 			addMember(new LayoutSpacer("*",20));
 			addMember(new IButton("Close", e->ReportLite.this.markForDestroy()));

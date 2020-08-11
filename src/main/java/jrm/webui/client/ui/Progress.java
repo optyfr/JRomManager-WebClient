@@ -220,36 +220,52 @@ public class Progress extends Window
 			lblTimeleft.setVisibility(progressBar.getVisibility());
 			packHeight();
 		}
-		if (pd.getPB1().getVal() > 0)
+		if (pd.getPB1().isVisible())
 		{
-			if (progressBar.getPercentDone() != (int) pd.getPB1().getPerc())
-				progressBar.setPercentDone((int) pd.getPB1().getPerc());
-			if (pd.getPB1().hasStringPainted())
-				progressBarLabel.setContents(Optional.ofNullable(pd.getPB1().getMsg()).orElse(""));
+			if(pd.getPB1().isIndeterminate())
+			{
+				progressBar.setPercentDone(0);
+				progressBarLabel.setContents("<center><img height='16' width='16' src='/images/loading.gif'></center>");
+			}
+			else if (pd.getPB1().getVal() > 0)
+			{
+				if (progressBar.getPercentDone() != (int) pd.getPB1().getPerc())
+					progressBar.setPercentDone((int) pd.getPB1().getPerc());
+				if (pd.getPB1().hasStringPainted())
+					progressBarLabel.setContents(Optional.ofNullable(pd.getPB1().getMsg()).orElse(""));
+				else
+					progressBarLabel.setContents("");
+				lblTimeleft.setContents("<code>" + pd.getPB1().getTimeleft() + "</code>");
+			}
 			else
-				progressBarLabel.setContents("");
-			lblTimeleft.setContents("<code>" + pd.getPB1().getTimeleft() + "</code>");
+				lblTimeleft.setContents("<code>--:--:--/--:--:--</code>");
 		}
-		else
-			lblTimeleft.setContents("<code>--:--:--/--:--:--</code>");
 		if (progressBar2.isVisible() != pd.getPB2().isVisible())
 		{
 			progressBar2.setVisibility(pd.getPB2().isVisible() ? Visibility.INHERIT : Visibility.HIDDEN);
 			lblTimeLeft2.setVisibility(progressBar2.getVisibility());
 			packHeight();
 		}
-		if (pd.getPB2().getVal() > 0)
+		if (pd.getPB2().isVisible())
 		{
-			if (progressBar2.getPercentDone() != (int) pd.getPB2().getPerc())
-				progressBar2.setPercentDone((int) pd.getPB2().getPerc());
-			if (pd.getPB2().hasStringPainted())
-				progressBarLabel2.setContents(Optional.ofNullable(pd.getPB2().getMsg()).orElse(""));
+			if(pd.getPB2().isIndeterminate())
+			{
+				progressBar2.setPercentDone(0);
+				progressBarLabel2.setContents("<center><img height='16' width='16' src='/images/loading.gif'></center>");
+			}
+			else if (pd.getPB2().getVal() > 0)
+			{
+				if (progressBar2.getPercentDone() != (int) pd.getPB2().getPerc())
+					progressBar2.setPercentDone((int) pd.getPB2().getPerc());
+				if (pd.getPB2().hasStringPainted())
+					progressBarLabel2.setContents(Optional.ofNullable(pd.getPB2().getMsg()).orElse(""));
+				else
+					progressBarLabel2.setContents("");
+				lblTimeLeft2.setContents("<code>" + pd.getPB2().getTimeleft() + "</code>");
+			}
 			else
-				progressBarLabel2.setContents("");
-			lblTimeLeft2.setContents("<code>" + pd.getPB2().getTimeleft() + "</code>");
+				lblTimeLeft2.setContents("<code>--:--:--/--:--:--</code>");
 		}
-		else
-			lblTimeLeft2.setContents("<code>--:--:--/--:--:--</code>");
 	}
 
 	public void cancel()

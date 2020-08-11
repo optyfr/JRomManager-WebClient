@@ -90,6 +90,32 @@ public class A_Profile extends A_
 		}
 	}
 
+	public static class Fixed extends A_
+	{
+		private EnhJSO params;
+		
+		public Fixed(final A_ a)
+		{
+			this(a.response);
+		}
+		
+		public Fixed(final EnhJSO response)
+		{
+			super(response);
+			params = response.getJSO("params");
+		}
+		
+		final public boolean getSuccess()
+		{
+			return params.getBool("success");
+		}
+		
+		final public Integer getActions()
+		{
+			return params.getInteger("actions");
+		}
+	}
+
 	public static class Imported extends A_
 	{
 		private EnhJSO params;

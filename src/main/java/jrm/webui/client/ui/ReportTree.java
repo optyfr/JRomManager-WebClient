@@ -7,9 +7,11 @@ import java.util.Optional;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.URL;
 import com.smartgwt.client.data.DSRequest;
+import com.smartgwt.client.data.DSResponse;
 import com.smartgwt.client.data.OperationBinding;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.RestDataSource;
+import com.smartgwt.client.data.XMLTools;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
@@ -23,6 +25,7 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeGridField;
+import com.smartgwt.client.widgets.tree.events.DataArrivedEvent;
 
 import jrm.webui.client.Client;
 import jrm.webui.client.protocol.Q_Report;
@@ -31,7 +34,48 @@ final class ReportTree extends TreeGrid
 {
 	final HashMap<String, Boolean> filters = new HashMap<>();
 	
-	public ReportTree(final String src)
+	class DS extends RestDataSource
+	{
+		private String status;
+		
+		DS(String src)
+		{
+			setID("Report");
+			setTitleField("title");
+			if(src!=null)
+				setRequestProperties(new DSRequest() {{setData(Collections.singletonMap("src", src));}});
+			setOperationBindings(
+				new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}},
+				new OperationBinding(){{setOperationType(DSOperationType.CUSTOM);setDataProtocol(DSProtocol.POSTXML);}}
+			);
+			setDataFormat(DSDataFormat.XML);
+			setDataURL("/datasources/"+getID());
+	        DataSourceTextField nameField = new DataSourceTextField("title");
+	        DataSourceIntegerField IDField = new DataSourceIntegerField("ID") {{
+		        setPrimaryKey(true);  
+		        setRequired(true);
+	        }};  
+	        DataSourceIntegerField parentIDField = new DataSourceIntegerField("ParentID") {{
+		        setRequired(true);  
+		        setForeignKey(id + ".ID");  
+		        setRootValue(0);
+	        }};  
+	        DataSourceTextField classField = new DataSourceTextField("class");
+	        DataSourceTextField statusField = new DataSourceTextField("status");
+	        DataSourceBooleanField hasNotesField = new DataSourceBooleanField("hasNotes");
+	        DataSourceBooleanField isFixableField = new DataSourceBooleanField("isFixable");
+	        setFields(nameField, IDField, parentIDField, classField, statusField, hasNotesField, isFixableField);  
+		}
+		
+		@Override
+		protected void transformResponse(DSResponse dsResponse, DSRequest dsRequest, Object data)
+		{
+			status = XMLTools.selectString(data, "/response/infos");
+			super.transformResponse(dsResponse, dsRequest, data);
+		}
+	}
+	
+	public ReportTree(final String src, ReportStatus status)
 	{
 		super();
 		setWidth100();
@@ -42,36 +86,12 @@ final class ReportTree extends TreeGrid
 		setShowOpenIcons(true);
 		setShowCustomIconOpen(true);
 		setDataFetchMode(FetchMode.PAGED);
-		setDataSource(
-			new RestDataSource() {{
-				setID("Report");
-				setTitleField("title");
-				if(src!=null)
-					setRequestProperties(new DSRequest() {{setData(Collections.singletonMap("src", src));}});
-				setOperationBindings(
-					new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}},
-					new OperationBinding(){{setOperationType(DSOperationType.CUSTOM);setDataProtocol(DSProtocol.POSTXML);}}
-				);
-				setDataFormat(DSDataFormat.XML);
-				setDataURL("/datasources/"+getID());
-		        DataSourceTextField nameField = new DataSourceTextField("title");
-		        DataSourceIntegerField IDField = new DataSourceIntegerField("ID") {{
-			        setPrimaryKey(true);  
-			        setRequired(true);
-		        }};  
-		        DataSourceIntegerField parentIDField = new DataSourceIntegerField("ParentID") {{
-			        setRequired(true);  
-			        setForeignKey(id + ".ID");  
-			        setRootValue(0);
-		        }};  
-		        DataSourceTextField classField = new DataSourceTextField("class");
-		        DataSourceTextField statusField = new DataSourceTextField("status");
-		        DataSourceBooleanField hasNotesField = new DataSourceBooleanField("hasNotes");
-		        DataSourceBooleanField isFixableField = new DataSourceBooleanField("isFixable");
-		        setFields(nameField, IDField, parentIDField, classField, statusField, hasNotesField, isFixableField);  
-			}},
-			new TreeGridField("title")
-		);
+		DS ds = new DS(src);
+		addDataArrivedHandler((DataArrivedEvent e) -> {
+			if (status != null)
+				status.setStatus(ds.status);
+		});
+		setDataSource(ds,new TreeGridField("title"));
 		setContextMenu(new Menu() {{
 			Dialog dialog = new Dialog();
 			dialog.setWidth(350);

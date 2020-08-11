@@ -2,13 +2,12 @@ package jrm.webui.client.ui;
 
 import java.util.HashMap;
 
-import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Window;
 
 import jrm.webui.client.Client;
 
 @SuppressWarnings("serial")
-final public class ReportViewer extends Window
+final public class ReportViewer extends Window implements ReportStatus
 {
 	private ReportTree tree;
 	
@@ -32,9 +31,9 @@ final public class ReportViewer extends Window
 		}});
 		setShowHeaderIcon(true);
 		addCloseClickHandler(event->ReportViewer.this.markForDestroy());
-		addItem(tree = new ReportTree(null));
+		addItem(tree = new ReportTree(null, this));
 		setShowFooter(true);
-		setFooterControls(new Label() {{setWidth100();setBorder("2px inset");}});
+		setShowStatusBar(true);
 		show();
 	}
 
