@@ -1,5 +1,7 @@
 package jrm.webui.client.protocol;
 
+import com.google.gwt.core.client.JsArrayString;
+
 import jrm.webui.client.utils.EnhJSO;
 
 public class A_Progress extends A_
@@ -87,77 +89,113 @@ public class A_Progress extends A_
 		}
 	}
 
-	public static class SetProgress extends A_
+
+	public static class SetFullProgress extends A_
 	{
-		private EnhJSO params;
+		private ProgressData params;
 		
-		public SetProgress(final A_ a)
+		public SetFullProgress(final A_ a)
 		{
 			this(a.response);
 		}
 		
-		public SetProgress(final EnhJSO response)
+		public SetFullProgress(final EnhJSO response)
 		{
 			super(response);
 			params = response.getJSO("params");
 		}
 		
-		final public int getOffset()
+		final public ProgressData getParams()
 		{
-			return params.getInt("offset");
+			return params;
 		}
-		
-		final public String getMsg()
+
+		public static class ProgressData extends EnhJSO
 		{
-			return params.getString("msg",false);
-		}
-		
-		final public String getSubMsg()
-		{
-			return params.getString("submsg",false);
-		}
-		
-		final public Integer getVal()
-		{
-			return params.getInteger("val");
-		}
-		
-		final public Integer getMax()
-		{
-			return params.getInteger("max");
+			protected ProgressData()
+			{
+			}
+			
+			final public JsArrayString getInfos()
+			{
+				return getJSAStrJSO("infos");
+			}
+			
+			final public JsArrayString getSubInfos()
+			{
+				return getJSAStrJSO("subinfos");
+			}
+			
+			final public boolean isMultipleSubInfos()
+			{
+				return getBool("multipleSubInfos");
+			}
+			
+			final public int getThreadCnt()
+			{
+				return getInt("threadCnt");
+			}
+			
+			final public Progress getPB1()
+			{
+				return getJSO("pb1");
+			}
+			
+			final public Progress getPB2()
+			{
+				return getJSO("pb2");
+			}
+			
+			public static class Progress extends EnhJSO
+			{
+				protected Progress()
+				{
+					
+				}
+				
+				final public boolean isVisible()
+				{
+					return getBool("visibility");
+				}
+				
+				final public boolean hasStringPainted()
+				{
+					return getBool("stringPainted");
+				}
+
+				final public boolean isIndeterminate()
+				{
+					return getBool("indeterminate");
+				}
+				
+				final public int getVal()
+				{
+					return getInt("val");
+				}
+				
+				final public int getMax()
+				{
+					return getInt("max");
+				}
+				
+				final public float getPerc()
+				{
+					return getInt("perc");
+				}
+				
+				final public String getMsg()
+				{
+					return get("msg");
+				}
+				
+				final public String getTimeleft()
+				{
+					return get("timeleft");
+				}
+			}
 		}
 	}
 	
 
-	public static class SetProgress2 extends A_
-	{
-		private EnhJSO params;
-		
-		public SetProgress2(final A_ a)
-		{
-			this(a.response);
-		}
-		
-		public SetProgress2(final EnhJSO response)
-		{
-			super(response);
-			params = response.getJSO("params");
-		}
-		
-		final public String getMsg()
-		{
-			return params.getString("msg",false);
-		}
-		
-		final public Integer getVal()
-		{
-			return params.getInteger("val");
-		}
-		
-		final public Integer getMax()
-		{
-			return params.getInteger("max");
-		}
-	}
-	
+
 }

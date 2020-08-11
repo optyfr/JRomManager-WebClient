@@ -244,14 +244,9 @@ public class MainWindow extends Window
 		progress.clearInfos();		
 	}
 	
-	public void update(A_Progress.SetProgress params)
+	public void update(A_Progress.SetFullProgress params)
 	{
-		progress.setProgress(params.getOffset(), params.getMsg(), params.getVal(), params.getMax(), params.getSubMsg());
-	}
-	
-	public void update(A_Progress.SetProgress2 params)
-	{
-		progress.setProgress2(params.getMsg(), params.getVal(), params.getMax());
+		progress.setFullProgress(params.getParams());
 	}
 	
 	public void update(A_CatVer.Loaded params)
