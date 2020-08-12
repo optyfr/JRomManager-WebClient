@@ -83,6 +83,26 @@ abstract class SettingsForm extends DynamicForm
 		hasSettings = settings!=null;
 	}
 
+	protected void setPropertiesItemValue(Map<String,?> propvalues)
+	{
+		setValues(propvalues);
+		if(!hasSettings)
+		{
+			final var properties = Q_Profile.SetProperty.instantiate();
+			propvalues.forEach((in,v)->{
+				if(fname2name.containsKey(in))
+				{
+					if(v instanceof Boolean)
+						properties.setProperty(fname2name.get(in), (boolean)v);
+					else
+						properties.setProperty(fname2name.get(in), (String)v);
+				}
+			});
+			properties.send();
+		}
+	}
+
+
 	protected void setPropertyItemValue(String field, String name, boolean value)
 	{
 		getItem(field).setValue(value);
@@ -161,6 +181,7 @@ abstract class SettingsForm extends DynamicForm
 	protected void initPropertyItemValues(EnhJSO settings)
 	{
 		fname2name.forEach((fn,n)->initPropertyItemValue(fn, n, settings));
+		updateDisabled();
 	}
 
 	Map<String,Object> getFilteredValues()
@@ -172,4 +193,11 @@ abstract class SettingsForm extends DynamicForm
 		});
 		return values;
 	}
+	
+	protected void updateDisabled()
+	{
+		getItem("chckbxCreateOnlyComplete").setDisabled(getValue("chckbxCreateMissingSets").equals(false));
+		getItem("cbHashCollision").setDisabled(!(getValue("cbbxMergeMode").equals("MERGE") || getValue("cbbxMergeMode").equals("FULLMERGE")));
+	}
+
 }

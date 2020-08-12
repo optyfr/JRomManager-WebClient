@@ -4,6 +4,8 @@ import java.util.HashMap;
 
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.menu.Menu;
+import com.smartgwt.client.widgets.menu.MenuItem;
 
 import jrm.webui.client.Client;
 import jrm.webui.client.utils.EnhJSO;
@@ -19,10 +21,84 @@ public final class ScannerSettingsPanel extends SettingsForm
 	public ScannerSettingsPanel(EnhJSO settings)
 	{
 		super(settings);
+		setID("ScannerSettingsPanel");
 		setWidth100();
 		setNumCols(4);
 		setColWidths("*","*","*","*");
 		setWrapItemTitles(false);
+		setContextMenu(new Menu() {{
+			addItem(new MenuItem() {{
+				setTitle(Client.session.getMsg("MainFrame.mnPresets.text"));
+				setSubmenu(new Menu() {{
+					addItem(new MenuItem() {{
+						setTitle(Client.session.getMsg("MainFrame.mnPdMame.text"));
+						setSubmenu(new Menu() {{
+							addItem(new MenuItem() {{	// merged
+								setTitle(Client.session.getMsg("MainFrame.mntmPleasuredome.text"));
+								addClickHandler(e->{
+									HashMap<String,Object> options = new HashMap<>();
+									options.put("chckbxCreateMissingSets", true);
+									options.put("chckbxCreateOnlyComplete", false);
+									options.put("chckbxIgnoreUnneededContainers", false);
+									options.put("chckbxIgnoreUnneededEntries", false);
+									options.put("chckbxIgnoreUnknownContainers", true); // Don't remove _ReadMe_.txt
+									options.put("chckbxUseImplicitMerge", true);
+									options.put("chckbxIgnoreMergeNameDisks", true);
+									options.put("chckbxIgnoreMergeNameRoms", false);
+									options.put("cbCompression", "TZIP");
+									options.put("cbbxMergeMode", "MERGE");
+									options.put("cbHashCollision", "HALFDUMB");
+									options.put("chckbxExcludeGames", false);
+									options.put("chckbxExcludeMachines", false);
+									setPropertiesItemValue(options);
+									updateDisabled();
+								});
+							}});
+							addItem(new MenuItem() {{	// non-merged
+								setTitle(Client.session.getMsg("MainFrame.mntmPdMameNon.text"));
+								addClickHandler(e->{
+									HashMap<String,Object> options = new HashMap<>();
+									options.put("chckbxCreateMissingSets", true);
+									options.put("chckbxCreateOnlyComplete", false);
+									options.put("chckbxIgnoreUnneededContainers", false);
+									options.put("chckbxIgnoreUnneededEntries", false);
+									options.put("chckbxIgnoreUnknownContainers", true); // Don't remove _ReadMe_.txt
+									options.put("chckbxUseImplicitMerge", true);
+									options.put("chckbxIgnoreMergeNameDisks", true);
+									options.put("chckbxIgnoreMergeNameRoms", false);
+									options.put("cbCompression", "TZIP");
+									options.put("cbbxMergeMode", "SUPERFULLNOMERGE");
+									options.put("chckbxExcludeGames", false);
+									options.put("chckbxExcludeMachines", false);
+									setPropertiesItemValue(options);
+									updateDisabled();
+								});
+							}});
+							addItem(new MenuItem() {{	// split
+								setTitle(Client.session.getMsg("MainFrame.mntmPdMameSplit.text"));
+								addClickHandler(e->{
+									HashMap<String,Object> options = new HashMap<>();
+									options.put("chckbxCreateMissingSets", true);
+									options.put("chckbxCreateOnlyComplete", false);
+									options.put("chckbxIgnoreUnneededContainers", false);
+									options.put("chckbxIgnoreUnneededEntries", false);
+									options.put("chckbxIgnoreUnknownContainers", true); // Don't remove _ReadMe_.txt
+									options.put("chckbxUseImplicitMerge", true);
+									options.put("chckbxIgnoreMergeNameDisks", true);
+									options.put("chckbxIgnoreMergeNameRoms", false);
+									options.put("cbCompression", "TZIP");
+									options.put("cbbxMergeMode", "SPLIT");
+									options.put("chckbxExcludeGames", false);
+									options.put("chckbxExcludeMachines", false);
+									setPropertiesItemValue(options);
+									updateDisabled();
+								});
+							}});
+						}});
+					}});
+				}});
+			}});
+		}});
 		setItems(
 			new CheckboxItem("chckbxNeedSHA1", Client.session.getMsg("MainFrame.chckbxNeedSHA1.text")) {{
 				addChangedHandler(event->setPropertyItemValue(getName(), "need_sha1_or_md5", (boolean)getValue()));
@@ -30,7 +106,7 @@ public final class ScannerSettingsPanel extends SettingsForm
 			new CheckboxItem("chckbxCreateMissingSets", Client.session.getMsg("MainFrame.chckbxCreateMissingSets.text")) {{
 				addChangedHandler(event->{
 					setPropertyItemValue(getName(), "create_mode", (boolean)getValue());
-					ScannerSettingsPanel.this.getItem("chckbxCreateOnlyComplete").setDisabled(!getValueAsBoolean());
+					updateDisabled();
 				});
 				setDefaultValue(true);
 			}},
@@ -95,7 +171,7 @@ public final class ScannerSettingsPanel extends SettingsForm
 				setDefaultValue("SPLIT");
 				addChangedHandler(event->{
 					setPropertyItemValue(getName(), "merge_mode", getValue().toString());
-					event.getForm().getItem("cbHashCollision").setDisabled(!(getValue().equals("MERGE") || getValue().equals("FULLMERGE")));
+					updateDisabled();
 				});
 				setColSpan(3);
 				setPrompt(Client.session.getMsg("MainFrame.cbbxMergeMode.toolTipText"));
@@ -120,5 +196,5 @@ public final class ScannerSettingsPanel extends SettingsForm
 		if(hasSettings)
 			initPropertyItemValues(settings);
 	}
-	
+
 }
