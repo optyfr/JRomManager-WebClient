@@ -3,6 +3,8 @@ package jrm.webui.client.ui;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.google.gwt.http.client.URL;
 import com.smartgwt.client.data.Criteria;
@@ -13,6 +15,7 @@ import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.OperationBinding;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.RestDataSource;
+import com.smartgwt.client.data.ResultSet;
 import com.smartgwt.client.data.XMLTools;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
@@ -63,6 +66,10 @@ public class ProfileViewer extends Window
 			setHoverAutoFitWidth(true);
 			setHoverAutoFitMaxWidth("50%");
 			setSelectionType(SelectionStyle.SINGLE);
+			setDataProperties(new ResultSet() {{
+				setUseClientFiltering(false);
+				setUseClientSorting(false);
+			}});
 			setCanSort(false);
 			addSelectionChangedHandler(event -> {
 				if(event.getState())
@@ -153,6 +160,10 @@ public class ProfileViewer extends Window
 		public AnywareList()
 		{
 			setCanEdit(true);
+			setDataProperties(new ResultSet() {{
+				setUseClientFiltering(false);
+				setUseClientSorting(false);
+			}});
 			setCanRemoveRecords(false);
 			setShowFilterEditor(true);
 			setSelectionType(SelectionStyle.SINGLE);
@@ -373,6 +384,10 @@ public class ProfileViewer extends Window
 		public Anyware()
 		{
 			super();
+			setDataProperties(new ResultSet() {{
+				setUseClientFiltering(false);
+				setUseClientSorting(false);
+			}});
 			setCanEdit(false);
 			setCanRemoveRecords(false);
 			setSelectionType(SelectionStyle.SINGLE);
@@ -558,82 +573,184 @@ public class ProfileViewer extends Window
 		addItem(new VLayout() {{
 			addMember(new HLayout() {{
 				setHeight("60%");
-				addMember(new VLayout() {{
-					setWidth("30%");
-					addMember(anywareListList = new AnywareListList());
-					addMember(new ToolStrip() {{
-						addButton(new ToolStripButton() {{
-							setIcon("/images/disk_multiple_red.png");
-							setActionType(SelectionType.CHECKBOX);
-							setShowFocused(false);
-							setSelected(true);
-							setPrompt(Client.session.getMsg("ProfileViewer.tglbtnMissingWL.toolTipText"));
+				addMember(new VLayout() {
+					private final ToolStripButton[] all_btn = new ToolStripButton[4];
+
+					{
+						setWidth("30%");
+						addMember(anywareListList = new AnywareListList());
+						addMember(new ToolStrip() {{
+							addButton(all_btn[0]=new ToolStripButton() {{
+								setName("UNKNOWN");
+								setIcon("/images/disk_multiple_gray.png");
+								setActionType(SelectionType.CHECKBOX);
+								setShowFocused(false);
+								setSelected(true);
+								setPrompt(Client.session.getMsg("ProfileViewer.tglbtnUnknownWL.toolTipText"));
+								addClickHandler(e->updateFilter());
+							}});
+							addButton(all_btn[1]=new ToolStripButton() {{
+								setName("MISSING");
+								setIcon("/images/disk_multiple_red.png");
+								setActionType(SelectionType.CHECKBOX);
+								setShowFocused(false);
+								setSelected(true);
+								setPrompt(Client.session.getMsg("ProfileViewer.tglbtnMissingWL.toolTipText"));
+								addClickHandler(e->updateFilter());
+							}});
+							addButton(all_btn[2]=new ToolStripButton() {{
+								setName("PARTIAL");
+								setIcon("/images/disk_multiple_orange.png");
+								setActionType(SelectionType.CHECKBOX);
+								setShowFocused(false);
+								setSelected(true);
+								setPrompt(Client.session.getMsg("ProfileViewer.tglbtnPartialWL.toolTipText"));
+								addClickHandler(e->updateFilter());
+							}});
+							addButton(all_btn[3]=new ToolStripButton() {{
+								setName("COMPLETE");
+								setIcon("/images/disk_multiple_green.png");
+								setActionType(SelectionType.CHECKBOX);
+								setShowFocused(false);
+								setSelected(true);
+								setPrompt(Client.session.getMsg("ProfileViewer.tglbtnCompleteWL.toolTipText"));
+								addClickHandler(e->updateFilter());
+							}});
 						}});
-						addButton(new ToolStripButton() {{
-							setIcon("/images/disk_multiple_orange.png");
-							setActionType(SelectionType.CHECKBOX);
-							setShowFocused(false);
-							setSelected(true);
-							setPrompt(Client.session.getMsg("ProfileViewer.tglbtnPartialWL.toolTipText"));
+						setShowResizeBar(true);
+					}
+					
+					private void updateFilter()
+					{
+						String filter = Stream.of(all_btn).filter(b -> b.isSelected()).map(b -> b.getName()).collect(Collectors.joining(","));
+						if(filter==null||filter.isEmpty())
+							filter="NONE";
+						final Criteria criteria;
+						if(anywareListList.getCriteria()!=null)
+						{
+							criteria = anywareListList.getCriteria();
+							criteria.addCriteria(new Criteria("status", filter));
+						}
+						else 
+							criteria = new Criteria("status", filter);
+						anywareListList.filterData(criteria);
+					}
+				});
+				addMember(new VLayout() {
+					private final ToolStripButton[] al_btn = new ToolStripButton[4];
+					
+					{
+						addMember(anywareList = new AnywareList());
+						addMember(new ToolStrip() {{
+							addButton(al_btn[0]=new ToolStripButton() {{
+								setName("UNKNOWN");
+								setIcon("/images/folder_closed_gray.png");
+								setActionType(SelectionType.CHECKBOX);
+								setShowFocused(false);
+								setSelected(true);
+								addClickHandler(e->updateFilter());
+							}});
+							addButton(al_btn[1]=new ToolStripButton() {{
+								setName("MISSING");
+								setIcon("/images/folder_closed_red.png");
+								setActionType(SelectionType.CHECKBOX);
+								setShowFocused(false);
+								setSelected(true);
+								setPrompt(Client.session.getMsg("ProfileViewer.tglbtnMissingW.toolTipText"));
+								addClickHandler(e->updateFilter());
+							}});
+							addButton(al_btn[2]=new ToolStripButton() {{
+								setName("PARTIAL");
+								setIcon("/images/folder_closed_orange.png");
+								setActionType(SelectionType.CHECKBOX);
+								setShowFocused(false);
+								setSelected(true);
+								setPrompt(Client.session.getMsg("ProfileViewer.tglbtnPartialW.toolTipText"));
+								addClickHandler(e->updateFilter());
+							}});
+							addButton(al_btn[3]=new ToolStripButton() {{
+								setName("COMPLETE");
+								setIcon("/images/folder_closed_green.png");
+								setActionType(SelectionType.CHECKBOX);
+								setShowFocused(false);
+								setSelected(true);
+								setPrompt(Client.session.getMsg("ProfileViewer.tglbtnCompleteW.toolTipText"));
+								addClickHandler(e->updateFilter());
+							}});
 						}});
-						addButton(new ToolStripButton() {{
-							setIcon("/images/disk_multiple_green.png");
-							setActionType(SelectionType.CHECKBOX);
-							setShowFocused(false);
-							setSelected(true);
-							setPrompt(Client.session.getMsg("ProfileViewer.tglbtnCompleteWL.toolTipText"));
-						}});
-					}});
-					setShowResizeBar(true);
-				}});
-				addMember(new VLayout() {{
-					addMember(anywareList = new AnywareList());
-					addMember(new ToolStrip() {{
-						addButton(new ToolStripButton() {{
-							setIcon("/images/folder_closed_red.png");
-							setActionType(SelectionType.CHECKBOX);
-							setShowFocused(false);
-							setSelected(true);
-							setPrompt(Client.session.getMsg("ProfileViewer.tglbtnMissingW.toolTipText"));
-						}});
-						addButton(new ToolStripButton() {{
-							setIcon("/images/folder_closed_orange.png");
-							setActionType(SelectionType.CHECKBOX);
-							setShowFocused(false);
-							setSelected(true);
-							setPrompt(Client.session.getMsg("ProfileViewer.tglbtnPartialW.toolTipText"));
-						}});
-						addButton(new ToolStripButton() {{
-							setIcon("/images/folder_closed_green.png");
-							setActionType(SelectionType.CHECKBOX);
-							setShowFocused(false);
-							setSelected(true);
-							setPrompt(Client.session.getMsg("ProfileViewer.tglbtnCompleteW.toolTipText"));
-						}});
-					}});
-				}});
+					}
+					
+					private void updateFilter()
+					{
+						String filter = Stream.of(al_btn).filter(b -> b.isSelected()).map(b -> b.getName()).collect(Collectors.joining(","));
+						if(filter==null||filter.isEmpty())
+							filter="NONE";
+						final Criteria criteria;
+						if(anywareList.getCriteria()!=null)
+						{
+							criteria = anywareList.getCriteria();
+							criteria.addCriteria(new Criteria("status", filter));
+						}
+						else 
+							criteria = new Criteria("status", filter);
+						anywareList.filterData(criteria);
+					}
+				});
 				setShowResizeBar(true);
 				setResizeBarTarget("next");
 			}});
-			addMember(new VLayout() {{
-				addMember(anyware = new Anyware());
-				addMember(new ToolStrip() {{
-					addButton(new ToolStripButton() {{
-						setIcon("/images/icons/bullet_red.png");
-						setActionType(SelectionType.CHECKBOX);
-						setShowFocused(false);
-						setSelected(true);
-						setPrompt(Client.session.getMsg("ProfileViewer.tglbtnBad.toolTipText"));
+			addMember(new VLayout() {
+				private final ToolStripButton[] a_btn = new ToolStripButton[3];
+
+				{
+					addMember(anyware = new Anyware());
+					addMember(new ToolStrip() {{
+						addButton(a_btn[0]=new ToolStripButton() {{
+							setName("UNKNOWN");
+							setIcon("/images/icons/bullet_black.png");
+							setActionType(SelectionType.CHECKBOX);
+							setShowFocused(false);
+							setSelected(true);
+							setPrompt(Client.session.getMsg("ProfileViewer.tglbtnUnknown.toolTipText"));
+							addClickHandler(e->updateFilter());
+						}});
+						addButton(a_btn[1]=new ToolStripButton() {{
+							setName("KO");
+							setIcon("/images/icons/bullet_red.png");
+							setActionType(SelectionType.CHECKBOX);
+							setShowFocused(false);
+							setSelected(true);
+							setPrompt(Client.session.getMsg("ProfileViewer.tglbtnBad.toolTipText"));
+							addClickHandler(e->updateFilter());
+						}});
+						addButton(a_btn[2]=new ToolStripButton() {{
+							setName("OK");
+							setIcon("/images/icons/bullet_green.png");
+							setActionType(SelectionType.CHECKBOX);
+							setShowFocused(false);
+							setSelected(true);
+							setPrompt(Client.session.getMsg("ProfileViewer.tglbtnOK.toolTipText"));
+							addClickHandler(e->updateFilter());
+						}});
 					}});
-					addButton(new ToolStripButton() {{
-						setIcon("/images/icons/bullet_green.png");
-						setActionType(SelectionType.CHECKBOX);
-						setShowFocused(false);
-						setSelected(true);
-						setPrompt(Client.session.getMsg("ProfileViewer.tglbtnOK.toolTipText"));
-					}});
-				}});
-			}});
+				}
+				
+				private void updateFilter()
+				{
+					String filter = Stream.of(a_btn).filter(b -> b.isSelected()).map(b -> b.getName()).collect(Collectors.joining(","));
+					if(filter==null||filter.isEmpty())
+						filter="NONE";
+					final Criteria criteria;
+					if(anyware.getCriteria()!=null)
+					{
+						criteria = anyware.getCriteria();
+						criteria.addCriteria(new Criteria("status", filter));
+					}
+					else 
+						criteria = new Criteria("status", filter);
+					anyware.filterData(criteria);
+				}
+			});
 		}});
 		show();
 		anywareListList.reset();

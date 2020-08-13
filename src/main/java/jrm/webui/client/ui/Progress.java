@@ -253,7 +253,7 @@ public class Progress extends Window
 				progressBar2.setPercentDone(0);
 				progressBarLabel2.setContents("<center><img height='16' width='16' src='/images/loading.gif'></center>");
 			}
-			else if (pd.getPB2().getVal() > 0)
+			else if (pd.getPB2().getPerc() >= 0)
 			{
 				if (progressBar2.getPercentDone() != (int) pd.getPB2().getPerc())
 					progressBar2.setPercentDone((int) pd.getPB2().getPerc());
