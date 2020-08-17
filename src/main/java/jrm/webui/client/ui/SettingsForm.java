@@ -4,7 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.*;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+import com.smartgwt.client.widgets.form.fields.FormItem;
+import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 
 import jrm.webui.client.protocol.Q_Global;
@@ -196,8 +200,7 @@ abstract class SettingsForm extends DynamicForm
 	
 	protected void updateDisabled()
 	{
-		getItem("chckbxCreateOnlyComplete").setDisabled(getValue("chckbxCreateMissingSets").equals(false));
-		getItem("cbHashCollision").setDisabled(!(getValue("cbbxMergeMode").equals("MERGE") || getValue("cbbxMergeMode").equals("FULLMERGE")));
+		
 	}
 
 }

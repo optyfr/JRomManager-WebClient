@@ -46,6 +46,121 @@ public class Client implements EntryPoint
 	{
 		super();
 	}
+	
+	private class EatSleepRaveRepeat implements RepeatingCommand
+	{
+		final String msg;
+		
+		private EatSleepRaveRepeat(String msg)
+		{
+			this.msg = msg;
+		}
+
+		@Override
+		public boolean execute()
+		{
+			execute(new A_(JsonUtils.safeEval(msg)));
+			return false;
+		}
+		
+		private void execute(A_ a)
+		{
+			switch(a.getCmd())
+			{
+				case "Progress":
+					mainwindow.update(new A_Progress(a));
+					break;
+				case "Progress.close":
+					mainwindow.update(new A_Progress.Close(a));
+					break;
+				case "Progress.canCancel":
+					mainwindow.update(new A_Progress.CanCancel(a));
+					break;
+				case "Progress.setInfos":
+					mainwindow.update(new A_Progress.SetInfos(a));
+					break;
+				case "Progress.clearInfos":
+					mainwindow.update(new A_Progress.ClearInfos(a));
+					break;
+				case "Progress.setFullProgress":
+					mainwindow.update(new A_Progress.SetFullProgress(a));
+					break;
+				case "Profile.loaded":
+					mainwindow.update(new A_Profile.Loaded(a));
+					break;
+				case "Profile.scanned":
+					mainwindow.update(new A_Profile.Scanned(a));
+					break;
+				case "Profile.fixed":
+					mainwindow.update(new A_Profile.Fixed(a));
+					break;
+				case "Profile.imported":
+					mainwindow.update(new A_Profile.Imported(a));
+					break;
+				case "CatVer.loaded":
+					mainwindow.update(new A_CatVer.Loaded(a));
+					break;
+				case "NPlayers.loaded":
+					mainwindow.update(new A_NPlayers.Loaded(a));
+					break;
+				case "Report.applyFilters":
+					mainwindow.update(new A_Report.ApplyFilter(a));
+					break;
+				case "ReportLite.applyFilters":
+					mainwindow.update(new A_ReportLite.ApplyFilter(a));
+					break;
+				case "Dat2Dir.clearResults":
+					mainwindow.update(new A_Dat2Dir.ClearResults(a));
+					break;
+				case "Dat2Dir.updateResult":
+					mainwindow.update(new A_Dat2Dir.UpdateResult(a));
+					break;
+				case "Dat2Dir.end":
+					mainwindow.update(new A_Dat2Dir.End(a));
+					break;
+				case "Dat2Dir.showSettings":
+					mainwindow.update(new A_Dat2Dir.ShowSettings(a));
+					break;
+				case "TrntChk.clearResults":
+					mainwindow.update(new A_TrntChk.ClearResults(a));
+					break;
+				case "TrntChk.updateResult":
+					mainwindow.update(new A_TrntChk.UpdateResult(a));
+					break;
+				case "TrntChk.end":
+					mainwindow.update(new A_TrntChk.End(a));
+					break;
+				case "Compressor.clearResults":
+					mainwindow.update(new A_Compressor.ClearResults(a));
+					break;
+				case "Compressor.updateResult":
+					mainwindow.update(new A_Compressor.UpdateResult(a));
+					break;
+				case "Compressor.updateFile":
+					mainwindow.update(new A_Compressor.UpdateFile(a));
+					break;
+				case "Compressor.end":
+					mainwindow.update(new A_Compressor.End(a));
+					break;
+				case "Global.setMemory":
+					mainwindow.update(new A_Global.SetMemory(a));
+					break;
+				case "Global.updateProperty":
+					new A_Global.UpdateProperty(a).getProperties().forEach((k,v)->{
+						session.setSetting(k, v);
+					});;
+					break;
+				case "Global.warn":
+					SC.warn(new A_Global.Warn(a).getMsg());
+					break;
+				case "Global.multiCMD":
+					for(final var sa : new A_Global.MultiCMD(a).getSubCMDs())
+						execute(sa);
+					break;
+			}
+		}
+		
+	}
 
 	private void processCmd(String msg)
 	{
@@ -53,104 +168,7 @@ public class Client implements EntryPoint
 			return;
 		try
 		{
-			Scheduler.get().scheduleIncremental(new RepeatingCommand()
-			{
-				@Override
-				public boolean execute()
-				{
-					A_ a = new A_(JsonUtils.safeEval(msg));
-					switch(a.getCmd())
-					{
-						case "Progress":
-							mainwindow.update(new A_Progress(a));
-							break;
-						case "Progress.close":
-							mainwindow.update(new A_Progress.Close(a));
-							break;
-						case "Progress.canCancel":
-							mainwindow.update(new A_Progress.CanCancel(a));
-							break;
-						case "Progress.setInfos":
-							mainwindow.update(new A_Progress.SetInfos(a));
-							break;
-						case "Progress.clearInfos":
-							mainwindow.update(new A_Progress.ClearInfos(a));
-							break;
-						case "Progress.setFullProgress":
-							mainwindow.update(new A_Progress.SetFullProgress(a));
-							break;
-						case "Profile.loaded":
-							mainwindow.update(new A_Profile.Loaded(a));
-							break;
-						case "Profile.scanned":
-							mainwindow.update(new A_Profile.Scanned(a));
-							break;
-						case "Profile.fixed":
-							mainwindow.update(new A_Profile.Fixed(a));
-							break;
-						case "Profile.imported":
-							mainwindow.update(new A_Profile.Imported(a));
-							break;
-						case "CatVer.loaded":
-							mainwindow.update(new A_CatVer.Loaded(a));
-							break;
-						case "NPlayers.loaded":
-							mainwindow.update(new A_NPlayers.Loaded(a));
-							break;
-						case "Report.applyFilters":
-							mainwindow.update(new A_Report.ApplyFilter(a));
-							break;
-						case "ReportLite.applyFilters":
-							mainwindow.update(new A_ReportLite.ApplyFilter(a));
-							break;
-						case "Dat2Dir.clearResults":
-							mainwindow.update(new A_Dat2Dir.ClearResults(a));
-							break;
-						case "Dat2Dir.updateResult":
-							mainwindow.update(new A_Dat2Dir.UpdateResult(a));
-							break;
-						case "Dat2Dir.end":
-							mainwindow.update(new A_Dat2Dir.End(a));
-							break;
-						case "Dat2Dir.showSettings":
-							mainwindow.update(new A_Dat2Dir.ShowSettings(a));
-							break;
-						case "TrntChk.clearResults":
-							mainwindow.update(new A_TrntChk.ClearResults(a));
-							break;
-						case "TrntChk.updateResult":
-							mainwindow.update(new A_TrntChk.UpdateResult(a));
-							break;
-						case "TrntChk.end":
-							mainwindow.update(new A_TrntChk.End(a));
-							break;
-						case "Compressor.clearResults":
-							mainwindow.update(new A_Compressor.ClearResults(a));
-							break;
-						case "Compressor.updateResult":
-							mainwindow.update(new A_Compressor.UpdateResult(a));
-							break;
-						case "Compressor.updateFile":
-							mainwindow.update(new A_Compressor.UpdateFile(a));
-							break;
-						case "Compressor.end":
-							mainwindow.update(new A_Compressor.End(a));
-							break;
-						case "Global.setMemory":
-							mainwindow.update(new A_Global.SetMemory(a));
-							break;
-						case "Global.updateProperty":
-							new A_Global.UpdateProperty(a).getProperties().forEach((k,v)->{
-								session.setSetting(k, v);
-							});;
-							break;
-						case "Global.warn":
-							SC.warn(new A_Global.Warn(a).getMsg());
-							break;
-					}
-					return false;
-				}
-			});
+			Scheduler.get().scheduleIncremental(new EatSleepRaveRepeat(msg));
 		}
 		catch(Exception e)
 		{

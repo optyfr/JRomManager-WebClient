@@ -81,15 +81,15 @@ gwt {
 	compile {
 		/** The level of logging detail (ERROR, WARN, INFO, TRACE, 
 		 * DEBUG, SPAM, ALL) */
-		logLevel = "INFO"
+		logLevel = "TRACE"
 		/** Compile a report that tells the "Story of Your Compile". */
 		compileReport = true
 		/** Compile quickly with minimal optimizations. */
-		draftCompile = false
+		draftCompile = true
 		/** Include assert statements in compiled output. */
 		checkAssertions = false
 		/** Script output style. (OBF, PRETTY, DETAILED)*/
-		style = "OBF"
+		style = "DETAILED"
 		/** Sets the optimization level used by the compiler. 
 		 * 0=none 9=maximum. */
 		optimize = 9
@@ -104,7 +104,7 @@ gwt {
 		/** Emit extra information allow chrome dev tools to display 
 		 * Java identifiers in many places instead of JavaScript functions.
 		 * (NONE, ONLY_METHOD_NAME, ABBREVIATED, FULL)*/
-		methodNameDisplayMode = "ONLY_METHOD_NAME"
+		methodNameDisplayMode = "FULL"
 		/** Specifies JsInterop mode (NONE, JS, CLOSURE) */
 		//jsInteropMode = "JS"
 		/** Generate and export JsInterop (since GWT 2.8) */

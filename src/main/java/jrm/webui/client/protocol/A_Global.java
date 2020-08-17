@@ -88,5 +88,20 @@ public class A_Global extends A_
 		}
 	}
 
-	
+	public static class MultiCMD extends A_
+	{
+		public MultiCMD(final A_ a)
+		{
+			super(a.response);
+		}
+		
+		public A_[] getSubCMDs()
+		{
+			final var jsa = response.getJSAJSO("params");
+			final A_[] subcmds = new A_[jsa.length()];
+			for(int i = 0; i < jsa.length(); i++)
+				subcmds[i] =  new A_(jsa.get(i).cast());
+			return subcmds;
+		}
+	}
 }

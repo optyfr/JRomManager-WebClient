@@ -8,7 +8,11 @@ import java.util.Map;
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window.Location;
-import com.smartgwt.client.data.*;
+import com.smartgwt.client.data.DSCallback;
+import com.smartgwt.client.data.DSRequest;
+import com.smartgwt.client.data.DSResponse;
+import com.smartgwt.client.data.Record;
+import com.smartgwt.client.data.RecordList;
 import com.smartgwt.client.rpc.RPCCallback;
 import com.smartgwt.client.rpc.RPCManager;
 import com.smartgwt.client.rpc.RPCRequest;
@@ -25,7 +29,16 @@ import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
 
 import jrm.webui.client.Client;
-import jrm.webui.client.protocol.*;
+import jrm.webui.client.protocol.A_CatVer;
+import jrm.webui.client.protocol.A_Compressor;
+import jrm.webui.client.protocol.A_Dat2Dir;
+import jrm.webui.client.protocol.A_Global;
+import jrm.webui.client.protocol.A_NPlayers;
+import jrm.webui.client.protocol.A_Profile;
+import jrm.webui.client.protocol.A_Progress;
+import jrm.webui.client.protocol.A_Report;
+import jrm.webui.client.protocol.A_ReportLite;
+import jrm.webui.client.protocol.A_TrntChk;
 import jrm.webui.client.utils.EnhJSO;
 
 public class MainWindow extends Window

@@ -197,4 +197,12 @@ public final class ScannerSettingsPanel extends SettingsForm
 			initPropertyItemValues(settings);
 	}
 
+	@Override
+	protected void updateDisabled()
+	{
+		getItem("chckbxCreateOnlyComplete").setDisabled(getValue("chckbxCreateMissingSets").equals(false));
+		getItem("cbHashCollision").setDisabled(!(getValue("cbbxMergeMode").equals("MERGE") || getValue("cbbxMergeMode").equals("FULLMERGE")));
+		super.updateDisabled();
+	}
+	
 }
