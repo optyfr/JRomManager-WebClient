@@ -49,9 +49,9 @@ public class A_Progress extends A_
 			return params.getInt("threadCnt");
 		}
 		
-		final public boolean getMultipleSubInfos()
+		final public Boolean getMultipleSubInfos()
 		{
-			return params.getBool("multipleSubInfos");
+			return params.getBoolean("multipleSubInfos");
 		}
 	}
 
@@ -126,9 +126,9 @@ public class A_Progress extends A_
 				return getJSAStrJSO("subinfos");
 			}
 			
-			final public boolean isMultipleSubInfos()
+			final public Boolean isMultipleSubInfos()
 			{
-				return getBool("multipleSubInfos");
+				return getBoolean("multipleSubInfos");
 			}
 			
 			final public int getThreadCnt()

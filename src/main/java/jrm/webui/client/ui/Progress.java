@@ -149,12 +149,12 @@ public class Progress extends Window
 		packHeight();
 	}
 
-	public void setInfos(int threadCnt, boolean multipleSubInfos)
+	public void setInfos(int threadCnt, Boolean multipleSubInfos)
 	{
 		panel.removeMembers(panel.getMembers());
 
 		lblInfo = new Label[threadCnt];
-		lblSubInfo = new Label[multipleSubInfos ? threadCnt : 1];
+		lblSubInfo = new Label[multipleSubInfos == null ? 0 : (multipleSubInfos ? threadCnt : 1)];
 
 		for (int i = 0; i < threadCnt; i++)
 		{
@@ -169,7 +169,7 @@ public class Progress extends Window
 			lblInfo[i].setShowHover(true);
 			panel.addMember(lblInfo[i]);
 
-			if (multipleSubInfos)
+			if (multipleSubInfos!=null && multipleSubInfos)
 			{
 				lblSubInfo[i] = new Label();
 				lblSubInfo[i].setWidth100();
@@ -183,7 +183,7 @@ public class Progress extends Window
 				panel.addMember(lblSubInfo[i]);
 			}
 		}
-		if (!multipleSubInfos)
+		if (multipleSubInfos!=null && !multipleSubInfos)
 		{
 			lblSubInfo[0] = new Label();
 			lblSubInfo[0].setWidth100();

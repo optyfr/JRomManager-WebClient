@@ -193,7 +193,7 @@ public class Client implements EntryPoint
 				if(response.getHttpResponseCode() == 200)
 				{
 					processCmd(rawData.toString());
-					lprTimer.schedule(100);
+					lprTimer.schedule(125);
 				}
 				else if(response.getHttpResponseCode() == 401)	// Session lost => reload page
 					com.google.gwt.user.client.Window.Location.reload();
