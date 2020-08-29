@@ -47,6 +47,13 @@ public class Progress extends Window
 	/** The lbl time left 2. */
 	private final Label lblTimeLeft2;
 
+	/** The progress bar 3. */
+	private final Progressbar progressBar3;
+	private final Label progressBarLabel3;
+
+	/** The lbl time left 3. */
+	private final Label lblTimeLeft3;
+
 	public Progress()
 	{
 		super();
@@ -111,6 +118,21 @@ public class Progress extends Window
 		progressBarLabel2.setAlign(Alignment.CENTER);
 		progressBar2.addChild(progressBarLabel2, "label", true);
 
+		progressBar3 = new Progressbar();
+		progressBar3.setLength("100%");
+		
+		lblTimeLeft3 = new Label("<code>--:--:--/--:--:--</code>");
+		lblTimeLeft3.setWidth("*");
+		lblTimeLeft3.setWrap(false);
+		lblTimeLeft3.setHeight(20);
+		lblTimeLeft3.setValign(VerticalAlignment.CENTER);
+		lblTimeLeft3.setAlign(Alignment.CENTER);
+
+		progressBarLabel3 = new Label();
+		progressBarLabel3.setWidth100();
+		progressBarLabel3.setAlign(Alignment.CENTER);
+		progressBar3.addChild(progressBarLabel3, "label", true);
+
 		btnCancel = new IButton("Cancel");
 		btnCancel.setPadding(2);
 		btnCancel.setLayoutAlign(Alignment.CENTER);
@@ -139,6 +161,14 @@ public class Progress extends Window
 						setHeight(10);
 						setMembersMargin(2);
 						addMembers(progressBar2, lblTimeLeft2);
+					}
+				}, new HLayout()
+				{
+					{
+						setWidth100();
+						setHeight(10);
+						setMembersMargin(2);
+						addMembers(progressBar3, lblTimeLeft3);
 					}
 				}, btnCancel);
 			}
@@ -265,6 +295,32 @@ public class Progress extends Window
 			}
 			else
 				lblTimeLeft2.setContents("<code>--:--:--/--:--:--</code>");
+		}
+		if (progressBar3.isVisible() != pd.getPB3().isVisible())
+		{
+			progressBar3.setVisibility(pd.getPB3().isVisible() ? Visibility.INHERIT : Visibility.HIDDEN);
+			lblTimeLeft3.setVisibility(progressBar3.getVisibility());
+			packHeight();
+		}
+		if (pd.getPB3().isVisible())
+		{
+			if(pd.getPB3().isIndeterminate())
+			{
+				progressBar3.setPercentDone(0);
+				progressBarLabel3.setContents("<center><img height='16' width='16' src='/images/loading.gif'></center>");
+			}
+			else if (pd.getPB3().getPerc() >= 0)
+			{
+				if (progressBar3.getPercentDone() != (int) pd.getPB3().getPerc())
+					progressBar3.setPercentDone((int) pd.getPB3().getPerc());
+				if (pd.getPB3().hasStringPainted())
+					progressBarLabel3.setContents(Optional.ofNullable(pd.getPB3().getMsg()).orElse(""));
+				else
+					progressBarLabel3.setContents("");
+				lblTimeLeft3.setContents("<code>" + pd.getPB3().getTimeleft() + "</code>");
+			}
+			else
+				lblTimeLeft3.setContents("<code>--:--:--/--:--:--</code>");
 		}
 	}
 

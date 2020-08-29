@@ -146,6 +146,11 @@ public class A_Progress extends A_
 				return getJSO("pb2");
 			}
 			
+			final public Progress getPB3()
+			{
+				return getJSO("pb3");
+			}
+			
 			public static class Progress extends EnhJSO
 			{
 				protected Progress()
