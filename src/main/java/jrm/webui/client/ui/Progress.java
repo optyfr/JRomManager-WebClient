@@ -101,6 +101,7 @@ public class Progress extends Window
 		progressBarLabel = new Label();
 		progressBarLabel.setWidth100();
 		progressBarLabel.setAlign(Alignment.CENTER);
+		progressBarLabel.setWrap(false);
 		progressBar.addChild(progressBarLabel, "label", true);
 
 		progressBar2 = new Progressbar();
@@ -116,6 +117,7 @@ public class Progress extends Window
 		progressBarLabel2 = new Label();
 		progressBarLabel2.setWidth100();
 		progressBarLabel2.setAlign(Alignment.CENTER);
+		progressBarLabel2.setWrap(false);
 		progressBar2.addChild(progressBarLabel2, "label", true);
 
 		progressBar3 = new Progressbar();
@@ -131,6 +133,7 @@ public class Progress extends Window
 		progressBarLabel3 = new Label();
 		progressBarLabel3.setWidth100();
 		progressBarLabel3.setAlign(Alignment.CENTER);
+		progressBarLabel3.setWrap(false);
 		progressBar3.addChild(progressBarLabel3, "label", true);
 
 		btnCancel = new IButton("Cancel");
@@ -150,7 +153,6 @@ public class Progress extends Window
 				{
 					{
 						setWidth100();
-						setHeight(10);
 						setMembersMargin(2);
 						addMembers(progressBar, lblTimeleft);
 					}
@@ -158,7 +160,6 @@ public class Progress extends Window
 				{
 					{
 						setWidth100();
-						setHeight(10);
 						setMembersMargin(2);
 						addMembers(progressBar2, lblTimeLeft2);
 					}
@@ -166,7 +167,6 @@ public class Progress extends Window
 				{
 					{
 						setWidth100();
-						setHeight(10);
 						setMembersMargin(2);
 						addMembers(progressBar3, lblTimeLeft3);
 					}
