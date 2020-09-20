@@ -74,6 +74,7 @@ abstract class SettingsForm extends DynamicForm
 		put("txt7ZThreads", "7z_threads");
 		put("chkbx7ZSolid", "7z_solid");
 		put("cbDbgLevel", "debug_level");
+		put("cbThreadCount", "thread_count");
 	}};
 
 	public SettingsForm()

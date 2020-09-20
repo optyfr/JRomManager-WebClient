@@ -50,6 +50,7 @@ public class MainWindow extends Window
 	BatchTrrntChkPanel batchTrrntChkPanel;
 	BatchCompressorPanel batchCompressorPanel;
 	Dir2DatPanel dir2datPanel;
+	SettingsGenPanel settingsGenPanel;
 	SettingsCompressorPanel settingsCompressorPanel;
 	SettingsDebugPanel settingsDebugPanel;
 	private Progress progress = null;
@@ -158,6 +159,15 @@ public class MainWindow extends Window
 							TabBarControls.TAB_SCROLLER,
 							TabBarControls.TAB_PICKER
 						);
+					addTab(new Tab() {{
+						setIcon("icons/cog.png"); //$NON-NLS-1$
+						setTitle("General"); //$NON-NLS-1$
+						setPane(new VLayout() {{
+							addMember(new LayoutSpacer("*","*")); //$NON-NLS-1$ //$NON-NLS-2$
+							addMember(settingsGenPanel = new SettingsGenPanel());
+							addMember(new LayoutSpacer("*","*")); //$NON-NLS-1$ //$NON-NLS-2$
+						}});
+					}});
 					addTab(new Tab() {{
 						setIcon("icons/compress.png"); //$NON-NLS-1$
 						setTitle(Client.session.getMsg("MainFrame.Compressors")); //$NON-NLS-1$
