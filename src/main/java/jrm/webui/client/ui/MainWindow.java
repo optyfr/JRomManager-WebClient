@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.user.client.Cookies;
@@ -18,6 +19,7 @@ import com.smartgwt.client.rpc.RPCManager;
 import com.smartgwt.client.rpc.RPCRequest;
 import com.smartgwt.client.rpc.RPCResponse;
 import com.smartgwt.client.types.TabBarControls;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
 import com.smartgwt.client.widgets.events.CloseClickHandler;
@@ -251,6 +253,8 @@ public class MainWindow extends Window
 	public void update(A_Progress.Close params)
 	{
 		progress.close();
+		if(params.hasErrors())
+			SC.warn(params.getErrors().stream().map(str->"<pre>"+str+"</pre>").collect(Collectors.joining()));
 	}
 	
 	public void update(A_Progress.SetInfos params)

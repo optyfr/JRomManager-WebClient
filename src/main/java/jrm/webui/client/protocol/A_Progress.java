@@ -1,5 +1,8 @@
 package jrm.webui.client.protocol;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.core.client.JsArrayString;
 
 import jrm.webui.client.utils.EnhJSO;
@@ -18,14 +21,31 @@ public class A_Progress extends A_
 	
 	public static class Close extends A_
 	{
+		private EnhJSO params;
+
 		public Close(final A_ a)
 		{
 			this(a.response);
+			params = response.getJSO("params");
 		}
 		
 		public Close(final EnhJSO response)
 		{
 			super(response);
+		}
+		
+		public boolean hasErrors()
+		{
+			return ((JsArrayString) params.getJSO("errors")).length() > 0;
+		}
+		
+		public List<String> getErrors()
+		{
+			final JsArrayString errors = params.getJSO("errors");
+			final List<String> result = new ArrayList<>();
+			for (int i = 0; i < errors.length(); i++)
+				result.add(errors.get(i));
+			return result;
 		}
 	}
 	
