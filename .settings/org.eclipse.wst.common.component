@@ -3,6 +3,5 @@
 	<wb-module deploy-name="WebClient">
 		<property name="context-root" value="release"/>
 		<wb-resource deploy-path="/WEB-INF/classes" source-path="src/main/java"/>
-		<wb-resource deploy-path="/" source-path="src/main/webapp"/>
 	</wb-module>
 </project-modules>
