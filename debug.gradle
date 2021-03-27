@@ -55,9 +55,9 @@ apply plugin: 'war'
 apply plugin: 'de.esoco.gwt'
 
 dependencies {
-	compile files(SmartGWT)
-	compile files(SmartGWTSkins)
-	compile group: 'com.sksamuel.gwt', name: 'gwt-websockets', version: '1.+'
+	implementation files(SmartGWT)
+	implementation files(SmartGWTSkins)
+	implementation group: 'com.sksamuel.gwt', name: 'gwt-websockets', version: '1.+'
 }
 
 sourceSets {
@@ -124,9 +124,9 @@ gwt {
 task webZip(type: Zip) {
 	from ("$buildDir/gwt/out/smartgwt")
 	into "webclient"
-	baseName='debug'
-	archiveName baseName + '.' + extension
-	destinationDir = file("$buildDir/distributions")
+	archiveBaseName = 'debug'
+	archiveFileName = 'debug.zip'
+	destinationDirectory = file("$buildDir/distributions")
 }
 
 build.dependsOn webZip
@@ -148,5 +148,5 @@ gwtCompile {
 }
 
 war {
-	baseName='debug'
+	archiveBaseName = 'debug'
 }
