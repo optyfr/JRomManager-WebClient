@@ -77,7 +77,7 @@ public class ProfileViewer extends Window
 			});
 			addDataArrivedHandler(event->{
 				getDataSource().setRequestProperties(new DSRequest());
-				if(getTotalRows()>0 && !anySelected())
+				if(getTotalRows()>0 && !Boolean.TRUE.equals(anySelected()))
 					selectSingleRecord(0);
 			});
 			setDataSource(
@@ -131,7 +131,7 @@ public class ProfileViewer extends Window
 					put("reset","true");
 				}});
 			}});
-			if(willFetchData(null))
+			if(Boolean.TRUE.equals(willFetchData(null)))
 				fetchData();
 			else
 				refreshData();
@@ -200,7 +200,7 @@ public class ProfileViewer extends Window
 						selectSingleRecord(to_select);
 						to_select=null;
 					}
-					else if(!anySelected())
+					else if(!Boolean.TRUE.equals(anySelected()))
 						selectSingleRecord(0);
 				}
 				refreshFields();
@@ -213,10 +213,10 @@ public class ProfileViewer extends Window
 					{
 						try
 						{
-							Integer idx = Integer.valueOf(dsResponse.getAttribute("found"));
+							final var idx = Integer.valueOf(dsResponse.getAttribute("found"));
 							if(idx!=null)
 							{
-								Record record = getRecordList().get(idx);
+								final var record = getRecordList().get(idx);
 								if(record==null || record.getAttribute("name")==null)
 									to_select = idx;
 								else
@@ -226,7 +226,7 @@ public class ProfileViewer extends Window
 						}
 						catch(NumberFormatException e)
 						{
-							e.printStackTrace();
+							// do nothing
 						}
 					}
 				};
@@ -355,7 +355,7 @@ public class ProfileViewer extends Window
 				}});
 			}});
 			ismachinelist =  "*".equals(record.getAttribute("name"));
-			if(willFetchData(new Criteria() {{addCriteria("list", record.getAttribute("name"));}}))
+			if(Boolean.TRUE.equals(willFetchData(new Criteria() {{addCriteria("list", record.getAttribute("name"));}})))
 				fetchRelatedData(record, ds);
 			else
 				refreshData();
@@ -544,7 +544,7 @@ public class ProfileViewer extends Window
 					put("reset","true");
 				}});
 			}});
-			if(willFetchData(new Criteria() {{addCriteria("list", record.getAttribute("list"));addCriteria("ware", record.getAttribute("name"));}}))
+			if(Boolean.TRUE.equals(willFetchData(new Criteria() {{addCriteria("list", record.getAttribute("list"));addCriteria("ware", record.getAttribute("name"));}})))
 				fetchRelatedData(record, ds);
 			else
 				refreshData();
