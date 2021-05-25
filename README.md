@@ -3,7 +3,6 @@
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=optyfr_JRomManager-WebClient&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=optyfr_JRomManager-WebClient)
 
 ![GitHub top language](https://img.shields.io/github/languages/top/optyfr/JRomManager-WebClient)
-![Gradle Build](https://github.com/optyfr/JRomManager-WebClient/actions/workflows/gradle.yml/badge.svg)
 ![GitHub](https://img.shields.io/github/license/optyfr/JRomManager-WebClient)
 
 
