@@ -90,11 +90,11 @@ public class ProfileViewer extends Window
 					);
 					setFields(
 						new DataSourceTextField("status"),
-						new DataSourceTextField("name",Client.session.getMsg("SoftwareListListRenderer.Name")) {{
+						new DataSourceTextField("name",Client.getSession().getMsg("SoftwareListListRenderer.Name")) {{
 							setPrimaryKey(true);
 						}},
-						new DataSourceTextField("description", Client.session.getMsg("SoftwareListListRenderer.Description")),
-						new DataSourceTextField("have", Client.session.getMsg("SoftwareListListRenderer.Have"))
+						new DataSourceTextField("description", Client.getSession().getMsg("SoftwareListListRenderer.Description")),
+						new DataSourceTextField("have", Client.getSession().getMsg("SoftwareListListRenderer.Have"))
 					);
 				}}, 
 				new ListGridField("name") {{
@@ -173,16 +173,16 @@ public class ProfileViewer extends Window
 			setAllowFilterOperators(false);
 			setContextMenu(new Menu() {{
 				setItems(
-					new MenuItem(Client.session.getMsg("ProfileViewer.mntmCollectKeywords.text")) {{
+					new MenuItem(Client.getSession().getMsg("ProfileViewer.mntmCollectKeywords.text")) {{
 						
 					}},
-					new MenuItem(Client.session.getMsg("ProfileViewer.mntmSelectNone.text")) {{
+					new MenuItem(Client.getSession().getMsg("ProfileViewer.mntmSelectNone.text")) {{
 						addClickHandler(event->AnywareList.this.getDataSource().performCustomOperation("selectNone", new Record(AnywareList.this.getCriteria().getValues()), (dsResponse, data, dsRequest)->AnywareList.this.refreshData()));
 					}},
-					new MenuItem(Client.session.getMsg("ProfileViewer.mntmSelectAll.text")) {{
+					new MenuItem(Client.getSession().getMsg("ProfileViewer.mntmSelectAll.text")) {{
 						addClickHandler(event->AnywareList.this.getDataSource().performCustomOperation("selectAll", new Record(AnywareList.this.getCriteria().getValues()), (dsResponse, data, dsRequest)->AnywareList.this.refreshData()));
 					}},
-					new MenuItem(Client.session.getMsg("ProfileViewer.mntmSelectInvert.text")) {{
+					new MenuItem(Client.getSession().getMsg("ProfileViewer.mntmSelectInvert.text")) {{
 						addClickHandler(event->AnywareList.this.getDataSource().performCustomOperation("selectInvert", new Record(AnywareList.this.getCriteria().getValues()), (dsResponse, data, dsRequest)->AnywareList.this.refreshData()));
 					}}
 				);
@@ -282,22 +282,22 @@ public class ProfileViewer extends Window
 						super.transformResponse(dsResponse, dsRequest, data);
 					}
 				}, 
-				new ListGridField("status",Client.session.getMsg("MachineListRenderer.Status"),24) {{
+				new ListGridField("status",Client.getSession().getMsg("MachineListRenderer.Status"),24) {{
 					setValueIcons(status_icons);
 					setShowValueIconOnly(true);
 					setAlign(Alignment.CENTER);
 					setCanEdit(false);
 					setCanFilter(false);
 				}},
-				new ListGridField("name",Client.session.getMsg("MachineListRenderer.Name")) {{
+				new ListGridField("name",Client.getSession().getMsg("MachineListRenderer.Name")) {{
 					setMinWidth(70);
 					setWidth("15%");
 					setCanEdit(false);
 				}},
-				new ListGridField("description",Client.session.getMsg("MachineListRenderer.Description")) {{
+				new ListGridField("description",Client.getSession().getMsg("MachineListRenderer.Description")) {{
 					setCanEdit(false);
 				}},
-				new ListGridField("have",Client.session.getMsg("MachineListRenderer.Have")) {{
+				new ListGridField("have",Client.getSession().getMsg("MachineListRenderer.Have")) {{
 					setMinWidth(40);
 					setWidth("8%");
 					setAlign(Alignment.CENTER);
@@ -305,24 +305,24 @@ public class ProfileViewer extends Window
 					setCanFilter(false);
 					setCanSort(false);
 				}},
-				new ListGridField("cloneof",Client.session.getMsg("MachineListRenderer.CloneOf")) {{
+				new ListGridField("cloneof",Client.getSession().getMsg("MachineListRenderer.CloneOf")) {{
 					setMinWidth(70);
 					setWidth("15%");
 					setCanEdit(false);
 				}},
-				new ListGridField("romof",Client.session.getMsg("MachineListRenderer.RomOf")) {{
-					setMinWidth(70);
-					setWidth("15%");
-					setCanEdit(false);
-					setShowIfCondition((grid, field, fieldNum)->ismachinelist);
-				}},
-				new ListGridField("sampleof",Client.session.getMsg("MachineListRenderer.SampleOf")) {{
+				new ListGridField("romof",Client.getSession().getMsg("MachineListRenderer.RomOf")) {{
 					setMinWidth(70);
 					setWidth("15%");
 					setCanEdit(false);
 					setShowIfCondition((grid, field, fieldNum)->ismachinelist);
 				}},
-				new ListGridField("selected",Client.session.getMsg("MachineListRenderer.Selected"),20) {{
+				new ListGridField("sampleof",Client.getSession().getMsg("MachineListRenderer.SampleOf")) {{
+					setMinWidth(70);
+					setWidth("15%");
+					setCanEdit(false);
+					setShowIfCondition((grid, field, fieldNum)->ismachinelist);
+				}},
+				new ListGridField("selected",Client.getSession().getMsg("MachineListRenderer.Selected"),20) {{
 					setAlign(Alignment.CENTER);
 					setCanToggle(true);
 					setCanSort(false);
@@ -472,17 +472,17 @@ public class ProfileViewer extends Window
 						new DataSourceTextField("sha1")
 					);
 				}}, 
-				new ListGridField("status",Client.session.getMsg("AnywareRenderer.Status"),24) {{
+				new ListGridField("status",Client.getSession().getMsg("AnywareRenderer.Status"),24) {{
 					setValueIcons(status_icons);
 					setShowValueIconOnly(true);
 					setAlign(Alignment.CENTER);
 					setCanEdit(false);
 				}},
-				new ListGridField("name",Client.session.getMsg("AnywareRenderer.Name")) {{
+				new ListGridField("name",Client.getSession().getMsg("AnywareRenderer.Name")) {{
 					setMinWidth(128);
 					setWidth("*");
 				}},
-				new ListGridField("size",Client.session.getMsg("AnywareRenderer.Size")) {{
+				new ListGridField("size",Client.getSession().getMsg("AnywareRenderer.Size")) {{
 					setMinWidth(48);
 					setAutoFitWidth(true);
 				}},
@@ -513,11 +513,11 @@ public class ProfileViewer extends Window
 						return null;
 					});
 				}},
-				new ListGridField("merge",Client.session.getMsg("AnywareRenderer.Merge")) {{
+				new ListGridField("merge",Client.getSession().getMsg("AnywareRenderer.Merge")) {{
 					setMinWidth(128);
 					setAutoFitWidth(true);
 				}},
-				new ListGridField("dumpstatus",Client.session.getMsg("AnywareRenderer.DumpStatus"),24) {{
+				new ListGridField("dumpstatus",Client.getSession().getMsg("AnywareRenderer.DumpStatus"),24) {{
 					setValueIcons(dumpstatus_icons);
 					setShowValueIconOnly(true);
 					setAlign(Alignment.CENTER);
@@ -554,8 +554,8 @@ public class ProfileViewer extends Window
 	public ProfileViewer()
 	{
 		super();
-		Client.childWindows.add(this);
-		setTitle(Client.session.getMsg("ProfileViewer.this.title"));
+		Client.getChildWindows().add(this);
+		setTitle(Client.getSession().getMsg("ProfileViewer.this.title"));
 		setWidth("80%");
 		setHeight("80%");
 		setAnimateMinimize(true);
@@ -586,7 +586,7 @@ public class ProfileViewer extends Window
 								setActionType(SelectionType.CHECKBOX);
 								setShowFocused(false);
 								setSelected(true);
-								setPrompt(Client.session.getMsg("ProfileViewer.tglbtnUnknownWL.toolTipText"));
+								setPrompt(Client.getSession().getMsg("ProfileViewer.tglbtnUnknownWL.toolTipText"));
 								addClickHandler(e->updateFilter());
 							}});
 							addButton(all_btn[1]=new ToolStripButton() {{
@@ -595,7 +595,7 @@ public class ProfileViewer extends Window
 								setActionType(SelectionType.CHECKBOX);
 								setShowFocused(false);
 								setSelected(true);
-								setPrompt(Client.session.getMsg("ProfileViewer.tglbtnMissingWL.toolTipText"));
+								setPrompt(Client.getSession().getMsg("ProfileViewer.tglbtnMissingWL.toolTipText"));
 								addClickHandler(e->updateFilter());
 							}});
 							addButton(all_btn[2]=new ToolStripButton() {{
@@ -604,7 +604,7 @@ public class ProfileViewer extends Window
 								setActionType(SelectionType.CHECKBOX);
 								setShowFocused(false);
 								setSelected(true);
-								setPrompt(Client.session.getMsg("ProfileViewer.tglbtnPartialWL.toolTipText"));
+								setPrompt(Client.getSession().getMsg("ProfileViewer.tglbtnPartialWL.toolTipText"));
 								addClickHandler(e->updateFilter());
 							}});
 							addButton(all_btn[3]=new ToolStripButton() {{
@@ -613,7 +613,7 @@ public class ProfileViewer extends Window
 								setActionType(SelectionType.CHECKBOX);
 								setShowFocused(false);
 								setSelected(true);
-								setPrompt(Client.session.getMsg("ProfileViewer.tglbtnCompleteWL.toolTipText"));
+								setPrompt(Client.getSession().getMsg("ProfileViewer.tglbtnCompleteWL.toolTipText"));
 								addClickHandler(e->updateFilter());
 							}});
 						}});
@@ -656,7 +656,7 @@ public class ProfileViewer extends Window
 								setActionType(SelectionType.CHECKBOX);
 								setShowFocused(false);
 								setSelected(true);
-								setPrompt(Client.session.getMsg("ProfileViewer.tglbtnMissingW.toolTipText"));
+								setPrompt(Client.getSession().getMsg("ProfileViewer.tglbtnMissingW.toolTipText"));
 								addClickHandler(e->updateFilter());
 							}});
 							addButton(al_btn[2]=new ToolStripButton() {{
@@ -665,7 +665,7 @@ public class ProfileViewer extends Window
 								setActionType(SelectionType.CHECKBOX);
 								setShowFocused(false);
 								setSelected(true);
-								setPrompt(Client.session.getMsg("ProfileViewer.tglbtnPartialW.toolTipText"));
+								setPrompt(Client.getSession().getMsg("ProfileViewer.tglbtnPartialW.toolTipText"));
 								addClickHandler(e->updateFilter());
 							}});
 							addButton(al_btn[3]=new ToolStripButton() {{
@@ -674,7 +674,7 @@ public class ProfileViewer extends Window
 								setActionType(SelectionType.CHECKBOX);
 								setShowFocused(false);
 								setSelected(true);
-								setPrompt(Client.session.getMsg("ProfileViewer.tglbtnCompleteW.toolTipText"));
+								setPrompt(Client.getSession().getMsg("ProfileViewer.tglbtnCompleteW.toolTipText"));
 								addClickHandler(e->updateFilter());
 							}});
 						}});
@@ -711,7 +711,7 @@ public class ProfileViewer extends Window
 							setActionType(SelectionType.CHECKBOX);
 							setShowFocused(false);
 							setSelected(true);
-							setPrompt(Client.session.getMsg("ProfileViewer.tglbtnUnknown.toolTipText"));
+							setPrompt(Client.getSession().getMsg("ProfileViewer.tglbtnUnknown.toolTipText"));
 							addClickHandler(e->updateFilter());
 						}});
 						addButton(a_btn[1]=new ToolStripButton() {{
@@ -720,7 +720,7 @@ public class ProfileViewer extends Window
 							setActionType(SelectionType.CHECKBOX);
 							setShowFocused(false);
 							setSelected(true);
-							setPrompt(Client.session.getMsg("ProfileViewer.tglbtnBad.toolTipText"));
+							setPrompt(Client.getSession().getMsg("ProfileViewer.tglbtnBad.toolTipText"));
 							addClickHandler(e->updateFilter());
 						}});
 						addButton(a_btn[2]=new ToolStripButton() {{
@@ -729,7 +729,7 @@ public class ProfileViewer extends Window
 							setActionType(SelectionType.CHECKBOX);
 							setShowFocused(false);
 							setSelected(true);
-							setPrompt(Client.session.getMsg("ProfileViewer.tglbtnOK.toolTipText"));
+							setPrompt(Client.getSession().getMsg("ProfileViewer.tglbtnOK.toolTipText"));
 							addClickHandler(e->updateFilter());
 						}});
 					}});
@@ -759,7 +759,7 @@ public class ProfileViewer extends Window
 	@Override
 	protected void onDestroy()
 	{
-		Client.childWindows.remove(this);
+		Client.getChildWindows().remove(this);
 		super.onDestroy();
 	}
 	

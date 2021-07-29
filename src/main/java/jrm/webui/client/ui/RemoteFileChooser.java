@@ -693,7 +693,7 @@ public final class RemoteFileChooser extends Window
 	public RemoteFileChooser(String context, String initialPath, CallBack cb)
 	{
 		super();
-		Client.childWindows.remove(this);
+		Client.getChildWindows().remove(this);
 		final Options options = new Options(context, initialPath);
 		setID("RemoteFileChooser_"+context);
 		setWidth(700);
@@ -946,7 +946,7 @@ public final class RemoteFileChooser extends Window
 	@Override
 	protected void onDestroy()
 	{
-		Client.childWindows.remove(this);
+		Client.getChildWindows().remove(this);
 		super.onDestroy();
 	}
 	

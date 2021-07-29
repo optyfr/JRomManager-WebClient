@@ -17,8 +17,8 @@ final public class ReportLite extends Window implements ReportStatus
 	public ReportLite(String src)
 	{
 		super();
-		Client.childWindows.add(this);
-		setTitle(Client.session.getMsg("ReportFrame.Title")+" - "+src);
+		Client.getChildWindows().add(this);
+		setTitle(Client.getSession().getMsg("ReportFrame.Title")+" - "+src);
 		setWidth("60%");
 		setHeight("80%");
 		setAnimateMinimize(true);
@@ -59,7 +59,7 @@ final public class ReportLite extends Window implements ReportStatus
 	@Override
 	protected void onDestroy()
 	{
-		Client.childWindows.remove(this);
+		Client.getChildWindows().remove(this);
 		super.onDestroy();
 	}
 	

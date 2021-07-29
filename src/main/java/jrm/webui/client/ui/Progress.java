@@ -57,7 +57,7 @@ public class Progress extends Window
 	public Progress()
 	{
 		super();
-		Client.childWindows.add(this);
+		Client.getChildWindows().add(this);
 		setIsModal(true);
 		setShowModalMask(true);
 		setWidth(500);
@@ -339,7 +339,7 @@ public class Progress extends Window
 	@Override
 	protected void onDestroy()
 	{
-		Client.childWindows.remove(this);
+		Client.getChildWindows().remove(this);
 		super.onDestroy();
 	}
 

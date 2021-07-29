@@ -97,12 +97,12 @@ final class ReportTree extends TreeGrid
 			dialog.setWidth(350);
 			setItems(
 				new MenuItem() {{
-					setTitle(Client.session.getMsg("ReportFrame.chckbxmntmShowOkEntries.text"));
+					setTitle(Client.getSession().getMsg("ReportFrame.chckbxmntmShowOkEntries.text"));
 					addClickHandler(e->Client.sendMsg(JsonUtils.stringify(Q_Report.SetFilter.instantiate(src!=null).setFilter("SHOWOK",  !(filters.containsKey("SHOWOK")&&filters.get("SHOWOK"))))));
 					setCheckIfCondition((target, menu, item)->filters.containsKey("SHOWOK")&&filters.get("SHOWOK"));
 				}},
 				new MenuItem() {{
-					setTitle(Client.session.getMsg("ReportFrame.chckbxmntmHideFullyMissing.text"));
+					setTitle(Client.getSession().getMsg("ReportFrame.chckbxmntmHideFullyMissing.text"));
 					addClickHandler(e->Client.sendMsg(JsonUtils.stringify(Q_Report.SetFilter.instantiate(src!=null).setFilter("HIDEMISSING", !(filters.containsKey("HIDEMISSING")&&filters.get("HIDEMISSING"))))));
 					setCheckIfCondition((target, menu, item)->filters.containsKey("HIDEMISSING")&&filters.get("HIDEMISSING"));
 				}},

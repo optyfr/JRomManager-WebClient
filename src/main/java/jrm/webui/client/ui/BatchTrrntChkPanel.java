@@ -68,10 +68,10 @@ public class BatchTrrntChkPanel extends VLayout
 							@Override
 							public String execute(Canvas target, Menu menu, MenuItem item)
 							{
-								return Client.session.getMsg(sdr.getSelectedRecords().length==1?"BatchToolsTrrntChkPanel.mntmUpdTorrent.text":"BatchToolsTrrntChkPanel.mntmAddTorrent.text");
+								return Client.getSession().getMsg(sdr.getSelectedRecords().length==1?"BatchToolsTrrntChkPanel.mntmUpdTorrent.text":"BatchToolsTrrntChkPanel.mntmAddTorrent.text");
 							}
 						});
-						addClickHandler(e -> new RemoteFileChooser("addTrnt", Client.session.getSetting("dir.addTrnt", null), new RemoteFileChooser.CallBack()
+						addClickHandler(e -> new RemoteFileChooser("addTrnt", Client.getSession().getSetting("dir.addTrnt", null), new RemoteFileChooser.CallBack()
 						{
 							private void addData(PathInfo[] pi, int i)
 							{
@@ -111,7 +111,7 @@ public class BatchTrrntChkPanel extends VLayout
 					addItem(new MenuItem() {{
 						setTitle("Set Destination");
 						setEnableIfCondition((target, menu, item)->sdr.getSelectedRecords().length==1);
-						addClickHandler(e -> new RemoteFileChooser("updTrnt", Client.session.getSetting("dir.updTrnt", null), new RemoteFileChooser.CallBack()
+						addClickHandler(e -> new RemoteFileChooser("updTrnt", Client.getSession().getSetting("dir.updTrnt", null), new RemoteFileChooser.CallBack()
 						{
 							private void updData(PathInfo[] pi, int start, int i)
 							{
@@ -134,7 +134,7 @@ public class BatchTrrntChkPanel extends VLayout
 						}));
 					}});
 					addItem(new MenuItem() {{
-						setTitle(Client.session.getMsg("BatchToolsTrrntChkPanel.mntmDelTorrent.text"));
+						setTitle(Client.getSession().getMsg("BatchToolsTrrntChkPanel.mntmDelTorrent.text"));
 						setEnableIfCondition((target, menu, item)->sdr.getSelectedRecords().length>0);
 						addClickHandler(e -> sdr.removeSelectedData());
 					}});
@@ -160,14 +160,14 @@ public class BatchTrrntChkPanel extends VLayout
 					);
 				}});
 				setFields(
-					new ListGridField("src",Client.session.getMsg("MainFrame.TorrentFiles")) {{
+					new ListGridField("src",Client.getSession().getMsg("MainFrame.TorrentFiles")) {{
 						setWidth("35%");
 						setCanEdit(false);
 					}},
-					new ListGridField("dst",Client.session.getMsg("MainFrame.DstDirs")) {{
+					new ListGridField("dst",Client.getSession().getMsg("MainFrame.DstDirs")) {{
 						setCanEdit(false);
 					}},
-					new ListGridField("result",Client.session.getMsg("MainFrame.Result")) {{
+					new ListGridField("result",Client.getSession().getMsg("MainFrame.Result")) {{
 						setWidth("35%");
 						setCanEdit(false);
 					}},
@@ -208,7 +208,7 @@ public class BatchTrrntChkPanel extends VLayout
 						setContextMenu(new Menu() {{
 							setItems(
 								new MenuItem() {{
-									setTitle(Client.session.getMsg("ReportFrame.chckbxmntmShowOkEntries.text"));
+									setTitle(Client.getSession().getMsg("ReportFrame.chckbxmntmShowOkEntries.text"));
 									addClickHandler(e->{
 										grid.getDataSource().getRequestProperties().setData(new HashMap<String,String>() {{
 											put("src", record.getAttribute("src"));
@@ -326,31 +326,31 @@ public class BatchTrrntChkPanel extends VLayout
 				new SelectItem() {{
 					setValueMap("FILENAME","FILESIZE","SHA1");
 					setWidth(100);
-					setTitle(Client.session.getMsg("BatchToolsTrrntChkPanel.lblCheckMode.text"));
-					setDefaultValue(Client.session.getSetting("trntchk.mode","FILENAME"));
+					setTitle(Client.getSession().getMsg("BatchToolsTrrntChkPanel.lblCheckMode.text"));
+					setDefaultValue(Client.getSession().getSetting("trntchk.mode","FILENAME"));
 					addChangedHandler(e->{
 						Client.sendMsg(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("trntchk.mode", (String)e.getValue())));
 						e.getForm().getItem("remove_wrong_sized_files").setDisabled("FILENAME".equals(e.getValue()));
 					});
 				}},
 				new CheckboxItem() {{
-					setTitle(Client.session.getMsg("BatchTrrntChkPanel.chckbxDetectArchivedFolder.text"));
-					setDefaultValue(Client.session.getSettingAsBoolean("trntchk.detect_archived_folders",true));
+					setTitle(Client.getSession().getMsg("BatchTrrntChkPanel.chckbxDetectArchivedFolder.text"));
+					setDefaultValue(Client.getSession().getSettingAsBoolean("trntchk.detect_archived_folders",true));
 					addChangedHandler(e->Client.sendMsg(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("trntchk.detect_archived_folders", (Boolean)e.getValue()))));
 				}},
 				new CheckboxItem() {{
-					setTitle(Client.session.getMsg("BatchToolsTrrntChkPanel.chckbxRemoveUnknownFiles.text"));
-					setDefaultValue(Client.session.getSettingAsBoolean("trntchk.remove_unknown_files",false));
+					setTitle(Client.getSession().getMsg("BatchToolsTrrntChkPanel.chckbxRemoveUnknownFiles.text"));
+					setDefaultValue(Client.getSession().getSettingAsBoolean("trntchk.remove_unknown_files",false));
 					addChangedHandler(e->Client.sendMsg(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("trntchk.remove_unknown_files", (Boolean)e.getValue()))));
 				}},
 				new CheckboxItem("remove_wrong_sized_files") {{
-					setTitle(Client.session.getMsg("BatchToolsTrrntChkPanel.chckbxRemoveWrongSized.text"));
-					setDefaultValue(Client.session.getSettingAsBoolean("trntchk.remove_wrong_sized_files",false));
-					setDisabled("FILENAME".equals(Client.session.getSetting("trntchk.mode","FILENAME")));
+					setTitle(Client.getSession().getMsg("BatchToolsTrrntChkPanel.chckbxRemoveWrongSized.text"));
+					setDefaultValue(Client.getSession().getSettingAsBoolean("trntchk.remove_wrong_sized_files",false));
+					setDisabled("FILENAME".equals(Client.getSession().getSetting("trntchk.mode","FILENAME")));
 					addChangedHandler(e->Client.sendMsg(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("trntchk.remove_wrong_sized_files", (Boolean)e.getValue()))));
 				}},
 				new ButtonItem() {{
-					setTitle(Client.session.getMsg("BatchToolsTrrntChkPanel.TrntCheckStart.text"));
+					setTitle(Client.getSession().getMsg("BatchToolsTrrntChkPanel.TrntCheckStart.text"));
 					setIcon("icons/bullet_go.png");
 					setAlign(Alignment.RIGHT);
 					setStartRow(false);

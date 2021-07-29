@@ -62,7 +62,7 @@ public final class ScannerAdvFiltersPanel extends HLayout
 				ob.setOperationType(DSOperationType.FETCH);
 				ob.setDataProtocol(DSProtocol.POSTXML);
 				setOperationBindings(ob);
-				addField(new DataSourceTextField("Name",Client.session.getMsg("MainFrame.NPlayers")));
+				addField(new DataSourceTextField("Name",Client.getSession().getMsg("MainFrame.NPlayers")));
 				DataSourceField dsf = new DataSourceTextField("ID");
 				dsf.setPrimaryKey(true);
 				dsf.setHidden(true);
@@ -96,13 +96,13 @@ public final class ScannerAdvFiltersPanel extends HLayout
 			field.setCellFormatter((value, record, rowNum, colNum) -> value + " (" + record.getAttribute("Cnt") + ")");
 			setFields(field);
 			Menu menu = new Menu();
-			MenuItem item = new MenuItem(Client.session.getMsg("MainFrame.SelectAll"));
+			MenuItem item = new MenuItem(Client.getSession().getMsg("MainFrame.SelectAll"));
 			item.addClickHandler(event->nplayers_list.selectAllRecords());
 			menu.addItem(item);
-			item = new MenuItem(Client.session.getMsg("MainFrame.SelectNone"));
+			item = new MenuItem(Client.getSession().getMsg("MainFrame.SelectNone"));
 			item.addClickHandler(event->nplayers_list.deselectAllRecords());
 			menu.addItem(item);
-			item = new MenuItem(Client.session.getMsg("MainFrame.InvertSelection"));
+			item = new MenuItem(Client.getSession().getMsg("MainFrame.InvertSelection"));
 			item.addClickHandler(event->{
 				ListGridRecord[] to_unselect = nplayers_list.getSelectedRecords();
 				List<ListGridRecord> to_unselect_list = Arrays.asList(to_unselect);
@@ -114,7 +114,7 @@ public final class ScannerAdvFiltersPanel extends HLayout
 			item = new MenuItem();
 			item.setIsSeparator(true);
 			menu.addItem(item);
-			item = new MenuItem(Client.session.getMsg("ScannerAdvFilterPanel.mntmClear_1.text"));
+			item = new MenuItem(Client.getSession().getMsg("ScannerAdvFilterPanel.mntmClear_1.text"));
 			item.addClickHandler(event->Client.sendMsg(JsonUtils.stringify(Q_NPlayers.Load.instantiate().setPath(null))));
 			menu.addItem(item);
 			setContextMenu(menu);
@@ -136,7 +136,7 @@ public final class ScannerAdvFiltersPanel extends HLayout
 				ob.setOperationType(DSOperationType.FETCH);
 				ob.setDataProtocol(DSProtocol.POSTXML);
 				setOperationBindings(ob);
-				DataSourceField dsf = new DataSourceTextField("Name",Client.session.getMsg("MainFrame.Categories"));
+				DataSourceField dsf = new DataSourceTextField("Name",Client.getSession().getMsg("MainFrame.Categories"));
 				addField(dsf);
 				dsf = new DataSourceTextField("ID");
 				dsf.setPrimaryKey(true);
@@ -183,7 +183,7 @@ public final class ScannerAdvFiltersPanel extends HLayout
 			tree.setIsFolderProperty("isFolder");
 			setDataProperties(tree);
 			setSelectionProperty("isSelected");
-			setTreeFieldTitle(Client.session.getMsg("MainFrame.Categories"));
+			setTreeFieldTitle(Client.getSession().getMsg("MainFrame.Categories"));
 			setNodeIcon(null);
 			setFolderIcon(null);
 			addSelectionChangedHandler(event -> {
@@ -217,27 +217,27 @@ public final class ScannerAdvFiltersPanel extends HLayout
 			setFields(field);
 			Menu menu = new Menu();
 			MenuItem mnitem = new MenuItem();
-			mnitem.setTitle(Client.session.getMsg("MainFrame.Select"));
+			mnitem.setTitle(Client.getSession().getMsg("MainFrame.Select"));
 			Menu smenu = new Menu();
 			MenuItem smnitem = new MenuItem();
-			smnitem.setTitle(Client.session.getMsg("MainFrame.All"));
+			smnitem.setTitle(Client.getSession().getMsg("MainFrame.All"));
 			smnitem.addClickHandler(event->catver_tree.selectAllRecords());
 			smenu.addItem(smnitem);
 			smnitem = new MenuItem();
-			smnitem.setTitle(Client.session.getMsg("MainFrame.Mature"));
+			smnitem.setTitle(Client.getSession().getMsg("MainFrame.Mature"));
 			smnitem.addClickHandler(event->catver_tree.selectRecords(catver_tree.getData().findAll(new AdvancedCriteria("Name", OperatorId.ENDS_WITH, "* Mature *"))));
 			smenu.addItem(smnitem);
 			mnitem.setSubmenu(smenu);
 			menu.addItem(mnitem);
 			mnitem = new MenuItem();
-			mnitem.setTitle(Client.session.getMsg("MainFrame.Unselect"));
+			mnitem.setTitle(Client.getSession().getMsg("MainFrame.Unselect"));
 			smenu = new Menu();
 			smnitem = new MenuItem();
-			smnitem.setTitle(Client.session.getMsg("MainFrame.All"));
+			smnitem.setTitle(Client.getSession().getMsg("MainFrame.All"));
 			smnitem.addClickHandler(event->catver_tree.deselectAllRecords());
 			smenu.addItem(smnitem);
 			smnitem = new MenuItem();
-			smnitem.setTitle(Client.session.getMsg("MainFrame.Mature"));
+			smnitem.setTitle(Client.getSession().getMsg("MainFrame.Mature"));
 			smnitem.addClickHandler(event->catver_tree.deselectRecords(catver_tree.getData().findAll(new AdvancedCriteria("Name", OperatorId.ENDS_WITH, "* Mature *"))));
 			smenu.addItem(smnitem);
 			mnitem.setSubmenu(smenu);
@@ -245,7 +245,7 @@ public final class ScannerAdvFiltersPanel extends HLayout
 			mnitem = new MenuItem();
 			mnitem.setIsSeparator(true);
 			menu.addItem(mnitem);
-			mnitem = new MenuItem(Client.session.getMsg("ScannerAdvFilterPanel.mntmClear.text"));
+			mnitem = new MenuItem(Client.getSession().getMsg("ScannerAdvFilterPanel.mntmClear.text"));
 			mnitem.addClickHandler(event->Client.sendMsg(JsonUtils.stringify(Q_CatVer.Load.instantiate().setPath(null))));
 			menu.addItem(mnitem);
 			setContextMenu(menu);

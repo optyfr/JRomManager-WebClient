@@ -24,13 +24,13 @@ public final class ScannerAutomationPanel extends SettingsForm
 		setColWidths("25%","*");
 		setWrapItemTitles(false);
 		setItems(
-			new SelectItem("cbCompression", Client.session.getMsg("ScannerAutomationPanel.OnScanAction")) {{
+			new SelectItem("cbCompression", Client.getSession().getMsg("ScannerAutomationPanel.OnScanAction")) {{
 				setValueMap(new HashMap<String, String>() {{
-					put("SCAN", Client.session.getMsg("ScanAutomation.Scan"));
-					put("SCAN_REPORT", Client.session.getMsg("ScanAutomation.ScanReport"));
-					put("SCAN_REPORT_FIX", Client.session.getMsg("ScanAutomation.ScanReportFix"));
-					put("SCAN_REPORT_FIX_SCAN", Client.session.getMsg("ScanAutomation.ScanReportFixScan"));
-					put("SCAN_FIX", Client.session.getMsg("ScanAutomation.ScanFix"));
+					put("SCAN", Client.getSession().getMsg("ScanAutomation.Scan"));
+					put("SCAN_REPORT", Client.getSession().getMsg("ScanAutomation.ScanReport"));
+					put("SCAN_REPORT_FIX", Client.getSession().getMsg("ScanAutomation.ScanReportFix"));
+					put("SCAN_REPORT_FIX_SCAN", Client.getSession().getMsg("ScanAutomation.ScanReportFixScan"));
+					put("SCAN_FIX", Client.getSession().getMsg("ScanAutomation.ScanFix"));
 				}});
 				setDefaultValue("SCAN");
 				addChangedHandler(event->setPropertyItemValue(getName(), "automation.scan", getValue().toString()));

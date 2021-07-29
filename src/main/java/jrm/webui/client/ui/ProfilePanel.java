@@ -64,7 +64,7 @@ public class ProfilePanel extends VLayout
 					setContextMenu(new Menu() {{
 						setItems(
 							new MenuItem() {{
-								setTitle(Client.session.getMsg("MainFrame.btnImportDat.text"));
+								setTitle(Client.getSession().getMsg("MainFrame.btnImportDat.text"));
 								setIcon("icons/script_go.png");
 								addClickHandler(e->new RemoteFileChooser("importDat", null, path->{
 									for(PathInfo p : path)
@@ -81,19 +81,19 @@ public class ProfilePanel extends VLayout
 								setIsSeparator(true);
 							}},
 							new MenuItem() {{
-								setTitle(Client.session.getMsg("MainFrame.mntmDeleteProfile.text"));
+								setTitle(Client.getSession().getMsg("MainFrame.mntmDeleteProfile.text"));
 								setIcon("icons/script_delete.png");
 								setEnableIfCondition((Canvas target, Menu menu, MenuItem item)->listgrid.anySelected());
 								addClickHandler(e->listgrid.removeSelectedData());
 							}},
 							new MenuItem() {{
-								setTitle(Client.session.getMsg("MainFrame.mntmRenameProfile.text"));
+								setTitle(Client.getSession().getMsg("MainFrame.mntmRenameProfile.text"));
 								setIcon("icons/script_edit.png");
 								setEnableIfCondition((Canvas target, Menu menu, MenuItem item)->listgrid.getSelectedRecords().length==1);
 								addClickHandler(e->listgrid.startEditing(listgrid.getRecordIndex(listgrid.getSelectedRecord())));
 							}},
 							new MenuItem() {{
-								setTitle(Client.session.getMsg("MainFrame.mntmDropCache.text"));
+								setTitle(Client.getSession().getMsg("MainFrame.mntmDropCache.text"));
 								setIcon("icons/bin.png");
 								setEnableIfCondition((Canvas target, Menu menu, MenuItem item)->listgrid.getSelectedRecords().length==1);
 								addClickHandler(e->listgrid.getDataSource().performCustomOperation("DropCache",listgrid.getSelectedRecord()));
@@ -112,7 +112,7 @@ public class ProfilePanel extends VLayout
 								new OperationBinding(){{setOperationType(DSOperationType.REMOVE);setDataProtocol(DSProtocol.POSTXML);}},
 								new OperationBinding(){{setOperationType(DSOperationType.CUSTOM);setDataProtocol(DSProtocol.POSTXML);}}
 							);
-							DataSourceTextField nameField = new DataSourceTextField("Name", Client.session.getMsg("FileTableModel.Profile"));
+							DataSourceTextField nameField = new DataSourceTextField("Name", Client.getSession().getMsg("FileTableModel.Profile"));
 							nameField.setCanEdit(true);
 							DataSourceTextField parentField = new DataSourceTextField("Parent");
 							parentField.setHidden(true);
@@ -120,13 +120,13 @@ public class ProfilePanel extends VLayout
 							DataSourceTextField fileField = new DataSourceTextField("File");
 							fileField.setHidden(true);
 							fileField.setPrimaryKey(true);
-							DataSourceTextField verField = new DataSourceTextField("version", Client.session.getMsg("FileTableModel.Version"));
-							DataSourceTextField haveSetsField = new DataSourceTextField("haveSets", Client.session.getMsg("FileTableModel.HaveSets"));
-							DataSourceTextField haveRomsField = new DataSourceTextField("haveRoms", Client.session.getMsg("FileTableModel.HaveRoms"));
-							DataSourceTextField haveDisksField = new DataSourceTextField("haveDisks", Client.session.getMsg("FileTableModel.HaveDisks"));
-							DataSourceTextField createdField = new DataSourceTextField("created", Client.session.getMsg("FileTableModel.Created"));
-							DataSourceTextField scannedField = new DataSourceTextField("scanned", Client.session.getMsg("FileTableModel.Scanned"));
-							DataSourceTextField fixedField = new DataSourceTextField("fixed", Client.session.getMsg("FileTableModel.Fixed"));
+							DataSourceTextField verField = new DataSourceTextField("version", Client.getSession().getMsg("FileTableModel.Version"));
+							DataSourceTextField haveSetsField = new DataSourceTextField("haveSets", Client.getSession().getMsg("FileTableModel.HaveSets"));
+							DataSourceTextField haveRomsField = new DataSourceTextField("haveRoms", Client.getSession().getMsg("FileTableModel.HaveRoms"));
+							DataSourceTextField haveDisksField = new DataSourceTextField("haveDisks", Client.getSession().getMsg("FileTableModel.HaveDisks"));
+							DataSourceTextField createdField = new DataSourceTextField("created", Client.getSession().getMsg("FileTableModel.Created"));
+							DataSourceTextField scannedField = new DataSourceTextField("scanned", Client.getSession().getMsg("FileTableModel.Scanned"));
+							DataSourceTextField fixedField = new DataSourceTextField("fixed", Client.getSession().getMsg("FileTableModel.Fixed"));
 							setFields(nameField, parentField, fileField, verField, haveSetsField, haveRomsField, haveDisksField, createdField, scannedField, fixedField);
 						}
 						
@@ -153,13 +153,13 @@ public class ProfilePanel extends VLayout
 					setContextMenu(new Menu() {{
 						setItems(
 							new MenuItem() {{
-								setTitle(Client.session.getMsg("MainFrame.mntmCreateFolder.text"));
+								setTitle(Client.getSession().getMsg("MainFrame.mntmCreateFolder.text"));
 								setIcon("icons/folder_add.png");
 								addClickHandler(e->{
 									TreeNode node = treegrid.getSelectedRecord();
 									treegrid.getDataSource().addData(new Record() {{
 											setAttribute("ParentID", node.getAttribute("ID"));
-											setAttribute("title", Client.session.getMsg("MainFrame.NewFolder"));
+											setAttribute("title", Client.getSession().getMsg("MainFrame.NewFolder"));
 											setAttribute("Path", node.getAttribute("Path"));
 										}}, 
 										(dsResponse, data, dsRequest) -> treegrid.startEditing(treegrid.getRecordIndex(dsResponse.getData()[0]))
@@ -168,7 +168,7 @@ public class ProfilePanel extends VLayout
 								setEnableIfCondition((Canvas target, Menu menu, MenuItem item)->treegrid.anySelected());
 							}},
 							new MenuItem() {{
-								setTitle(Client.session.getMsg("MainFrame.mntmDeleteFolder.text"));
+								setTitle(Client.getSession().getMsg("MainFrame.mntmDeleteFolder.text"));
 								setIcon("icons/folder_delete.png");
 								addClickHandler(e->{
 									TreeNode node = treegrid.getSelectedRecord();
@@ -241,7 +241,7 @@ public class ProfilePanel extends VLayout
 						setIcon("icons/page_add.png");
 						addClickHandler(e->new RemoteFileChooser("manageUploads", null, null));
 					}},
-					new IButton(Client.session.getMsg("MainFrame.btnImportDat.text")) {{
+					new IButton(Client.getSession().getMsg("MainFrame.btnImportDat.text")) {{
 						setAutoFit(true);
 						setIcon("icons/script_go.png");
 						addClickHandler(e->new RemoteFileChooser("importDat", null, path->{

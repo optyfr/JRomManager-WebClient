@@ -41,7 +41,7 @@ public final class ScannerFiltersPanel extends HLayout
 			setShowAllRecords(true);
 			setAlternateRecordStyles(false);
 			setSelectionProperty("selected");
-			setFields(new ListGridField("name",Client.session.getMsg("MainFrame.systemsFilter.viewportBorderTitle")));
+			setFields(new ListGridField("name",Client.getSession().getMsg("MainFrame.systemsFilter.viewportBorderTitle")));
 			setSelectionAppearance(SelectionAppearance.CHECKBOX);
 			setShowSelectedStyle(false);
 			setCanEdit(false);
@@ -56,34 +56,34 @@ public final class ScannerFiltersPanel extends HLayout
 			});
 			setContextMenu(new Menu() {{
 				addItem(new MenuItem() {{
-					setTitle(Client.session.getMsg("MainFrame.mnSelect.text"));
+					setTitle(Client.getSession().getMsg("MainFrame.mnSelect.text"));
 					this.setSubmenu(new Menu() {{
-						addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmSelectAll.text")) {{
+						addItem(new MenuItem(Client.getSession().getMsg("MainFrame.mntmSelectAll.text")) {{
 							addClickHandler(event->resetProfileViewer(()->systems.selectAllRecords()));
 						}});
-						addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmAllBios.text")) {{
+						addItem(new MenuItem(Client.getSession().getMsg("MainFrame.mntmAllBios.text")) {{
 							addClickHandler(event->resetProfileViewer(()->systems.selectRecords(Stream.of(systems.getRecords()).filter(r->r.getAttribute("type").equals("BIOS")).collect(Collectors.toList()).toArray(new ListGridRecord[0]))));
 						}});
-						addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmAllSoftwares.text")) {{
+						addItem(new MenuItem(Client.getSession().getMsg("MainFrame.mntmAllSoftwares.text")) {{
 							addClickHandler(event->resetProfileViewer(()->systems.selectRecords(Stream.of(systems.getRecords()).filter(r->r.getAttribute("type").equals("SOFTWARELIST")).collect(Collectors.toList()).toArray(new ListGridRecord[0]))));
 						}});
 					}});
 				}});
 				addItem(new MenuItem() {{
-					setTitle(Client.session.getMsg("MainFrame.mnUnselect.text"));
+					setTitle(Client.getSession().getMsg("MainFrame.mnUnselect.text"));
 					this.setSubmenu(new Menu() {{
-						addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmSelectNone.text")) {{
+						addItem(new MenuItem(Client.getSession().getMsg("MainFrame.mntmSelectNone.text")) {{
 							addClickHandler(event->resetProfileViewer(()->systems.deselectAllRecords()));
 						}});
-						addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmAllBios.text")) {{
+						addItem(new MenuItem(Client.getSession().getMsg("MainFrame.mntmAllBios.text")) {{
 							addClickHandler(event->resetProfileViewer(()->systems.deselectRecords(Stream.of(systems.getRecords()).filter(r->r.getAttribute("type").equals("BIOS")).collect(Collectors.toList()).toArray(new ListGridRecord[0]))));
 						}});
-						addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmAllSoftwares.text")) {{
+						addItem(new MenuItem(Client.getSession().getMsg("MainFrame.mntmAllSoftwares.text")) {{
 							addClickHandler(event->resetProfileViewer(()->systems.deselectRecords(Stream.of(systems.getRecords()).filter(r->r.getAttribute("type").equals("SOFTWARELIST")).collect(Collectors.toList()).toArray(new ListGridRecord[0]))));
 						}});
 					}});
 				}});
-				addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmInvertSelection.text")) {{
+				addItem(new MenuItem(Client.getSession().getMsg("MainFrame.mntmInvertSelection.text")) {{
 					addClickHandler(event->resetProfileViewer(()->{
 						ListGridRecord[] to_unselect = systems.getSelectedRecords();
 						List<ListGridRecord> to_unselect_list = Arrays.asList(to_unselect);
@@ -120,46 +120,46 @@ public final class ScannerFiltersPanel extends HLayout
 			setNumCols(3);
 			setColWidths("*",80,"*");
 			setItems(
-				new CheckboxItem("chckbxIncludeClones", Client.session.getMsg("MainFrame.chckbxIncludeClones.text")) {{
+				new CheckboxItem("chckbxIncludeClones", Client.getSession().getMsg("MainFrame.chckbxIncludeClones.text")) {{
 					setTitleColSpan(2);
 					setLabelAsTitle(true);
 					addChangedHandler(event->resetProfileViewer(()->setPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue())));
 					setDefaultValue(true);
 				}},
-				new CheckboxItem("chckbxIncludeDisks", Client.session.getMsg("MainFrame.chckbxIncludeDisks.text")) {{
+				new CheckboxItem("chckbxIncludeDisks", Client.getSession().getMsg("MainFrame.chckbxIncludeDisks.text")) {{
 					setTitleColSpan(2);
 					setLabelAsTitle(true);
 					addChangedHandler(event->resetProfileViewer(()->setPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue())));
 					setDefaultValue(true);
 				}},
-				new CheckboxItem("chckbxIncludeSamples", Client.session.getMsg("MainFrame.chckbxIncludeSamples.text")) {{
+				new CheckboxItem("chckbxIncludeSamples", Client.getSession().getMsg("MainFrame.chckbxIncludeSamples.text")) {{
 					setTitleColSpan(2);
 					setLabelAsTitle(true);
 					addChangedHandler(event->resetProfileViewer(()->setPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue())));
 					setDefaultValue(true);
 				}},
-				new SelectItem("cbMachineType", Client.session.getMsg("MainFrame.lblMachineType.text")) {{
+				new SelectItem("cbMachineType", Client.getSession().getMsg("MainFrame.lblMachineType.text")) {{
 					setTitleColSpan(2);
 					setWidth("*");
 					setValueMap("any","upright","cocktail");
 					setDefaultValue("any");
 					addChangedHandler(event->resetProfileViewer(()->setPropertyItemValue(getName(), fname2name.get(getName()), getValue().toString())));
 				}},
-				new SelectItem("cbOrientation", Client.session.getMsg("MainFrame.lblOrientation.text")) {{
+				new SelectItem("cbOrientation", Client.getSession().getMsg("MainFrame.lblOrientation.text")) {{
 					setTitleColSpan(2);
 					setWidth("*");
 					setValueMap("any","horizontal","vertical");
 					setDefaultValue("any");
 					addChangedHandler(event->resetProfileViewer(()->setPropertyItemValue(getName(), fname2name.get(getName()), getValue().toString())));
 				}},
-				new SelectItem("cbDriverStatus", Client.session.getMsg("MainFrame.lblDriverStatus.text")) {{
+				new SelectItem("cbDriverStatus", Client.getSession().getMsg("MainFrame.lblDriverStatus.text")) {{
 					setTitleColSpan(2);
 					setWidth("*");
 					setValueMap("good","imperfect","preliminary");
 					setDefaultValue("preliminary");
 					addChangedHandler(event->resetProfileViewer(()->setPropertyItemValue(getName(), fname2name.get(getName()), getValue().toString())));
 				}},
-				new SelectItem("cbSwMinSupport", Client.session.getMsg("MainFrame.lblSwMinSupport.text")) {{
+				new SelectItem("cbSwMinSupport", Client.getSession().getMsg("MainFrame.lblSwMinSupport.text")) {{
 					setTitleColSpan(2);
 					setWidth("*");
 					setValueMap("no","partial","yes");
@@ -174,7 +174,7 @@ public final class ScannerFiltersPanel extends HLayout
 				}},
 				new StaticTextItem() {{
 					setShowTitle(false);
-					setDefaultValue(Client.session.getMsg("MainFrame.lblYear.text"));
+					setDefaultValue(Client.getSession().getMsg("MainFrame.lblYear.text"));
 					setTextAlign(Alignment.CENTER);
 					setWidth("*");
 				}},
@@ -231,8 +231,8 @@ public final class ScannerFiltersPanel extends HLayout
 				public void run()
 				{
 					if (canResetPV)
-						if (Client.mainwindow.scannerPanel.profileViewer != null && Client.childWindows.contains(Client.mainwindow.scannerPanel.profileViewer))
-							Client.mainwindow.scannerPanel.profileViewer.anywareListList.reset();
+						if (Client.getMainWindow().scannerPanel.profileViewer != null && Client.getChildWindows().contains(Client.getMainWindow().scannerPanel.profileViewer))
+							Client.getMainWindow().scannerPanel.profileViewer.anywareListList.reset();
 				}
 			};
 		}

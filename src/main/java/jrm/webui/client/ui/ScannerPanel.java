@@ -38,10 +38,10 @@ public final class ScannerPanel extends VLayout
 				addButton(
 					new ToolStripButton() {{
 						setAutoFit(true);
-						setTitle(Client.session.getMsg("MainFrame.btnInfo.text"));
+						setTitle(Client.getSession().getMsg("MainFrame.btnInfo.text"));
 						setIcon("icons/information.png");
 						addClickHandler(event->{
-							if(profileViewer==null || !Client.childWindows.contains(profileViewer))
+							if(profileViewer==null || !Client.getChildWindows().contains(profileViewer))
 								profileViewer = new ProfileViewer();
 							else if(profileViewer.isVisible())
 								profileViewer.bringToFront();
@@ -54,7 +54,7 @@ public final class ScannerPanel extends VLayout
 				addButton(
 					btnScan = new ToolStripButton() {{
 						setAutoFit(true);
-						setTitle(Client.session.getMsg("MainFrame.btnScan.text"));
+						setTitle(Client.getSession().getMsg("MainFrame.btnScan.text"));
 						setIcon("icons/magnifier.png");
 						addClickHandler(event->{
 							Client.sendMsg(JsonUtils.stringify(Q_Profile.Scan.instantiate()));
@@ -64,10 +64,10 @@ public final class ScannerPanel extends VLayout
 				addButton(
 					new ToolStripButton() {{
 						setAutoFit(true);
-						setTitle(Client.session.getMsg("MainFrame.btnReport.text"));
+						setTitle(Client.getSession().getMsg("MainFrame.btnReport.text"));
 						setIcon("icons/report.png");
 						addClickHandler(event->{
-							if(reportViewer==null || !Client.childWindows.contains(reportViewer))
+							if(reportViewer==null || !Client.getChildWindows().contains(reportViewer))
 								reportViewer = new ReportViewer();
 							else if(reportViewer.isVisible())
 								reportViewer.bringToFront();
@@ -79,7 +79,7 @@ public final class ScannerPanel extends VLayout
 				addButton(
 					btnFix = new ToolStripButton() {{
 						setAutoFit(true);
-						setTitle(Client.session.getMsg("MainFrame.btnFix.text"));
+						setTitle(Client.getSession().getMsg("MainFrame.btnFix.text"));
 						setIcon("icons/tick.png");
 						setDisabled(true);
 						addClickHandler(event->{
@@ -113,7 +113,7 @@ public final class ScannerPanel extends VLayout
 				setPaneMargin(0);
 				setTabs(
 					new Tab() {{
-						setTitle(Client.session.getMsg("MainFrame.scannerDirectories.title"));
+						setTitle(Client.getSession().getMsg("MainFrame.scannerDirectories.title"));
 						setIcon("icons/folder.png");
 						setPane(new HLayout() {{
 							addMember(new LayoutSpacer("5%","*"));
@@ -127,7 +127,7 @@ public final class ScannerPanel extends VLayout
 						}});
 					}},
 					new Tab() {{
-						setTitle(Client.session.getMsg("MainFrame.scannerSettingsPanel.title"));
+						setTitle(Client.getSession().getMsg("MainFrame.scannerSettingsPanel.title"));
 						setIcon("icons/cog.png");
 						setPane(new HLayout() {{
 							addMember(new LayoutSpacer("5%","*"));
@@ -141,17 +141,17 @@ public final class ScannerPanel extends VLayout
 						}});
 					}},
 					new Tab() {{
-						setTitle(Client.session.getMsg("MainFrame.Filters"));
+						setTitle(Client.getSession().getMsg("MainFrame.Filters"));
 						setIcon("icons/arrow_join.png");
 						setPane(scannerFiltersPanel = new ScannerFiltersPanel());
 					}},
 					new Tab() {{
-						setTitle(Client.session.getMsg("MainFrame.AdvFilters"));
+						setTitle(Client.getSession().getMsg("MainFrame.AdvFilters"));
 						setIcon("icons/arrow_in.png");
 						setPane(scannerAdvFiltersPanel = new ScannerAdvFiltersPanel());
 					}},
 					new Tab() {{
-						setTitle(Client.session.getMsg("MainFrame.Automation"));
+						setTitle(Client.getSession().getMsg("MainFrame.Automation"));
 						setIcon("icons/link.png");
 						setPane(new HLayout() {{
 							addMember(new LayoutSpacer("25%","*"));

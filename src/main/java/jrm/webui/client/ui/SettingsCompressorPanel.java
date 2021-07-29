@@ -32,37 +32,37 @@ final class SettingsCompressorPanel extends TabSet
 			setColWidths(300,"*");
 			setItems(
 				new SelectItem("cbZipTempThreshold") {{
-					setTitle(Client.session.getMsg("MainFrame.lblTemporaryFilesThreshold.text"));
+					setTitle(Client.getSession().getMsg("MainFrame.lblTemporaryFilesThreshold.text"));
 					setValueMap(new HashMap<String,String>() {{
-						put("_NEVER",Client.session.getMsg("ZipTempThreshold.Never")); //$NON-NLS-1$
-						put("_1MB",Client.session.getMsg("ZipTempThreshold.1MB")); //$NON-NLS-1$
-						put("_2MB",Client.session.getMsg("ZipTempThreshold.2MB")); //$NON-NLS-1$
-						put("_5MB",Client.session.getMsg("ZipTempThreshold.5MB")); //$NON-NLS-1$
-						put("_10MB",Client.session.getMsg("ZipTempThreshold.10MB")); //$NON-NLS-1$
-						put("_25MB",Client.session.getMsg("ZipTempThreshold.25MB")); //$NON-NLS-1$
-						put("_50MB",Client.session.getMsg("ZipTempThreshold.50MB")); //$NON-NLS-1$
-						put("_100MB",Client.session.getMsg("ZipTempThreshold.100MB")); //$NON-NLS-1$
-						put("_250MB",Client.session.getMsg("ZipTempThreshold.250MB")); //$NON-NLS-1$
-						put("_500MB",Client.session.getMsg("ZipTempThreshold.500MB")); //$NON-NLS-1$
+						put("_NEVER",Client.getSession().getMsg("ZipTempThreshold.Never")); //$NON-NLS-1$
+						put("_1MB",Client.getSession().getMsg("ZipTempThreshold.1MB")); //$NON-NLS-1$
+						put("_2MB",Client.getSession().getMsg("ZipTempThreshold.2MB")); //$NON-NLS-1$
+						put("_5MB",Client.getSession().getMsg("ZipTempThreshold.5MB")); //$NON-NLS-1$
+						put("_10MB",Client.getSession().getMsg("ZipTempThreshold.10MB")); //$NON-NLS-1$
+						put("_25MB",Client.getSession().getMsg("ZipTempThreshold.25MB")); //$NON-NLS-1$
+						put("_50MB",Client.getSession().getMsg("ZipTempThreshold.50MB")); //$NON-NLS-1$
+						put("_100MB",Client.getSession().getMsg("ZipTempThreshold.100MB")); //$NON-NLS-1$
+						put("_250MB",Client.getSession().getMsg("ZipTempThreshold.250MB")); //$NON-NLS-1$
+						put("_500MB",Client.getSession().getMsg("ZipTempThreshold.500MB")); //$NON-NLS-1$
 					}});
 					setWidth("*");
 					addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), (String)getValue()));
-					setDefaultValue(Client.session.getSetting(fname2name.get(getName()), "_10MB"));
+					setDefaultValue(Client.getSession().getSetting(fname2name.get(getName()), "_10MB"));
 				}},
 				new SelectItem("cbZipLevel") {{
-					setTitle(Client.session.getMsg("MainFrame.lblCompressionLevel.text"));
+					setTitle(Client.getSession().getMsg("MainFrame.lblCompressionLevel.text"));
 					setValueMap(new HashMap<String,String>() {{
-						put("DEFAULT",Client.session.getMsg("ZipOptions.DEFAULT")); //$NON-NLS-1$
-						put("STORE",Client.session.getMsg("ZipOptions.STORE")); //$NON-NLS-1$
-						put("FASTEST",Client.session.getMsg("ZipOptions.FASTEST")); //$NON-NLS-1$
-						put("FAST",Client.session.getMsg("ZipOptions.FAST")); //$NON-NLS-1$
-						put("NORMAL",Client.session.getMsg("ZipOptions.NORMAL")); //$NON-NLS-1$
-						put("MAXIMUM",Client.session.getMsg("ZipOptions.MAXIMUM")); //$NON-NLS-1$
-						put("ULTRA",Client.session.getMsg("ZipOptions.ULTRA")); //$NON-NLS-1$
+						put("DEFAULT",Client.getSession().getMsg("ZipOptions.DEFAULT")); //$NON-NLS-1$
+						put("STORE",Client.getSession().getMsg("ZipOptions.STORE")); //$NON-NLS-1$
+						put("FASTEST",Client.getSession().getMsg("ZipOptions.FASTEST")); //$NON-NLS-1$
+						put("FAST",Client.getSession().getMsg("ZipOptions.FAST")); //$NON-NLS-1$
+						put("NORMAL",Client.getSession().getMsg("ZipOptions.NORMAL")); //$NON-NLS-1$
+						put("MAXIMUM",Client.getSession().getMsg("ZipOptions.MAXIMUM")); //$NON-NLS-1$
+						put("ULTRA",Client.getSession().getMsg("ZipOptions.ULTRA")); //$NON-NLS-1$
 					}});
 					setWidth("*");
 					addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), (String)getValue()));
-					setDefaultValue(Client.session.getSetting(fname2name.get(getName()), "DEFAULT"));
+					setDefaultValue(Client.getSession().getSetting(fname2name.get(getName()), "DEFAULT"));
 				}}
 			);
 		}
@@ -80,18 +80,18 @@ final class SettingsCompressorPanel extends TabSet
 			setColWidths(300,"*");
 			setItems(
 				new SelectItem("cbZipELevel") {{
-					setTitle(Client.session.getMsg("MainFrame.lblZipEArgs.text"));
+					setTitle(Client.getSession().getMsg("MainFrame.lblZipEArgs.text"));
 					setValueMap(new HashMap<String,String>() {{
-						put("STORE",Client.session.getMsg("ZipOptions.STORE")); //$NON-NLS-1$
-						put("FASTEST",Client.session.getMsg("ZipOptions.FASTEST")); //$NON-NLS-1$
-						put("FAST",Client.session.getMsg("ZipOptions.FAST")); //$NON-NLS-1$
-						put("NORMAL",Client.session.getMsg("ZipOptions.NORMAL")); //$NON-NLS-1$
-						put("MAXIMUM",Client.session.getMsg("ZipOptions.MAXIMUM")); //$NON-NLS-1$
-						put("ULTRA",Client.session.getMsg("ZipOptions.ULTRA")); //$NON-NLS-1$
+						put("STORE",Client.getSession().getMsg("ZipOptions.STORE")); //$NON-NLS-1$
+						put("FASTEST",Client.getSession().getMsg("ZipOptions.FASTEST")); //$NON-NLS-1$
+						put("FAST",Client.getSession().getMsg("ZipOptions.FAST")); //$NON-NLS-1$
+						put("NORMAL",Client.getSession().getMsg("ZipOptions.NORMAL")); //$NON-NLS-1$
+						put("MAXIMUM",Client.getSession().getMsg("ZipOptions.MAXIMUM")); //$NON-NLS-1$
+						put("ULTRA",Client.getSession().getMsg("ZipOptions.ULTRA")); //$NON-NLS-1$
 					}});
 					setWidth("*");
 					addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), getValueAsString()));
-					setDefaultValue(Client.session.getSetting(fname2name.get(getName()), "NORMAL"));
+					setDefaultValue(Client.getSession().getSetting(fname2name.get(getName()), "NORMAL"));
 				}}
 			);
 		}
@@ -109,30 +109,30 @@ final class SettingsCompressorPanel extends TabSet
 			setItems(
 				new SelectItem("cb7ZLevel") {{
 					setColSpan(3);
-					setTitle(Client.session.getMsg("MainFrame.lbl7zArgs.text"));
+					setTitle(Client.getSession().getMsg("MainFrame.lbl7zArgs.text"));
 					setValueMap(new HashMap<String,String>() {{
-						put("STORE",Client.session.getMsg("SevenZipOptions.STORE")); //$NON-NLS-1$
-						put("FASTEST",Client.session.getMsg("SevenZipOptions.FASTEST")); //$NON-NLS-1$
-						put("FAST",Client.session.getMsg("SevenZipOptions.FAST")); //$NON-NLS-1$
-						put("NORMAL",Client.session.getMsg("SevenZipOptions.NORMAL")); //$NON-NLS-1$
-						put("MAXIMUM",Client.session.getMsg("SevenZipOptions.MAXIMUM")); //$NON-NLS-1$
-						put("ULTRA",Client.session.getMsg("SevenZipOptions.ULTRA")); //$NON-NLS-1$
+						put("STORE",Client.getSession().getMsg("SevenZipOptions.STORE")); //$NON-NLS-1$
+						put("FASTEST",Client.getSession().getMsg("SevenZipOptions.FASTEST")); //$NON-NLS-1$
+						put("FAST",Client.getSession().getMsg("SevenZipOptions.FAST")); //$NON-NLS-1$
+						put("NORMAL",Client.getSession().getMsg("SevenZipOptions.NORMAL")); //$NON-NLS-1$
+						put("MAXIMUM",Client.getSession().getMsg("SevenZipOptions.MAXIMUM")); //$NON-NLS-1$
+						put("ULTRA",Client.getSession().getMsg("SevenZipOptions.ULTRA")); //$NON-NLS-1$
 					}});
 					setWidth("*");
 					addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), (String)getValue()));
-					setDefaultValue(Client.session.getSetting(fname2name.get(getName()), "NORMAL"));
+					setDefaultValue(Client.getSession().getSetting(fname2name.get(getName()), "NORMAL"));
 				}},
-				new IntegerItem("txt7ZThreads", Client.session.getMsg("MainFrame.lbl7zThreads.text")) {{
+				new IntegerItem("txt7ZThreads", Client.getSession().getMsg("MainFrame.lbl7zThreads.text")) {{
 					addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), getValueAsInteger()));
-					setDefaultValue(Client.session.getSettingAsInteger(fname2name.get(getName()), -1));
+					setDefaultValue(Client.getSession().getSettingAsInteger(fname2name.get(getName()), -1));
 				}},
-				new CheckboxItem("chkbx7ZSolid", Client.session.getMsg("MainFrame.ckbx7zSolid.text")) {{
+				new CheckboxItem("chkbx7ZSolid", Client.getSession().getMsg("MainFrame.ckbx7zSolid.text")) {{
 					setLabelAsTitle(true);
 					addChangedHandler(event->{
 						setGPropertyItemValue(getName(), fname2name.get(getName()), getValueAsBoolean());
 						event.getForm().getItem("cb7ZLevel").setDisabled(!getValueAsBoolean());
 					});
-					setDefaultValue(Client.session.getSettingAsBoolean(fname2name.get(getName()), true));
+					setDefaultValue(Client.getSession().getSettingAsBoolean(fname2name.get(getName()), true));
 				}}
 			);
 		}
@@ -145,7 +145,7 @@ final class SettingsCompressorPanel extends TabSet
 		addTab(new Tab()
 		{
 			{
-				setTitle(Client.session.getMsg("MainFrame.Zip"));
+				setTitle(Client.getSession().getMsg("MainFrame.Zip"));
 				setPane(new VLayout() {{
 					addMember(new LayoutSpacer("*","*"));
 					addMember(settingsCompressorZipPanel = new SettingsCompressorZipPanel());
@@ -156,7 +156,7 @@ final class SettingsCompressorPanel extends TabSet
 		addTab(new Tab()
 		{
 			{
-				setTitle(Client.session.getMsg("MainFrame.ZipExternal"));
+				setTitle(Client.getSession().getMsg("MainFrame.ZipExternal"));
 				setPane(new VLayout() {{
 					addMember(new LayoutSpacer("*","*"));
 					addMember(settingsCompressorZipEPanel = new SettingsCompressorZipEPanel());
@@ -167,7 +167,7 @@ final class SettingsCompressorPanel extends TabSet
 		addTab(new Tab()
 		{
 			{
-				setTitle(Client.session.getMsg("MainFrame.7zExternal"));
+				setTitle(Client.getSession().getMsg("MainFrame.7zExternal"));
 				setPane(new VLayout() {{
 					addMember(new LayoutSpacer("*","*"));
 					addMember(settingsCompressor7zEPanel = new SettingsCompressor7zEPanel());

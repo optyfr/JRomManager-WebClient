@@ -65,7 +65,7 @@ public class BatchDirUpd8rPanel extends VLayout
 			setAutoFetchData(true);
 			setContextMenu(new Menu() {{
 				addItem(new MenuItem() {{
-					setTitle(Client.session.getMsg("MainFrame.AddSrcDir"));
+					setTitle(Client.getSession().getMsg("MainFrame.AddSrcDir"));
 					addClickHandler(e -> new RemoteFileChooser("addDatSrc", null, pi -> {
 						for(PathInfo p : pi)
 						{
@@ -76,7 +76,7 @@ public class BatchDirUpd8rPanel extends VLayout
 					}));
 				}});
 				addItem(new MenuItem() {{
-					setTitle(Client.session.getMsg("MainFrame.DelSrcDir"));
+					setTitle(Client.getSession().getMsg("MainFrame.DelSrcDir"));
 					setEnableIfCondition((target, menu, item) ->src.getSelectedRecords().length>0);
 					addClickHandler(e -> src.removeSelectedData());
 				}});
@@ -117,10 +117,10 @@ public class BatchDirUpd8rPanel extends VLayout
 							@Override
 							public String execute(Canvas target, Menu menu, MenuItem item)
 							{
-								return Client.session.getMsg(sdr.getSelectedRecords().length==1?"MainFrame.UpdDat":"MainFrame.AddDat");
+								return Client.getSession().getMsg(sdr.getSelectedRecords().length==1?"MainFrame.UpdDat":"MainFrame.AddDat");
 							}
 						});
-						addClickHandler(e -> new RemoteFileChooser("addDat", Client.session.getSetting("dir.addDat", null), new RemoteFileChooser.CallBack()
+						addClickHandler(e -> new RemoteFileChooser("addDat", Client.getSession().getSetting("dir.addDat", null), new RemoteFileChooser.CallBack()
 						{
 							private void addData(PathInfo[] pi, int i)
 							{
@@ -160,7 +160,7 @@ public class BatchDirUpd8rPanel extends VLayout
 					addItem(new MenuItem() {{
 						setTitle("Set Destination");
 						setEnableIfCondition((target, menu, item)->sdr.getSelectedRecords().length==1);
-						addClickHandler(e -> new RemoteFileChooser("updDat", Client.session.getSetting("dir.updDat", null), new RemoteFileChooser.CallBack()
+						addClickHandler(e -> new RemoteFileChooser("updDat", Client.getSession().getSetting("dir.updDat", null), new RemoteFileChooser.CallBack()
 						{
 							private void updData(PathInfo[] pi, int start, int i)
 							{
@@ -183,7 +183,7 @@ public class BatchDirUpd8rPanel extends VLayout
 						}));
 					}});
 					addItem(new MenuItem() {{
-						setTitle(Client.session.getMsg("MainFrame.DelDat"));
+						setTitle(Client.getSession().getMsg("MainFrame.DelDat"));
 						setEnableIfCondition(new MenuItemIfFunction()
 						{
 							@Override
@@ -195,7 +195,7 @@ public class BatchDirUpd8rPanel extends VLayout
 						addClickHandler(e -> sdr.removeSelectedData());
 					}});
 					addItem(new MenuItem() {{
-						setTitle(Client.session.getMsg("MainFrame.Presets"));
+						setTitle(Client.getSession().getMsg("MainFrame.Presets"));
 						setEnableIfCondition(new MenuItemIfFunction()
 						{
 							@Override
@@ -206,10 +206,10 @@ public class BatchDirUpd8rPanel extends VLayout
 						});
 						setSubmenu(new Menu() {{
 							addItem(new MenuItem() {{
-								setTitle(Client.session.getMsg("MainFrame.Dir2DatMenu"));
+								setTitle(Client.getSession().getMsg("MainFrame.Dir2DatMenu"));
 								setSubmenu(new Menu() {{
 									addItem(new MenuItem() {{
-										setTitle(Client.session.getMsg("MainFrame.TZIP"));
+										setTitle(Client.getSession().getMsg("MainFrame.TZIP"));
 										addClickHandler(e -> {
 											Q_Profile.SetProperty settings = Q_Profile.SetProperty.instantiate();
 											settings.setProperty("need_sha1_or_md5", false); //$NON-NLS-1$
@@ -233,7 +233,7 @@ public class BatchDirUpd8rPanel extends VLayout
 										});
 									}});
 									addItem(new MenuItem() {{
-										setTitle(Client.session.getMsg("MainFrame.DIR"));
+										setTitle(Client.getSession().getMsg("MainFrame.DIR"));
 										addClickHandler(e -> {
 											Q_Profile.SetProperty settings = Q_Profile.SetProperty.instantiate();
 											settings.setProperty("need_sha1_or_md5", false); //$NON-NLS-1$
@@ -259,7 +259,7 @@ public class BatchDirUpd8rPanel extends VLayout
 								}});
 							}});
 							addItem(new MenuItem() {{
-								setTitle(Client.session.getMsg("BatchToolsDirUpd8rPanel.mntmCustom.text"));
+								setTitle(Client.getSession().getMsg("BatchToolsDirUpd8rPanel.mntmCustom.text"));
 								addClickHandler(e -> {
 									final List<String> srcs = Stream.of(sdr.getSelectedRecords()).map(n->n.getAttribute("src")).collect(Collectors.toList());
 									Q_Dat2Dir.Settings.instantiate().setSrcs(srcs).send();
@@ -289,14 +289,14 @@ public class BatchDirUpd8rPanel extends VLayout
 					);
 				}});
 				setFields(
-					new ListGridField("src",Client.session.getMsg("BatchTableModel.SrcDats")) {{
+					new ListGridField("src",Client.getSession().getMsg("BatchTableModel.SrcDats")) {{
 						setCanEdit(false);
 						setWidth("35%");
 					}},
-					new ListGridField("dst",Client.session.getMsg("BatchTableModel.DstDirs")) {{
+					new ListGridField("dst",Client.getSession().getMsg("BatchTableModel.DstDirs")) {{
 						setCanEdit(false);
 					}},
-					new ListGridField("result",Client.session.getMsg("BatchTableModel.Result")) {{
+					new ListGridField("result",Client.getSession().getMsg("BatchTableModel.Result")) {{
 						setCanEdit(false);
 						setWidth("35%");
 					}},
@@ -401,15 +401,15 @@ public class BatchDirUpd8rPanel extends VLayout
 			addMember(new DynamicForm() {{
 				setColWidths(100,50);
 				setWrapItemTitles(false);
-				setItems(new CheckboxItem("dry_run", Client.session.getMsg("MainFrame.cbBatchToolsDat2DirDryRun.text")) {{
+				setItems(new CheckboxItem("dry_run", Client.getSession().getMsg("MainFrame.cbBatchToolsDat2DirDryRun.text")) {{
 					setLabelAsTitle(true);
-					setDefaultValue(Client.session.getSettingAsBoolean("dat2dir.dry_run",true));
+					setDefaultValue(Client.getSession().getSettingAsBoolean("dat2dir.dry_run",true));
 					setShowLabel(false);
 					addChangedHandler(e->Client.sendMsg(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("dat2dir.dry_run", (Boolean)e.getValue()))));
 				}});
 			}});
-			IButton start = new IButton(Client.session.getMsg("MainFrame.btnStart.text"), e->{
-				Client.mainwindow.mainPane.disableTab(1);
+			IButton start = new IButton(Client.getSession().getMsg("MainFrame.btnStart.text"), e->{
+				Client.getMainWindow().mainPane.disableTab(1);
 				Client.sendMsg(JsonUtils.stringify(Q_Dat2Dir.Start.instantiate()));
 			});
 			start.setIcon("icons/bullet_go.png");
@@ -424,7 +424,7 @@ public class BatchDirUpd8rPanel extends VLayout
 
 		Settings(EnhJSO settings, JsArrayString srcs)
 		{
-			Client.childWindows.add(this);
+			Client.getChildWindows().add(this);
 			setAnimateMinimize(true);
 			setIsModal(true);
 			setShowModalMask(true);
@@ -478,7 +478,7 @@ public class BatchDirUpd8rPanel extends VLayout
 		@Override
 		protected void onDestroy()
 		{
-			Client.childWindows.remove(this);
+			Client.getChildWindows().remove(this);
 			super.onDestroy();
 		}
 		

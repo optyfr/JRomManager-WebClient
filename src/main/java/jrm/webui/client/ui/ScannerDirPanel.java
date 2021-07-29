@@ -43,7 +43,7 @@ public final class ScannerDirPanel extends DynamicForm
 		setWrapItemTitles(false);
 		setItems(
 			new RowSpacerItem(),
-			new TextItem("tfRomsDest",Client.session.getMsg("MainFrame.lblRomsDest.text")) {{
+			new TextItem("tfRomsDest",Client.getSession().getMsg("MainFrame.lblRomsDest.text")) {{
 				setWidth("*");
 				setCanEdit(false);
 				setEndRow(false);
@@ -57,7 +57,7 @@ public final class ScannerDirPanel extends DynamicForm
 				addClickHandler(event->new RemoteFileChooser("tfRomsDest", null, records->setPropertyItemValue("tfRomsDest", "roms_dest_dir", records[0].path)));
 			}},
 			new SpacerItem(),
-			new TextItem("tfDisksDest",Client.session.getMsg("MainFrame.lblDisksDest.text")) {{
+			new TextItem("tfDisksDest",Client.getSession().getMsg("MainFrame.lblDisksDest.text")) {{
 				setWidth("*");
 				setCanEdit(false);
 				setDisabled(true);
@@ -83,7 +83,7 @@ public final class ScannerDirPanel extends DynamicForm
 					Client.sendMsg(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty("disks_dest_dir_enabled", selected)));
 				});
 			}},
-			new TextItem("tfSWDest",Client.session.getMsg("MainFrame.chckbxSoftwareDest.text")) {{
+			new TextItem("tfSWDest",Client.getSession().getMsg("MainFrame.chckbxSoftwareDest.text")) {{
 				setWidth("*");
 				setCanEdit(false);
 				setDisabled(true);
@@ -109,7 +109,7 @@ public final class ScannerDirPanel extends DynamicForm
 					Client.sendMsg(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty("swroms_dest_dir_enabled", selected)));
 				});
 			}},
-			new TextItem("tfSWDisksDest",Client.session.getMsg("MainFrame.chckbxSwdisksdest.text")) {{
+			new TextItem("tfSWDisksDest",Client.getSession().getMsg("MainFrame.chckbxSwdisksdest.text")) {{
 				setWidth("*");
 				setCanEdit(false);
 				setDisabled(true);
@@ -135,7 +135,7 @@ public final class ScannerDirPanel extends DynamicForm
 					Client.sendMsg(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty("swdisks_dest_dir_enabled", selected)));
 				});
 			}},
-			new TextItem("tfSamplesDest",Client.session.getMsg("MainFrame.lblSamplesDest.text")) {{
+			new TextItem("tfSamplesDest",Client.getSession().getMsg("MainFrame.lblSamplesDest.text")) {{
 				setWidth("*");
 				setCanEdit(false);
 				setDisabled(true);
@@ -161,7 +161,7 @@ public final class ScannerDirPanel extends DynamicForm
 					Client.sendMsg(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty("samples_dest_dir_enabled", selected)));
 				});
 			}},
-			new SelectItem("listSrcDir",Client.session.getMsg("MainFrame.lblSrcDir.text")) {{
+			new SelectItem("listSrcDir",Client.getSession().getMsg("MainFrame.lblSrcDir.text")) {{
 				setWidth("*");
 				setID("listSrcDir");
 				setHeight(200);
@@ -179,7 +179,7 @@ public final class ScannerDirPanel extends DynamicForm
 				setHeight(20);
 				setVAlign(VerticalAlignment.TOP);
 				setIcon("icons/folder_add.png");
-				setPrompt(Client.session.getMsg("MainFrame.mntmAddDirectory.text"));
+				setPrompt(Client.getSession().getMsg("MainFrame.mntmAddDirectory.text"));
 				setTitle(null);
 				addClickHandler(event->addSrcDir());
 			}},
@@ -189,7 +189,7 @@ public final class ScannerDirPanel extends DynamicForm
 				setHeight(20);
 				setVAlign(VerticalAlignment.TOP);
 				setIcon("icons/folder_delete.png");
-				setPrompt(Client.session.getMsg("MainFrame.mntmDeleteSelected.text"));
+				setPrompt(Client.getSession().getMsg("MainFrame.mntmDeleteSelected.text"));
 				setTitle(null);
 				addClickHandler(event->delSrcDir());
 				setDisabled(true);
@@ -215,11 +215,11 @@ public final class ScannerDirPanel extends DynamicForm
 					event.cancel();
 				}
 			});
-			addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmAddDirectory.text")) {{
+			addItem(new MenuItem(Client.getSession().getMsg("MainFrame.mntmAddDirectory.text")) {{
 				setIcon("icons/folder_add.png");
 				addClickHandler(event->addSrcDir());
 			}});
-			addItem(new MenuItem(Client.session.getMsg("MainFrame.mntmDeleteSelected.text")) {{
+			addItem(new MenuItem(Client.getSession().getMsg("MainFrame.mntmDeleteSelected.text")) {{
 				setIcon("icons/folder_delete.png");
 				setEnableIfCondition(new MenuItemIfFunction()
 				{

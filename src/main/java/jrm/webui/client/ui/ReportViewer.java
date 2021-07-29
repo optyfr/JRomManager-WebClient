@@ -14,8 +14,8 @@ final public class ReportViewer extends Window implements ReportStatus
 	public ReportViewer()
 	{
 		super();
-		Client.childWindows.add(this);
-		setTitle(Client.session.getMsg("ReportFrame.title"));
+		Client.getChildWindows().add(this);
+		setTitle(Client.getSession().getMsg("ReportFrame.title"));
 		setWidth("60%");
 		setHeight("80%");
 		setAnimateMinimize(true);
@@ -50,7 +50,7 @@ final public class ReportViewer extends Window implements ReportStatus
 	@Override
 	protected void onDestroy()
 	{
-		Client.childWindows.remove(this);
+		Client.getChildWindows().remove(this);
 		super.onDestroy();
 	}
 	

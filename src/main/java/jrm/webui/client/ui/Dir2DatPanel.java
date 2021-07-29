@@ -27,7 +27,7 @@ public class Dir2DatPanel extends VLayout
 						setColWidths("30%","70%");
 						setFields(
 							new HeaderItem() {{
-								setDefaultValue(Client.session.getMsg("MainFrame.Options"));
+								setDefaultValue(Client.getSession().getMsg("MainFrame.Options"));
 							}},
 							new CanvasItem() {{
 								setHeight("*");
@@ -35,43 +35,43 @@ public class Dir2DatPanel extends VLayout
 								setColSpan(2);
 							}},
 							new CheckboxItem("chckbxScanSubfolders") {{
-								setTitle(Client.session.getMsg("MainFrame.chckbxScanSubfolders.text"));
-								setDefaultValue(Client.session.getSettingAsBoolean(fname2name.get(getName()), true));
+								setTitle(Client.getSession().getMsg("MainFrame.chckbxScanSubfolders.text"));
+								setDefaultValue(Client.getSession().getSettingAsBoolean(fname2name.get(getName()), true));
 								addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue()));
 							}},
 							new CheckboxItem("chckbxDeepScan") {{
-								setTitle(Client.session.getMsg("MainFrame.chckbxDeepScanFor.text"));
-								setDefaultValue(Client.session.getSettingAsBoolean(fname2name.get(getName()), false));
+								setTitle(Client.getSession().getMsg("MainFrame.chckbxDeepScanFor.text"));
+								setDefaultValue(Client.getSession().getSettingAsBoolean(fname2name.get(getName()), false));
 								addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue()));
 							}},
 							new CheckboxItem("chckbxAddMD5") {{
-								setTitle(Client.session.getMsg("MainFrame.chckbxAddMd.text"));
-								setDefaultValue(Client.session.getSettingAsBoolean(fname2name.get(getName()), false));
+								setTitle(Client.getSession().getMsg("MainFrame.chckbxAddMd.text"));
+								setDefaultValue(Client.getSession().getSettingAsBoolean(fname2name.get(getName()), false));
 								addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue()));
 							}},
 							new CheckboxItem("chckbxAddSHA1") {{
-								setTitle(Client.session.getMsg("MainFrame.chckbxAddShamd.text"));
-								setDefaultValue(Client.session.getSettingAsBoolean(fname2name.get(getName()), false));
+								setTitle(Client.getSession().getMsg("MainFrame.chckbxAddShamd.text"));
+								setDefaultValue(Client.getSession().getSettingAsBoolean(fname2name.get(getName()), false));
 								addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue()));
 							}},
 							new CheckboxItem("chckbxJunkFolders") {{
-								setTitle(Client.session.getMsg("MainFrame.chckbxJunkSubfolders.text"));
-								setDefaultValue(Client.session.getSettingAsBoolean(fname2name.get(getName()), false));
+								setTitle(Client.getSession().getMsg("MainFrame.chckbxJunkSubfolders.text"));
+								setDefaultValue(Client.getSession().getSettingAsBoolean(fname2name.get(getName()), false));
 								addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue()));
 							}},
 							new CheckboxItem("chckbxDoNotScanArchives") {{
-								setTitle(Client.session.getMsg("MainFrame.chckbxDoNotScan.text"));
-								setDefaultValue(Client.session.getSettingAsBoolean(fname2name.get(getName()), false));
+								setTitle(Client.getSession().getMsg("MainFrame.chckbxDoNotScan.text"));
+								setDefaultValue(Client.getSession().getSettingAsBoolean(fname2name.get(getName()), false));
 								addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue()));
 							}},
 							new CheckboxItem("chckbxMatchProfile") {{
-								setTitle(Client.session.getMsg("MainFrame.chckbxMatchCurrentProfile.text"));
-								setDefaultValue(Client.session.getSettingAsBoolean(fname2name.get(getName()), false));
+								setTitle(Client.getSession().getMsg("MainFrame.chckbxMatchCurrentProfile.text"));
+								setDefaultValue(Client.getSession().getSettingAsBoolean(fname2name.get(getName()), false));
 								addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue()));
 							}},
 							new CheckboxItem("chckbxIncludeEmptyDirs") {{
-								setTitle(Client.session.getMsg("MainFrame.chckbxIncludeEmptyDirs.text"));
-								setDefaultValue(Client.session.getSettingAsBoolean(fname2name.get(getName()), false));
+								setTitle(Client.getSession().getMsg("MainFrame.chckbxIncludeEmptyDirs.text"));
+								setDefaultValue(Client.getSession().getSettingAsBoolean(fname2name.get(getName()), false));
 								addChangedHandler(event->setGPropertyItemValue(getName(), fname2name.get(getName()), (boolean)getValue()));
 							}},
 							new CanvasItem() {{
@@ -89,7 +89,7 @@ public class Dir2DatPanel extends VLayout
 						setColWidths(100,"*");
 						setFields(
 							new HeaderItem() {{
-								setDefaultValue(Client.session.getMsg("MainFrame.Headers"));
+								setDefaultValue(Client.getSession().getMsg("MainFrame.Headers"));
 							}},
 							new CanvasItem() {{
 								setHeight("*");
@@ -97,43 +97,43 @@ public class Dir2DatPanel extends VLayout
 								setColSpan(2);
 							}},
 							new TextItem("tfDir2DatName") {{
-								setTitle(Client.session.getMsg("MainFrame.lblName.text"));
+								setTitle(Client.getSession().getMsg("MainFrame.lblName.text"));
 								setWidth("*");
 							}},
 							new TextItem("tfDir2DatDescription") {{
-								setTitle(Client.session.getMsg("MainFrame.lblDescription.text"));
+								setTitle(Client.getSession().getMsg("MainFrame.lblDescription.text"));
 								setWidth("*");
 							}},
 							new TextItem("tfDir2DatVersion") {{
-								setTitle(Client.session.getMsg("MainFrame.lblVersion.text"));
+								setTitle(Client.getSession().getMsg("MainFrame.lblVersion.text"));
 								setWidth("*");
 							}},
 							new TextItem("tfDir2DatAuthor") {{
-								setTitle(Client.session.getMsg("MainFrame.lblAuthor.text"));
+								setTitle(Client.getSession().getMsg("MainFrame.lblAuthor.text"));
 								setWidth("*");
 							}},
 							new TextItem("tfDir2DatComment") {{
-								setTitle(Client.session.getMsg("MainFrame.lblComment.text"));
+								setTitle(Client.getSession().getMsg("MainFrame.lblComment.text"));
 								setWidth("*");
 							}},
 							new TextItem("tfDir2DatCategory") {{
-								setTitle(Client.session.getMsg("MainFrame.lblCategory.text"));
+								setTitle(Client.getSession().getMsg("MainFrame.lblCategory.text"));
 								setWidth("*");
 							}},
 							new TextItem("tfDir2DatDate") {{
-								setTitle(Client.session.getMsg("MainFrame.lblDate.text"));
+								setTitle(Client.getSession().getMsg("MainFrame.lblDate.text"));
 								setWidth("*");
 							}},
 							new TextItem("tfDir2DatEMail") {{
-								setTitle(Client.session.getMsg("MainFrame.lblEmail.text"));
+								setTitle(Client.getSession().getMsg("MainFrame.lblEmail.text"));
 								setWidth("*");
 							}},
 							new TextItem("tfDir2DatHomepage") {{
-								setTitle(Client.session.getMsg("MainFrame.lblHomepage.text"));
+								setTitle(Client.getSession().getMsg("MainFrame.lblHomepage.text"));
 								setWidth("*");
 							}},
 							new TextItem("tfDir2DatURL") {{
-								setTitle(Client.session.getMsg("MainFrame.lblUrl.text"));
+								setTitle(Client.getSession().getMsg("MainFrame.lblUrl.text"));
 								setWidth("*");
 							}},
 							new CanvasItem() {{
@@ -153,14 +153,14 @@ public class Dir2DatPanel extends VLayout
 				setColWidths(100,"*",28,100);
 				setFields(
 					new HeaderItem() {{
-						setDefaultValue(Client.session.getMsg("MainFrame.IO"));
+						setDefaultValue(Client.getSession().getMsg("MainFrame.IO"));
 					}},
 					new TextItem("txtSrcDir") {{
-						setTitle(Client.session.getMsg("MainFrame.lblSrcDir_1.text"));
+						setTitle(Client.getSession().getMsg("MainFrame.lblSrcDir_1.text"));
 						setWidth("*");
 						setCanEdit(false);
 						setEndRow(false);
-						setDefaultValue(Client.session.getSetting(fname2name.get(getName()), null));
+						setDefaultValue(Client.getSession().getSetting(fname2name.get(getName()), null));
 					}},
 					new ButtonItem() {{
 						setStartRow(false);
@@ -175,7 +175,7 @@ public class Dir2DatPanel extends VLayout
 					}},
 					new ButtonItem() {{
 						setStartRow(false);
-						setTitle(Client.session.getMsg("MainFrame.btnGenerate.text"));
+						setTitle(Client.getSession().getMsg("MainFrame.btnGenerate.text"));
 						setEndRow(false);
 						setRowSpan(3);
 						setHeight("*");
@@ -190,11 +190,11 @@ public class Dir2DatPanel extends VLayout
 						});
 					}},
 					new TextItem("txtDstDat") {{
-						setTitle(Client.session.getMsg("MainFrame.lblDstDat.text"));
+						setTitle(Client.getSession().getMsg("MainFrame.lblDstDat.text"));
 						setWidth("*");
 						setCanEdit(false);
 						setEndRow(false);
-						setDefaultValue(Client.session.getSetting(fname2name.get(getName()), null));
+						setDefaultValue(Client.getSession().getSetting(fname2name.get(getName()), null));
 					}},
 					new ButtonItem() {{
 						setStartRow(false);
@@ -207,7 +207,7 @@ public class Dir2DatPanel extends VLayout
 						}));
 					}},
 					new RadioGroupItem("rgFormat") {{
-						setTitle(Client.session.getMsg("MainFrame.lblFormat.text"));
+						setTitle(Client.getSession().getMsg("MainFrame.lblFormat.text"));
 						setVertical(false);
 						setFillHorizontalSpace(true);
 						setWidth("*");
@@ -216,12 +216,12 @@ public class Dir2DatPanel extends VLayout
 						setValueMap(new HashMap<String,String>() {
 							private static final long serialVersionUID = 1L;
 							{
-								put("MAME",Client.session.getMsg("MainFrame.rdbtnMame.text"));
-								put("DATAFILE",Client.session.getMsg("MainFrame.rdbtnLogiqxDat.text"));
-								put("SOFTWARELIST",Client.session.getMsg("MainFrame.rdbtnSwList.text"));
+								put("MAME",Client.getSession().getMsg("MainFrame.rdbtnMame.text"));
+								put("DATAFILE",Client.getSession().getMsg("MainFrame.rdbtnLogiqxDat.text"));
+								put("SOFTWARELIST",Client.getSession().getMsg("MainFrame.rdbtnSwList.text"));
 							}
 						});
-						setDefaultValue(Client.session.getSetting(fname2name.get(getName()), "MAME"));
+						setDefaultValue(Client.getSession().getSetting(fname2name.get(getName()), "MAME"));
 					}}
 				);
 			}}

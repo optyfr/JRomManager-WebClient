@@ -28,13 +28,13 @@ public final class ScannerSettingsPanel extends SettingsForm
 		setWrapItemTitles(false);
 		setContextMenu(new Menu() {{
 			addItem(new MenuItem() {{
-				setTitle(Client.session.getMsg("MainFrame.mnPresets.text"));
+				setTitle(Client.getSession().getMsg("MainFrame.mnPresets.text"));
 				setSubmenu(new Menu() {{
 					addItem(new MenuItem() {{
-						setTitle(Client.session.getMsg("MainFrame.mnPdMame.text"));
+						setTitle(Client.getSession().getMsg("MainFrame.mnPdMame.text"));
 						setSubmenu(new Menu() {{
 							addItem(new MenuItem() {{	// merged
-								setTitle(Client.session.getMsg("MainFrame.mntmPleasuredome.text"));
+								setTitle(Client.getSession().getMsg("MainFrame.mntmPleasuredome.text"));
 								addClickHandler(e->{
 									HashMap<String,Object> options = new HashMap<>();
 									options.put("chckbxCreateMissingSets", true);
@@ -55,7 +55,7 @@ public final class ScannerSettingsPanel extends SettingsForm
 								});
 							}});
 							addItem(new MenuItem() {{	// non-merged
-								setTitle(Client.session.getMsg("MainFrame.mntmPdMameNon.text"));
+								setTitle(Client.getSession().getMsg("MainFrame.mntmPdMameNon.text"));
 								addClickHandler(e->{
 									HashMap<String,Object> options = new HashMap<>();
 									options.put("chckbxCreateMissingSets", true);
@@ -75,7 +75,7 @@ public final class ScannerSettingsPanel extends SettingsForm
 								});
 							}});
 							addItem(new MenuItem() {{	// split
-								setTitle(Client.session.getMsg("MainFrame.mntmPdMameSplit.text"));
+								setTitle(Client.getSession().getMsg("MainFrame.mntmPdMameSplit.text"));
 								addClickHandler(e->{
 									HashMap<String,Object> options = new HashMap<>();
 									options.put("chckbxCreateMissingSets", true);
@@ -100,73 +100,73 @@ public final class ScannerSettingsPanel extends SettingsForm
 			}});
 		}});
 		setItems(
-			new CheckboxItem("chckbxNeedSHA1", Client.session.getMsg("MainFrame.chckbxNeedSHA1.text")) {{
+			new CheckboxItem("chckbxNeedSHA1", Client.getSession().getMsg("MainFrame.chckbxNeedSHA1.text")) {{
 				addChangedHandler(event->setPropertyItemValue(getName(), "need_sha1_or_md5", (boolean)getValue()));
 			}},
-			new CheckboxItem("chckbxCreateMissingSets", Client.session.getMsg("MainFrame.chckbxCreateMissingSets.text")) {{
+			new CheckboxItem("chckbxCreateMissingSets", Client.getSession().getMsg("MainFrame.chckbxCreateMissingSets.text")) {{
 				addChangedHandler(event->{
 					setPropertyItemValue(getName(), "create_mode", (boolean)getValue());
 					updateDisabled();
 				});
 				setDefaultValue(true);
 			}},
-			new CheckboxItem("chckbxUseParallelism", Client.session.getMsg("MainFrame.chckbxUseParallelism.text")) {{
+			new CheckboxItem("chckbxUseParallelism", Client.getSession().getMsg("MainFrame.chckbxUseParallelism.text")) {{
 				addChangedHandler(event->setPropertyItemValue(getName(), "use_parallelism", (boolean)getValue()));
 				setDefaultValue(true);
 			}},
-			new CheckboxItem("chckbxCreateOnlyComplete", Client.session.getMsg("MainFrame.chckbxCreateOnlyComplete.text")) {{
+			new CheckboxItem("chckbxCreateOnlyComplete", Client.getSession().getMsg("MainFrame.chckbxCreateOnlyComplete.text")) {{
 				addChangedHandler(event->setPropertyItemValue(getName(), "createfull_mode", (boolean)getValue()));
 			}},
-			new CheckboxItem("chckbxIgnoreUnneededContainers", Client.session.getMsg("MainFrame.chckbxIgnoreUnneededContainers.text")) {{
+			new CheckboxItem("chckbxIgnoreUnneededContainers", Client.getSession().getMsg("MainFrame.chckbxIgnoreUnneededContainers.text")) {{
 				addChangedHandler(event->setPropertyItemValue(getName(), "ignore_unneeded_containers", (boolean)getValue()));
 			}},
-			new CheckboxItem("chckbxIgnoreUnneededEntries", Client.session.getMsg("MainFrame.chckbxIgnoreUnneededEntries.text")) {{
+			new CheckboxItem("chckbxIgnoreUnneededEntries", Client.getSession().getMsg("MainFrame.chckbxIgnoreUnneededEntries.text")) {{
 				addChangedHandler(event->setPropertyItemValue(getName(), "ignore_unneeded_entries", (boolean)getValue()));
 			}},
-			new CheckboxItem("chckbxIgnoreUnknownContainers", Client.session.getMsg("MainFrame.chckbxIgnoreUnknownContainers.text")) {{
+			new CheckboxItem("chckbxIgnoreUnknownContainers", Client.getSession().getMsg("MainFrame.chckbxIgnoreUnknownContainers.text")) {{
 				addChangedHandler(event->setPropertyItemValue(getName(), "ignore_unknown_containers", (boolean)getValue()));
 			}},
-			new CheckboxItem("chckbxUseImplicitMerge", Client.session.getMsg("MainFrame.chckbxUseImplicitMerge.text")) {{
+			new CheckboxItem("chckbxUseImplicitMerge", Client.getSession().getMsg("MainFrame.chckbxUseImplicitMerge.text")) {{
 				addChangedHandler(event->setPropertyItemValue(getName(), "implicit_merge", (boolean)getValue()));
 			}},
-			new CheckboxItem("chckbxIgnoreMergeNameRoms", Client.session.getMsg("MainFrame.chckbxIgnoreMergeName.text")) {{
+			new CheckboxItem("chckbxIgnoreMergeNameRoms", Client.getSession().getMsg("MainFrame.chckbxIgnoreMergeName.text")) {{
 				addChangedHandler(event->setPropertyItemValue(getName(), "ignore_merge_name_roms", (boolean)getValue()));
 			}},
-			new CheckboxItem("chckbxIgnoreMergeNameDisks", Client.session.getMsg("MainFrame.chckbxIgnoreMergeName_1.text")) {{
+			new CheckboxItem("chckbxIgnoreMergeNameDisks", Client.getSession().getMsg("MainFrame.chckbxIgnoreMergeName_1.text")) {{
 				addChangedHandler(event->setPropertyItemValue(getName(), "ignore_merge_name_disks", (boolean)getValue()));
 			}},
-			new CheckboxItem("chckbxExcludeGames", Client.session.getMsg("MainFrame.chckbxExcludeGames.text")) {{
+			new CheckboxItem("chckbxExcludeGames", Client.getSession().getMsg("MainFrame.chckbxExcludeGames.text")) {{
 				addChangedHandler(event->setPropertyItemValue(getName(), "exclude_games", (boolean)getValue()));
 			}},
-			new CheckboxItem("chckbxExcludeMachines", Client.session.getMsg("MainFrame.chckbxExcludeMachines.text")) {{
+			new CheckboxItem("chckbxExcludeMachines", Client.getSession().getMsg("MainFrame.chckbxExcludeMachines.text")) {{
 				addChangedHandler(event->setPropertyItemValue(getName(), "exclude_machines", (boolean)getValue()));
 			}},
-			new CheckboxItem("chckbxBackup", Client.session.getMsg("MainFrame.chckbxBackup.text")) {{
+			new CheckboxItem("chckbxBackup", Client.getSession().getMsg("MainFrame.chckbxBackup.text")) {{
 				addChangedHandler(event->setPropertyItemValue(getName(), "backup", (boolean)getValue()));
 				setDefaultValue(true);
 			}},
-			new SelectItem("cbCompression", Client.session.getMsg("MainFrame.lblCompression.text")) {{
+			new SelectItem("cbCompression", Client.getSession().getMsg("MainFrame.lblCompression.text")) {{
 				setValueMap(new HashMap<String, String>() {{
-					put("ZIP", Client.session.getMsg("FormatOptions.Zip"));
-					put("ZIPE", Client.session.getMsg("FormatOptions.ZipExternal"));
-					put("SEVENZIP", Client.session.getMsg("FormatOptions.SevenZip"));
-					put("TZIP", Client.session.getMsg("FormatOptions.TorrentZip"));
-					put("DIR", Client.session.getMsg("FormatOptions.Directories"));
-					put("FAKE", Client.session.getMsg("FormatOptions.SingleFile"));
+					put("ZIP", Client.getSession().getMsg("FormatOptions.Zip"));
+					put("ZIPE", Client.getSession().getMsg("FormatOptions.ZipExternal"));
+					put("SEVENZIP", Client.getSession().getMsg("FormatOptions.SevenZip"));
+					put("TZIP", Client.getSession().getMsg("FormatOptions.TorrentZip"));
+					put("DIR", Client.getSession().getMsg("FormatOptions.Directories"));
+					put("FAKE", Client.getSession().getMsg("FormatOptions.SingleFile"));
 				}});
 				setDefaultValue("ZIP");
 				addChangedHandler(event->setPropertyItemValue(getName(), "format", getValue().toString()));
 				setColSpan(3);
 				setWidth("*");
 			}},
-			new SelectItem("cbbxMergeMode", Client.session.getMsg("MainFrame.lblMergeMode.text")) {{
+			new SelectItem("cbbxMergeMode", Client.getSession().getMsg("MainFrame.lblMergeMode.text")) {{
 				setValueMap(new HashMap<String, String>() {{
-					put("FULLMERGE", Client.session.getMsg("MergeOptions.FullMerge"));
-					put("MERGE", Client.session.getMsg("MergeOptions.Merge"));
-					put("SUPERFULLNOMERGE", Client.session.getMsg("MergeOptions.NoMergeInclBiosAndDevices"));
-					put("FULLNOMERGE", Client.session.getMsg("MergeOptions.NoMergeInclBios"));
-					put("NOMERGE", Client.session.getMsg("MergeOptions.NoMerge"));
-					put("SPLIT", Client.session.getMsg("MergeOptions.Split"));
+					put("FULLMERGE", Client.getSession().getMsg("MergeOptions.FullMerge"));
+					put("MERGE", Client.getSession().getMsg("MergeOptions.Merge"));
+					put("SUPERFULLNOMERGE", Client.getSession().getMsg("MergeOptions.NoMergeInclBiosAndDevices"));
+					put("FULLNOMERGE", Client.getSession().getMsg("MergeOptions.NoMergeInclBios"));
+					put("NOMERGE", Client.getSession().getMsg("MergeOptions.NoMerge"));
+					put("SPLIT", Client.getSession().getMsg("MergeOptions.Split"));
 				}});
 				setDefaultValue("SPLIT");
 				addChangedHandler(event->{
@@ -174,17 +174,17 @@ public final class ScannerSettingsPanel extends SettingsForm
 					updateDisabled();
 				});
 				setColSpan(3);
-				setPrompt(Client.session.getMsg("MainFrame.cbbxMergeMode.toolTipText"));
+				setPrompt(Client.getSession().getMsg("MainFrame.cbbxMergeMode.toolTipText"));
 				setWidth("*");
 			}},
-			new SelectItem("cbHashCollision", Client.session.getMsg("MainFrame.lblHashCollision.text")) {{
+			new SelectItem("cbHashCollision", Client.getSession().getMsg("MainFrame.lblHashCollision.text")) {{
 				setValueMap(new HashMap<String, String>() {{
-					put("SINGLEFILE", Client.session.getMsg("HashCollisionOptions.SingleFile"));
-					put("SINGLECLONE", Client.session.getMsg("HashCollisionOptions.SingleClone"));
-					put("ALLCLONES", Client.session.getMsg("HashCollisionOptions.AllClones"));
-					put("HALFDUMB", Client.session.getMsg("HashCollisionOptions.AllClonesHalfDumb"));
-					put("DUMB", Client.session.getMsg("HashCollisionOptions.AllClonesDumb"));
-					put("DUMBER", Client.session.getMsg("HashCollisionOptions.AllClonesDumber"));
+					put("SINGLEFILE", Client.getSession().getMsg("HashCollisionOptions.SingleFile"));
+					put("SINGLECLONE", Client.getSession().getMsg("HashCollisionOptions.SingleClone"));
+					put("ALLCLONES", Client.getSession().getMsg("HashCollisionOptions.AllClones"));
+					put("HALFDUMB", Client.getSession().getMsg("HashCollisionOptions.AllClonesHalfDumb"));
+					put("DUMB", Client.getSession().getMsg("HashCollisionOptions.AllClonesDumb"));
+					put("DUMBER", Client.getSession().getMsg("HashCollisionOptions.AllClonesDumber"));
 				}});
 				setDefaultValue("SINGLEFILE");
 				addChangedHandler(event->setPropertyItemValue(getName(), "hash_collision_mode", getValue().toString()));
