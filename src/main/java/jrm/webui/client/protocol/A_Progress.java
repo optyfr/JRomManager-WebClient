@@ -124,7 +124,7 @@ public class A_Progress extends A_	//NOSONAR
 		public SetFullProgress(final EnhJSO response)
 		{
 			super(response);
-			params = response.getJSO("params");
+			params = response.getJSO(PARAMS_STR);
 		}
 		
 		public final ProgressData getParams()
