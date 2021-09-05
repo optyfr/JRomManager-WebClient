@@ -8,6 +8,9 @@ import jrm.webui.client.utils.EnhJSO;
 
 public class A_Profile extends A_	//NOSONAR
 {
+	private static final String SUCCESS_STR = "success";
+	private static final String PARAMS_STR = "params";
+
 	public A_Profile(final A_ a)
 	{
 		this(a.response);
@@ -20,8 +23,6 @@ public class A_Profile extends A_	//NOSONAR
 	
 	public static class Loaded extends A_
 	{
-		private static final String SUCCESS_STR = "success";
-		private static final String PARAMS_STR = "params";
 		private EnhJSO params;
 		
 		public Loaded(final A_ a)
@@ -64,8 +65,6 @@ public class A_Profile extends A_	//NOSONAR
 	
 	public static class Scanned extends A_
 	{
-		private static final String SUCCESS_STR = "success";
-		private static final String PARAMS_STR = "params";
 		private EnhJSO params;
 		
 		public Scanned(final A_ a)
@@ -96,8 +95,6 @@ public class A_Profile extends A_	//NOSONAR
 
 	public static class Fixed extends A_
 	{
-		private static final String SUCCESS_STR = "success";
-		private static final String PARAMS_STR = "params";
 		private EnhJSO params;
 		
 		public Fixed(final A_ a)
@@ -124,7 +121,6 @@ public class A_Profile extends A_	//NOSONAR
 
 	public static class Imported extends A_
 	{
-		private static final String PARAMS_STR = "params";
 		private EnhJSO params;
 		
 		public Imported(final A_ a)

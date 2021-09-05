@@ -9,6 +9,8 @@ import jrm.webui.client.utils.EnhJSO;
 
 public class A_Global extends A_	//NOSONAR
 {
+	private static final String PARAMS_STR = "params";
+
 	public A_Global(final A_ a)
 	{
 		this(a.response);
@@ -21,7 +23,6 @@ public class A_Global extends A_	//NOSONAR
 	
 	public static class SetMemory extends A_
 	{
-		private static final String PARAMS_STR = "params";
 		private EnhJSO params;
 		
 		public SetMemory(final A_ a)
@@ -43,7 +44,6 @@ public class A_Global extends A_	//NOSONAR
 
 	public static class UpdateProperty extends A_
 	{
-		private static final String PARAMS_STR = "params";
 		private Map<String,String> params = new HashMap<>();
 		
 		public UpdateProperty(final A_ a)
@@ -71,7 +71,6 @@ public class A_Global extends A_	//NOSONAR
 
 	public static class Warn extends A_
 	{
-		private static final String PARAMS_STR = "params";
 		private EnhJSO params;
 		
 		public Warn(final A_ a)
@@ -100,7 +99,7 @@ public class A_Global extends A_	//NOSONAR
 		
 		public A_[] getSubCMDs()
 		{
-			final var jsa = response.getJSAJSO("params");
+			final var jsa = response.getJSAJSO(PARAMS_STR);
 			final A_[] subcmds = new A_[jsa.length()];
 			for(int i = 0; i < jsa.length(); i++)
 				subcmds[i] =  new A_(jsa.get(i).cast());

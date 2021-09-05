@@ -9,6 +9,8 @@ import jrm.webui.client.utils.EnhJSO;
 
 public class A_Progress extends A_	//NOSONAR
 {
+	private static final String PARAMS_STR = "params";
+
 	public A_Progress(final A_ a)
 	{
 		this(a.response);
@@ -21,7 +23,6 @@ public class A_Progress extends A_	//NOSONAR
 	
 	public static class Close extends A_
 	{
-		private static final String PARAMS_STR = "params";
 		private EnhJSO params;
 
 		public Close(final A_ a)
@@ -62,7 +63,7 @@ public class A_Progress extends A_	//NOSONAR
 		public SetInfos(final EnhJSO response)
 		{
 			super(response);
-			params = response.getJSO("params");
+			params = response.getJSO(PARAMS_STR);
 		}
 		
 		public final int getThreadCnt()
@@ -88,7 +89,7 @@ public class A_Progress extends A_	//NOSONAR
 		public CanCancel(final EnhJSO response)
 		{
 			super(response);
-			params = response.getJSO("params");
+			params = response.getJSO(PARAMS_STR);
 		}
 		
 		public final boolean canCancel()
