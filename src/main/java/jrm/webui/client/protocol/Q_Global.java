@@ -1,6 +1,6 @@
 package jrm.webui.client.protocol;
 
-public class Q_Global extends Q_
+public class Q_Global extends Q_	//NOSONAR
 {
 	protected Q_Global()
 	{
@@ -15,24 +15,24 @@ public class Q_Global extends Q_
 		}
 		
 		
-		final public static SetProperty instantiate()
+		public static final SetProperty instantiate()
 		{
 			return Q_.instantiateCmd("Global.setProperty").cast();
 		}
 		
-		final public SetProperty setProperty(String name, String value)
+		public final SetProperty setProperty(String name, String value)
 		{
 			getParams().set(name, value);
 			return this;
 		}
 		
-		final public SetProperty setProperty(String name, int value)
+		public final SetProperty setProperty(String name, int value)
 		{
 			getParams().set(name, value);
 			return this;
 		}
 		
-		final public SetProperty setProperty(String name, boolean value)
+		public final SetProperty setProperty(String name, boolean value)
 		{
 			getParams().set(name, value);
 			return this;
@@ -46,7 +46,7 @@ public class Q_Global extends Q_
 			super();
 		}
 
-		final public static GC instantiate()
+		public static final GC instantiate()
 		{
 			return Q_.instantiateCmd("Global.GC").cast();
 		}
@@ -60,7 +60,7 @@ public class Q_Global extends Q_
 			super();
 		}
 
-		final public static GetMemory instantiate()
+		public static final GetMemory instantiate()
 		{
 			return Q_.instantiateCmd("Global.getMemory").cast();
 		}

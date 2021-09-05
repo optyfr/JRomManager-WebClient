@@ -2,7 +2,7 @@ package jrm.webui.client.protocol;
 
 import jrm.webui.client.utils.EnhJSO;
 
-public class A_
+public class A_	//NOSONAR
 {
 	protected EnhJSO response;
 

@@ -1,6 +1,6 @@
 package jrm.webui.client.protocol;
 
-public class Q_CatVer extends Q_
+public class Q_CatVer extends Q_	//NOSONAR
 {
 	protected Q_CatVer()
 	{
@@ -14,12 +14,12 @@ public class Q_CatVer extends Q_
 			super();
 		}
 		
-		final public static Load instantiate()
+		public static final Load instantiate()
 		{
 			return Q_.instantiateCmd("CatVer.load").cast();
 		}
 		
-		final public Load setPath(String path)
+		public final Load setPath(String path)
 		{
 			getParams().set("path",path);
 			return this;

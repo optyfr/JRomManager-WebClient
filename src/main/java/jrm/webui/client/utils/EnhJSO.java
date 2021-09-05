@@ -38,35 +38,35 @@ public class EnhJSO extends JavaScriptObject
 
 	protected static native JsArray<JavaScriptObject> getJSAJSO(JavaScriptObject jso, String name) /*-{
         return jso[name];
-	}-*/;;
+	}-*/;
 
 	protected static native JsArrayString getJSAStrJSO(JavaScriptObject jso, String name) /*-{
         return jso[name];
-	}-*/;;
+	}-*/;
 
 	protected static native <T extends JavaScriptObject> T getJSO(JavaScriptObject jso, String name) /*-{
         return jso[name];
-	}-*/;;
+	}-*/;
 
 	public static native JsArrayString getProperties(JavaScriptObject jso) /*-{
 		return Object.keys(jso);
-	}-*/;;
+	}-*/;
 
 	protected static native String getString(JavaScriptObject jso, String name) /*-{
         return jso[name];
-	}-*/;;
+	}-*/;
 
 	protected static native boolean isArray(JavaScriptObject jso, String name) /*-{
 		return $wnd.isc.isA.Array(jso[name]);
-	}-*/;;
+	}-*/;
 
 	protected static native boolean isObject(JavaScriptObject jso, String name) /*-{
 		return $wnd.isc.isA.Object(jso[name]);
-	}-*/;;
+	}-*/;
 
 	protected static native boolean isEmptyObject(JavaScriptObject jso, String name) /*-{
 		return $wnd.isc.isA.emptyObject(jso[name]);
-	}-*/;;
+	}-*/;
 
 	protected static native boolean isVoid(JavaScriptObject jso, String name) /*-{
 		if(typeof (jso[name]) == 'undefined')
@@ -84,15 +84,15 @@ public class EnhJSO extends JavaScriptObject
 		else if($wnd.isc.isA.Boolean(jso[name]))
 			return !jso[name];
 		return false;
-	}-*/;;
+	}-*/;
 
 	protected static native boolean isBoolean(JavaScriptObject jso, String name) /*-{
 		return $wnd.isc.isA.Boolean(jso[name]);
-	}-*/;;
+	}-*/;
 
 	protected static native boolean isString(JavaScriptObject jso, String name) /*-{
 		return $wnd.isc.isA.String(jso[name]);
-	}-*/;;
+	}-*/;
 
 	protected static native boolean isNull(JavaScriptObject jso, String name) /*-{
 		if(typeof (jso[name]) == 'undefined')
@@ -100,23 +100,23 @@ public class EnhJSO extends JavaScriptObject
 		else if(jso[name] == null)
 			return true;
 		return false;
-	}-*/;;
+	}-*/;
 
 	protected static native boolean set(JavaScriptObject jso, String name, boolean value) /*-{
         return jso[name] = value;
-	}-*/;;
+	}-*/;
 
 	protected static native int set(JavaScriptObject jso, String name, int value) /*-{
         return jso[name] = value;
-	}-*/;;
+	}-*/;
 
 	protected static native JavaScriptObject set(JavaScriptObject jso, String name, JavaScriptObject value) /*-{
         return jso[name] = value;
-	}-*/;;
+	}-*/;
 	
 	protected static native String set(JavaScriptObject jso, String name, String value) /*-{
         return jso[name] = value;
-	}-*/;;
+	}-*/;
 	
 	protected static native JsArray<JavaScriptObject> toArray(JavaScriptObject jso, String name) /*-{
 		if(jso[name]==null)
@@ -127,13 +127,13 @@ public class EnhJSO extends JavaScriptObject
 			return [];
 		else
 			return [jso[name]];
-	}-*/;;
+	}-*/;
 
 	public final void delete(final String name)
 	{
 		EnhJSO.delete(this, name);
 		
-	};
+	}
 
 	public final boolean exists(final String name)
 	{
@@ -158,7 +158,7 @@ public class EnhJSO extends JavaScriptObject
 	public final Boolean getBoolean(final String name)
 	{
 		if(EnhJSO.isNull(this, name))
-			return null;
+			return null;	//NOSONAR
 		return EnhJSO.getBool(this, name);
 	}
 
@@ -281,23 +281,23 @@ public class EnhJSO extends JavaScriptObject
 	
 	public final void forEach(String prop, ForEachConsumer<String, EnhJSO> bc)
 	{
-		EnhJSO prop_jso = getJSO(prop);
-		JsArrayString props = getProperties(prop_jso);
+		EnhJSO propJso = getJSO(prop);
+		JsArrayString props = getProperties(propJso);
 		for(int i = 0; i < props.length(); i++)
 		{
 			prop = props.get(i);
-			bc.accept(prop, prop_jso.getJSO(prop));
+			bc.accept(prop, propJso.getJSO(prop));
 		}
 	}
 	
 	public final void forEachBoolean(String prop, ForEachConsumer<String, Boolean> bc)
 	{
-		EnhJSO prop_jso = getJSO(prop);
-		JsArrayString props = getProperties(prop_jso);
+		EnhJSO propJso = getJSO(prop);
+		JsArrayString props = getProperties(propJso);
 		for(int i = 0; i < props.length(); i++)
 		{
 			prop = props.get(i);
-			bc.accept(prop, prop_jso.getBoolean(prop));
+			bc.accept(prop, propJso.getBoolean(prop));
 		}
 	}
 }

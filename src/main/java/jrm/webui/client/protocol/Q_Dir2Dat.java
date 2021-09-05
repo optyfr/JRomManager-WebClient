@@ -6,7 +6,7 @@ import com.google.gwt.core.client.JavaScriptObject;
 
 import jrm.webui.client.utils.EnhJSO;
 
-public class Q_Dir2Dat extends Q_
+public class Q_Dir2Dat extends Q_	//NOSONAR
 {
 	protected Q_Dir2Dat()
 	{
@@ -20,31 +20,31 @@ public class Q_Dir2Dat extends Q_
 			super();
 		}
 		
-		final public static Start instantiate()
+		public static final Start instantiate()
 		{
 			return Q_.instantiateCmd("Dir2Dat.start").cast();
 		}
 
-		final public Start setOptions(Map<String,Object> values)
+		public final Start setOptions(Map<String,Object> values)
 		{
 			EnhJSO jso = JavaScriptObject.createObject().cast();
-			values.forEach((k,v)->jso.set(k, v));
+			values.forEach(jso::set);
 			getParams().set("options", jso);
 			return this;
 		}
 
-		final public Start setHeaders(Map<String,Object> values)
+		public final Start setHeaders(Map<String,Object> values)
 		{
 			EnhJSO jso = JavaScriptObject.createObject().cast();
-			values.forEach((k,v)->jso.set(k, v));
+			values.forEach(jso::set);
 			getParams().set("headers", jso);
 			return this;
 		}
 
-		final public Start setIO(Map<String,Object> values)
+		public final Start setIO(Map<String,Object> values)
 		{
 			EnhJSO jso = JavaScriptObject.createObject().cast();
-			values.forEach((k,v)->jso.set(k, v));
+			values.forEach(jso::set);
 			getParams().set("io", jso);
 			return this;
 		}

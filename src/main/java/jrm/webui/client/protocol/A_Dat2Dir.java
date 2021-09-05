@@ -4,7 +4,7 @@ import com.google.gwt.core.client.JsArrayString;
 
 import jrm.webui.client.utils.EnhJSO;
 
-public class A_Dat2Dir extends A_
+public class A_Dat2Dir extends A_	//NOSONAR
 {
 	public A_Dat2Dir(final A_ a)
 	{
@@ -18,8 +18,6 @@ public class A_Dat2Dir extends A_
 	
 	public static class ClearResults extends A_
 	{
-//		private EnhJSO params;
-		
 		public ClearResults(final A_ a)
 		{
 			this(a.response);
@@ -28,7 +26,6 @@ public class A_Dat2Dir extends A_
 		public ClearResults(final EnhJSO response)
 		{
 			super(response);
-//			params = response.getJSO("params");
 		}
 	}
 

@@ -1,6 +1,6 @@
 package jrm.webui.client.protocol;
 
-public class Q_Profile extends Q_
+public class Q_Profile extends Q_	//NOSONAR
 {
 	protected Q_Profile()
 	{
@@ -14,18 +14,18 @@ public class Q_Profile extends Q_
 			super();
 		}
 		
-		final public static Import instantiate()
+		public static final Import instantiate()
 		{
 			return Q_.instantiateCmd("Profile.import").cast();
 		}
 		
-		final public Import setSL(boolean sl)
+		public final Import setSL(boolean sl)
 		{
 			getParams().set("sl", sl);
 			return this;
 		}
 		
-		final public Import setParent(String parent)
+		public final Import setParent(String parent)
 		{
 			getParams().set("parent", parent);
 			return this;
@@ -39,12 +39,12 @@ public class Q_Profile extends Q_
 			super();
 		}
 		
-		final public static Load instantiate()
+		public static final Load instantiate()
 		{
 			return Q_.instantiateCmd("Profile.load").cast();
 		}
 		
-		final public Load setPath(String parent, String file)
+		public final Load setPath(String parent, String file)
 		{
 			getParams().set("parent",parent);
 			getParams().set("file",file);
@@ -59,7 +59,7 @@ public class Q_Profile extends Q_
 			super();
 		}
 		
-		final public static Scan instantiate()
+		public static final Scan instantiate()
 		{
 			return Q_.instantiateCmd("Profile.scan").cast();
 		}
@@ -72,7 +72,7 @@ public class Q_Profile extends Q_
 			super();
 		}
 		
-		final public static Fix instantiate()
+		public static final Fix instantiate()
 		{
 			return Q_.instantiateCmd("Profile.fix").cast();
 		}
@@ -85,12 +85,12 @@ public class Q_Profile extends Q_
 			super();
 		}
 		
-		final public static ImportSettings instantiate()
+		public static final ImportSettings instantiate()
 		{
 			return Q_.instantiateCmd("Profile.importSettings").cast();
 		}
 		
-		final public ImportSettings setPath(String path)
+		public final ImportSettings setPath(String path)
 		{
 			getParams().set("path",path);
 			return this;
@@ -104,12 +104,12 @@ public class Q_Profile extends Q_
 			super();
 		}
 		
-		final public static ExportSettings instantiate()
+		public static final ExportSettings instantiate()
 		{
 			return Q_.instantiateCmd("Profile.exportSettings").cast();
 		}
 
-		final public ExportSettings setPath(String path)
+		public final ExportSettings setPath(String path)
 		{
 			getParams().set("path",path);
 			return this;
@@ -124,18 +124,18 @@ public class Q_Profile extends Q_
 		}
 		
 		
-		final public static SetProperty instantiate()
+		public static final SetProperty instantiate()
 		{
 			return Q_.instantiateCmd("Profile.setProperty").cast();
 		}
 		
-		final public SetProperty setProfile(String name)
+		public final SetProperty setProfile(String name)
 		{
 			set("profile", name);
 			return this;
 		}
 
-		final public SetProperty setProperty(String name, Object value)
+		public final SetProperty setProperty(String name, Object value)
 		{
 			if(value instanceof Boolean)
 				return setProperty(name, (boolean)value);
@@ -145,19 +145,19 @@ public class Q_Profile extends Q_
 				return setProperty(name, value.toString());
 		}
 
-		final public SetProperty setProperty(String name, String value)
+		public final SetProperty setProperty(String name, String value)
 		{
 			getParams().set(name, value);
 			return this;
 		}
 		
-		final public SetProperty setProperty(String name, int value)
+		public final SetProperty setProperty(String name, int value)
 		{
 			getParams().set(name, value);
 			return this;
 		}
 		
-		final public SetProperty setProperty(String name, boolean value)
+		public final SetProperty setProperty(String name, boolean value)
 		{
 			getParams().set(name, value);
 			return this;

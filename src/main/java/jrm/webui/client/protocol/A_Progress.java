@@ -7,7 +7,7 @@ import com.google.gwt.core.client.JsArrayString;
 
 import jrm.webui.client.utils.EnhJSO;
 
-public class A_Progress extends A_
+public class A_Progress extends A_	//NOSONAR
 {
 	public A_Progress(final A_ a)
 	{
@@ -21,12 +21,13 @@ public class A_Progress extends A_
 	
 	public static class Close extends A_
 	{
+		private static final String PARAMS_STR = "params";
 		private EnhJSO params;
 
 		public Close(final A_ a)
 		{
 			this(a.response);
-			params = response.getJSO("params");
+			params = response.getJSO(PARAMS_STR);
 		}
 		
 		public Close(final EnhJSO response)
@@ -64,12 +65,12 @@ public class A_Progress extends A_
 			params = response.getJSO("params");
 		}
 		
-		final public int getThreadCnt()
+		public final int getThreadCnt()
 		{
 			return params.getInt("threadCnt");
 		}
 		
-		final public Boolean getMultipleSubInfos()
+		public final Boolean getMultipleSubInfos()
 		{
 			return params.getBoolean("multipleSubInfos");
 		}
@@ -90,7 +91,7 @@ public class A_Progress extends A_
 			params = response.getJSO("params");
 		}
 		
-		final public boolean canCancel()
+		public final boolean canCancel()
 		{
 			return params.getBool("canCancel");
 		}
@@ -125,7 +126,7 @@ public class A_Progress extends A_
 			params = response.getJSO("params");
 		}
 		
-		final public ProgressData getParams()
+		public final ProgressData getParams()
 		{
 			return params;
 		}
@@ -136,37 +137,37 @@ public class A_Progress extends A_
 			{
 			}
 			
-			final public JsArrayString getInfos()
+			public final JsArrayString getInfos()
 			{
 				return getJSAStrJSO("infos");
 			}
 			
-			final public JsArrayString getSubInfos()
+			public final JsArrayString getSubInfos()
 			{
 				return getJSAStrJSO("subinfos");
 			}
 			
-			final public Boolean isMultipleSubInfos()
+			public final Boolean isMultipleSubInfos()
 			{
 				return getBoolean("multipleSubInfos");
 			}
 			
-			final public int getThreadCnt()
+			public final int getThreadCnt()
 			{
 				return getInt("threadCnt");
 			}
 			
-			final public Progress getPB1()
+			public final Progress getPB1()
 			{
 				return getJSO("pb1");
 			}
 			
-			final public Progress getPB2()
+			public final Progress getPB2()
 			{
 				return getJSO("pb2");
 			}
 			
-			final public Progress getPB3()
+			public final Progress getPB3()
 			{
 				return getJSO("pb3");
 			}
@@ -178,42 +179,42 @@ public class A_Progress extends A_
 					
 				}
 				
-				final public boolean isVisible()
+				public final boolean isVisible()
 				{
 					return getBool("visibility");
 				}
 				
-				final public boolean hasStringPainted()
+				public final boolean hasStringPainted()
 				{
 					return getBool("stringPainted");
 				}
 
-				final public boolean isIndeterminate()
+				public final boolean isIndeterminate()
 				{
 					return getBool("indeterminate");
 				}
 				
-				final public int getVal()
+				public final int getVal()
 				{
 					return getInt("val");
 				}
 				
-				final public int getMax()
+				public final int getMax()
 				{
 					return getInt("max");
 				}
 				
-				final public float getPerc()
+				public final float getPerc()
 				{
 					return getInt("perc");
 				}
 				
-				final public String getMsg()
+				public final String getMsg()
 				{
 					return get("msg");
 				}
 				
-				final public String getTimeleft()
+				public final String getTimeleft()
 				{
 					return get("timeleft");
 				}

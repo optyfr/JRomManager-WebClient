@@ -2,7 +2,7 @@ package jrm.webui.client.protocol;
 
 import jrm.webui.client.utils.EnhJSO;
 
-public class A_CatVer extends A_
+public class A_CatVer extends A_	//NOSONAR
 {
 	public A_CatVer(final A_ a)
 	{
@@ -29,7 +29,7 @@ public class A_CatVer extends A_
 			params = response.getJSO("params");
 		}
 		
-		final public String getPath()
+		public final String getPath()
 		{
 			return params.getString("path");
 		}

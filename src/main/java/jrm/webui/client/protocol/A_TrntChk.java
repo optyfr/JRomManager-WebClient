@@ -2,7 +2,7 @@ package jrm.webui.client.protocol;
 
 import jrm.webui.client.utils.EnhJSO;
 
-public class A_TrntChk extends A_
+public class A_TrntChk extends A_	//NOSONAR
 {
 	public A_TrntChk(final A_ a)
 	{
@@ -16,8 +16,6 @@ public class A_TrntChk extends A_
 	
 	public static class ClearResults extends A_
 	{
-//		private EnhJSO params;
-		
 		public ClearResults(final A_ a)
 		{
 			this(a.response);
@@ -26,7 +24,6 @@ public class A_TrntChk extends A_
 		public ClearResults(final EnhJSO response)
 		{
 			super(response);
-//			params = response.getJSO("params");
 		}
 	}
 

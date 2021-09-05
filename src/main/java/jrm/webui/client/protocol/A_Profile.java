@@ -6,7 +6,7 @@ import com.google.gwt.core.client.JsArrayString;
 
 import jrm.webui.client.utils.EnhJSO;
 
-public class A_Profile extends A_
+public class A_Profile extends A_	//NOSONAR
 {
 	public A_Profile(final A_ a)
 	{
@@ -20,6 +20,8 @@ public class A_Profile extends A_
 	
 	public static class Loaded extends A_
 	{
+		private static final String SUCCESS_STR = "success";
+		private static final String PARAMS_STR = "params";
 		private EnhJSO params;
 		
 		public Loaded(final A_ a)
@@ -30,30 +32,30 @@ public class A_Profile extends A_
 		public Loaded(final EnhJSO response)
 		{
 			super(response);
-			params = response.getJSO("params");
+			params = response.getJSO(PARAMS_STR);
 		}
 		
-		final public boolean getSuccess()
+		public final boolean getSuccess()
 		{
-			return params.getBool("success");
+			return params.getBool(SUCCESS_STR);
 		}
 		
-		final public String getName()
+		public final String getName()
 		{
 			return params.getString("name");
 		}
 		
-		final public EnhJSO getSettings()
+		public final EnhJSO getSettings()
 		{
 			return params.getJSO("settings");
 		}
 		
-		final public JsArrayString getYears()
+		public final JsArrayString getYears()
 		{
 			return params.getJSO("years");
 		}
 
-		final public JsArray<JavaScriptObject> getSystems()
+		public final JsArray<JavaScriptObject> getSystems()
 		{
 			return params.getJSAJSO("systems");
 		}
@@ -62,6 +64,8 @@ public class A_Profile extends A_
 	
 	public static class Scanned extends A_
 	{
+		private static final String SUCCESS_STR = "success";
+		private static final String PARAMS_STR = "params";
 		private EnhJSO params;
 		
 		public Scanned(final A_ a)
@@ -72,19 +76,19 @@ public class A_Profile extends A_
 		public Scanned(final EnhJSO response)
 		{
 			super(response);
-			params = response.getJSO("params");
+			params = response.getJSO(PARAMS_STR);
 		}
 		
-		final public boolean getSuccess()
+		public final boolean getSuccess()
 		{
-			return params.getBool("success");
+			return params.getBool(SUCCESS_STR);
 		}
 		
-		final public Integer getActions()
+		public final Integer getActions()
 		{
 			return params.getInteger("actions");
 		}
-		final public boolean hasReport()
+		public final boolean hasReport()
 		{
 			return params.getBool("report");
 		}
@@ -92,6 +96,8 @@ public class A_Profile extends A_
 
 	public static class Fixed extends A_
 	{
+		private static final String SUCCESS_STR = "success";
+		private static final String PARAMS_STR = "params";
 		private EnhJSO params;
 		
 		public Fixed(final A_ a)
@@ -102,15 +108,15 @@ public class A_Profile extends A_
 		public Fixed(final EnhJSO response)
 		{
 			super(response);
-			params = response.getJSO("params");
+			params = response.getJSO(PARAMS_STR);
 		}
 		
-		final public boolean getSuccess()
+		public final boolean getSuccess()
 		{
-			return params.getBool("success");
+			return params.getBool(SUCCESS_STR);
 		}
 		
-		final public Integer getActions()
+		public final Integer getActions()
 		{
 			return params.getInteger("actions");
 		}
@@ -118,6 +124,7 @@ public class A_Profile extends A_
 
 	public static class Imported extends A_
 	{
+		private static final String PARAMS_STR = "params";
 		private EnhJSO params;
 		
 		public Imported(final A_ a)
@@ -128,20 +135,20 @@ public class A_Profile extends A_
 		public Imported(final EnhJSO response)
 		{
 			super(response);
-			params = response.getJSO("params");
+			params = response.getJSO(PARAMS_STR);
 		}
 		
-		final public String getPath()
+		public final String getPath()
 		{
 			return params.getString("path");
 		}
 		
-		final public String getParent()
+		public final String getParent()
 		{
 			return params.getString("parent");
 		}
 		
-		final public String getName()
+		public final String getName()
 		{
 			return params.getString("name");
 		}

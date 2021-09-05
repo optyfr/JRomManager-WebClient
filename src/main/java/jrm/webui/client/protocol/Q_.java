@@ -6,38 +6,40 @@ import com.google.gwt.core.client.JsonUtils;
 import jrm.webui.client.Client;
 import jrm.webui.client.utils.EnhJSO;
 
-public class Q_ extends EnhJSO
+public class Q_ extends EnhJSO	//NOSONAR
 {
+	private static final String PARAMS_STR = "params";
+
 	protected Q_()
 	{
 		super();
 	}
 
-	final static private Q_ _instantiate()
+	static final private Q_ _instantiate()	//NOSONAR
 	{
 		return JavaScriptObject.createObject().cast();
 	}
 	
-	final static protected Q_ instantiateCmd(String cmd)
+	protected static final Q_ instantiateCmd(String cmd)
 	{
 		Q_ q = _instantiate();
 		q.setCmd(cmd);
 		return q;
 	}
 	
-	final protected void setCmd(String cmd)
+	protected final void setCmd(String cmd)
 	{
 		set("cmd", cmd);
 	}
 
-	final protected EnhJSO getParams()
+	protected final EnhJSO getParams()
 	{
-		if(!exists("params"))
-			set("params", JavaScriptObject.createObject());
-		return getJSO("params");
+		if(!exists(PARAMS_STR))
+			set(PARAMS_STR, JavaScriptObject.createObject());
+		return getJSO(PARAMS_STR);
 	}
 	
-	final public void send()
+	public final void send()
 	{
 		Client.sendMsg(JsonUtils.stringify(this));
 	}

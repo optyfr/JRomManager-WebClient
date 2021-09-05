@@ -1,6 +1,6 @@
 package jrm.webui.client.protocol;
-
-public class Q_Compressor extends Q_
+//NOSONAR
+public class Q_Compressor extends Q_	//NOSONAR
 {
 	protected Q_Compressor()
 	{
@@ -14,7 +14,7 @@ public class Q_Compressor extends Q_
 			super();
 		}
 		
-		final public static Start instantiate()
+		public static final Start instantiate()
 		{
 			return Q_.instantiateCmd("Compressor.start").cast();
 		}

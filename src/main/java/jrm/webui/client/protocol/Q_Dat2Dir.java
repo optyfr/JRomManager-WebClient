@@ -2,9 +2,10 @@ package jrm.webui.client.protocol;
 
 import java.util.List;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArrayString;
 
-public class Q_Dat2Dir extends Q_
+public class Q_Dat2Dir extends Q_	//NOSONAR
 {
 	protected Q_Dat2Dir()
 	{
@@ -18,7 +19,7 @@ public class Q_Dat2Dir extends Q_
 			super();
 		}
 		
-		final public static Start instantiate()
+		public static final Start instantiate()
 		{
 			return Q_.instantiateCmd("Dat2Dir.start").cast();
 		}
@@ -31,15 +32,15 @@ public class Q_Dat2Dir extends Q_
 			super();
 		}
 		
-		final public static Settings instantiate()
+		public static final Settings instantiate()
 		{
 			return Q_.instantiateCmd("Dat2Dir.settings").cast();
 		}
 		
-		final public Settings setSrcs(List<String> srcs)
+		public final Settings setSrcs(List<String> srcs)
 		{
-			JsArrayString jsarrstr = JsArrayString.createArray().cast();
-			srcs.forEach(s->jsarrstr.push(s));
+			JsArrayString jsarrstr = JavaScriptObject.createArray().cast();
+			srcs.forEach(jsarrstr::push);
 			getParams().set("srcs", jsarrstr);
 			return this;
 		}

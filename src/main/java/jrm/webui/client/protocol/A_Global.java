@@ -7,7 +7,7 @@ import com.google.gwt.core.client.JsArrayString;
 
 import jrm.webui.client.utils.EnhJSO;
 
-public class A_Global extends A_
+public class A_Global extends A_	//NOSONAR
 {
 	public A_Global(final A_ a)
 	{
@@ -21,6 +21,7 @@ public class A_Global extends A_
 	
 	public static class SetMemory extends A_
 	{
+		private static final String PARAMS_STR = "params";
 		private EnhJSO params;
 		
 		public SetMemory(final A_ a)
@@ -31,10 +32,10 @@ public class A_Global extends A_
 		public SetMemory(final EnhJSO response)
 		{
 			super(response);
-			params = response.getJSO("params");
+			params = response.getJSO(PARAMS_STR);
 		}
 		
-		final public String getMsg()
+		public final String getMsg()
 		{
 			return params.getString("msg");
 		}
@@ -42,6 +43,7 @@ public class A_Global extends A_
 
 	public static class UpdateProperty extends A_
 	{
+		private static final String PARAMS_STR = "params";
 		private Map<String,String> params = new HashMap<>();
 		
 		public UpdateProperty(final A_ a)
@@ -52,7 +54,7 @@ public class A_Global extends A_
 		public UpdateProperty(final EnhJSO response)
 		{
 			super(response);
-			EnhJSO p = response.getJSO("params");
+			EnhJSO p = response.getJSO(PARAMS_STR);
 			JsArrayString keys = EnhJSO.getProperties(p);
 			for(int i = 0; i < keys.length(); i++)
 			{
@@ -61,7 +63,7 @@ public class A_Global extends A_
 			}
 		}
 		
-		final public Map<String,String> getProperties()
+		public final Map<String,String> getProperties()
 		{
 			return params;
 		}
@@ -69,6 +71,7 @@ public class A_Global extends A_
 
 	public static class Warn extends A_
 	{
+		private static final String PARAMS_STR = "params";
 		private EnhJSO params;
 		
 		public Warn(final A_ a)
@@ -79,10 +82,10 @@ public class A_Global extends A_
 		public Warn(final EnhJSO response)
 		{
 			super(response);
-			params = response.getJSO("params");
+			params = response.getJSO(PARAMS_STR);
 		}
 		
-		final public String getMsg()
+		public final String getMsg()
 		{
 			return params.getString("msg");
 		}

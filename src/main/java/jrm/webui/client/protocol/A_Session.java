@@ -8,9 +8,10 @@ import com.google.gwt.core.client.JsArrayString;
 
 import jrm.webui.client.utils.EnhJSO;
 
-public class A_Session extends EnhJSO
+public class A_Session extends EnhJSO	//NOSONAR
 {
-	private static Map<String,String> msgs_cache = new HashMap<>();
+	private static final String SETTINGS_STR = "settings";
+	private static Map<String,String> msgsCache = new HashMap<>();
 	
 	protected A_Session()
 	{
@@ -34,56 +35,56 @@ public class A_Session extends EnhJSO
 	
 	public final Map<String,String> getMsgs()
 	{
-		if (msgs_cache.size()==0)
+		if (msgsCache.size()==0)
 		{
-			EnhJSO prop_jso = getJSO("msgs");
-			JsArrayString props = getProperties(prop_jso);
+			EnhJSO propJso = getJSO("msgs");
+			JsArrayString props = getProperties(propJso);
 			for (int i = 0; i < props.length(); i++)
-				msgs_cache.put(props.get(i), prop_jso.get(props.get(i)));
+				msgsCache.put(props.get(i), propJso.get(props.get(i)));
 		}
-		return msgs_cache;
+		return msgsCache;
 	}
 	
 	public final String getSetting(String key, String def)
 	{
-		EnhJSO prop_jso = getJSO("settings");
-		return prop_jso.exists(key)?prop_jso.get(key):def;
+		EnhJSO propJso = getJSO(SETTINGS_STR);
+		return propJso.exists(key)?propJso.get(key):def;
 	}
 	
 	public final Boolean getSettingAsBoolean(String key, boolean def)
 	{
-		EnhJSO prop_jso = getJSO("settings");
-		return prop_jso.exists(key)?prop_jso.getBoolean(key):def;
+		EnhJSO propJso = getJSO(SETTINGS_STR);
+		return propJso.exists(key)?propJso.getBoolean(key):def;
 	}
 	
 	public final Integer getSettingAsInteger(String key, int def)
 	{
-		EnhJSO prop_jso = getJSO("settings");
-		return prop_jso.exists(key)?prop_jso.getInteger(key):def;
+		EnhJSO propJso = getJSO(SETTINGS_STR);
+		return propJso.exists(key)?propJso.getInteger(key):def;
 	}
 	
 	public final void setSetting(String key, EnhJSO val)
 	{
-		EnhJSO prop_jso = getJSO("settings");
-		prop_jso.set(key, val);
+		EnhJSO propJso = getJSO(SETTINGS_STR);
+		propJso.set(key, val);
 	}
 	
 	public final void setSetting(String key, String val)
 	{
-		EnhJSO prop_jso = getJSO("settings");
-		prop_jso.set(key, val);
+		EnhJSO propJso = getJSO(SETTINGS_STR);
+		propJso.set(key, val);
 	}
 	
 	public final void setSetting(String key, boolean val)
 	{
-		EnhJSO prop_jso = getJSO("settings");
-		prop_jso.set(key, val);
+		EnhJSO propJso = getJSO(SETTINGS_STR);
+		propJso.set(key, val);
 	}
 	
 	public final void setSetting(String key, int val)
 	{
-		EnhJSO prop_jso = getJSO("settings");
-		prop_jso.set(key, val);
+		EnhJSO propJso = getJSO(SETTINGS_STR);
+		propJso.set(key, val);
 	}
 	
 	public final String getMsg(String code)

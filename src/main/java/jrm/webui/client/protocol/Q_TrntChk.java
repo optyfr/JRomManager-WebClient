@@ -1,6 +1,6 @@
 package jrm.webui.client.protocol;
 
-public class Q_TrntChk extends Q_
+public class Q_TrntChk extends Q_	//NOSONAR
 {
 	protected Q_TrntChk()
 	{
@@ -14,7 +14,7 @@ public class Q_TrntChk extends Q_
 			super();
 		}
 		
-		final public static Start instantiate()
+		public static final Start instantiate()
 		{
 			return Q_.instantiateCmd("TrntChk.start").cast();
 		}

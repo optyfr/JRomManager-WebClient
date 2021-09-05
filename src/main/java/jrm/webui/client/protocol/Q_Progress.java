@@ -1,6 +1,6 @@
 package jrm.webui.client.protocol;
 
-public class Q_Progress extends Q_
+public class Q_Progress extends Q_	//NOSONAR
 {
 	protected Q_Progress()
 	{
@@ -14,7 +14,7 @@ public class Q_Progress extends Q_
 			super();
 		}
 		
-		final public static Cancel instantiate()
+		public static final Cancel instantiate()
 		{
 			return Q_.instantiateCmd("Progress.cancel").cast();
 		}
