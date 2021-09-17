@@ -140,7 +140,7 @@ public class ProfilePanel extends VLayout
 					});
 				}};
 				setNavigationPane(treegrid=new TreeGrid() {{
-					setShowRoot(true);
+//					setShowRoot(true);
 					setAutoFetchData(true);
 					setLoadDataOnDemand(false);
 					setAutoFitFieldWidths(true);

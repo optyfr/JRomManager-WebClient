@@ -8,8 +8,6 @@ import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.RepeatingCommand;
 import com.google.gwt.user.client.Timer;
-import com.sksamuel.gwt.websockets.Websocket;
-import com.sksamuel.gwt.websockets.WebsocketListener;
 import com.smartgwt.client.rpc.RPCManager;
 import com.smartgwt.client.rpc.RPCRequest;
 import com.smartgwt.client.rpc.RPCResponse;
@@ -41,7 +39,6 @@ public class Client implements EntryPoint
 	private static MainWindow mainWindow = null;
 	private static Set<Window> childWindows = new HashSet<>();
 	
-	private static Websocket socket = null;
 	private static Timer lprTimer;
 
 	public Client()
@@ -180,7 +177,7 @@ public class Client implements EntryPoint
 	
 	private void lpr(boolean init)
 	{
-		updateMainWindow(new MainWindow());
+		updateMainWindow();
 		RPCRequest request = new RPCRequest();
 		request.setActionURL(init?"/actions/init":"/actions/lpr");
 		request.setContentType("application/json");
@@ -202,26 +199,15 @@ public class Client implements EntryPoint
 	
 	public static void sendMsg(String msg)
 	{
-		SC.logWarn(msg);
-		if (socket != null)
-			socket.send(msg);
-		else
-		{
-			RPCRequest request = new RPCRequest();
-			request.setActionURL("/actions/cmd");
-			SC.logWarn(request.getActionURL());
-			request.setContentType("application/json");
-			request.setUseSimpleHttp(true); // obligatoire car sinon on s'adresse à un serveur rpc smartclient, et ce n'est pas le cas ici
-			request.setHttpMethod("POST"); // on simplifie le plus possible la requête (POST est plus complexe pour le protocole HTTP et nécessite 2 aller-retour)
-			request.setData(msg);
-			RPCManager.sendRequest(request);
-		}
+		RPCRequest request = new RPCRequest();
+		request.setActionURL("/actions/cmd");
+		SC.logWarn(request.getActionURL());
+		request.setContentType("application/json");
+		request.setUseSimpleHttp(true); // obligatoire car sinon on s'adresse à un serveur rpc smartclient, et ce n'est pas le cas ici
+		request.setHttpMethod("POST"); // on simplifie le plus possible la requête (POST est plus complexe pour le protocole HTTP et nécessite 2 aller-retour)
+		request.setData(msg);
+		RPCManager.sendRequest(request);
 	}
-	
-	private native boolean canWS() /*-{
-		return $wnd.jrm_no_ws !== true;
-	}-*/;
-	
 	
 	@Override
 	public void onModuleLoad()
@@ -243,47 +229,17 @@ public class Client implements EntryPoint
 					if(response.getHttpResponseCode() == 200)
 					{
 						setSession(JsonUtils.safeEval(rawData.toString()));
-						if(Websocket.isSupported() && canWS())
+						setLprTimer(new Timer()
 						{
-							setSocket(new Websocket("ws://"+com.google.gwt.user.client.Window.Location.getHost()));
-							socket.addListener(new WebsocketListener()
+							boolean init = true;
+							
+							@Override
+							public void run()
 							{
-								@Override
-								public void onMessage(String msg)
-								{
-									processCmd(msg);
-								}
-	
-								@Override
-								public void onOpen()
-								{
-									setMainWindow(new MainWindow());
-								}
-	
-								@Override
-								public void onClose()
-								{
-									childWindows.forEach(Window::markForDestroy);
-									mainWindow.markForDestroy();
-									SC.say("Error", "Server closed connection");
-								}
-							});
-							socket.open();
-						}
-						else
-						{
-							setLprTimer(new Timer()
-							{
-								boolean init = true;
-								
-								@Override
-								public void run()
-								{
-									lpr(init);
-									init = false;
-								}
-							}).schedule(1);
-						}
+								lpr(init);
+								init = false;
+							}
+						}).schedule(1);
 					}
 				}
 		);
@@ -294,24 +250,15 @@ public class Client implements EntryPoint
 		Client.session = session;
 	}
 	
-	private static synchronized void setSocket(Websocket socket)
-	{
-		Client.socket = socket;
-	}
-	
 	public static synchronized A_Session getSession()
 	{
 		return session;
 	}
 
-	private static synchronized void updateMainWindow(MainWindow mainWindow)
+	private static synchronized void updateMainWindow()
 	{
-		if(Client.mainWindow == null) setMainWindow(mainWindow);
-	}
-	
-	private static synchronized void setMainWindow(MainWindow mainWindow)
-	{
-		Client.mainWindow = mainWindow;
+		if (Client.mainWindow == null)
+			Client.mainWindow = new MainWindow();
 	}
 	
 	public static synchronized MainWindow getMainWindow()
