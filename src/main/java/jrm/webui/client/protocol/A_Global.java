@@ -44,7 +44,7 @@ public class A_Global extends A_	//NOSONAR
 
 	public static class UpdateProperty extends A_
 	{
-		private Map<String,String> params = new HashMap<>();
+		private Map<String,Object> params = new HashMap<>();
 		
 		public UpdateProperty(final A_ a)
 		{
@@ -63,7 +63,7 @@ public class A_Global extends A_	//NOSONAR
 			}
 		}
 		
-		public final Map<String,String> getProperties()
+		public final Map<String,Object> getProperties()
 		{
 			return params;
 		}

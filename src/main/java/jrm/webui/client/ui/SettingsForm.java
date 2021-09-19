@@ -75,6 +75,8 @@ abstract class SettingsForm extends DynamicForm
 		put("chkbx7ZSolid", "7z_solid");
 		put("cbDbgLevel", "debug_level");
 		put("cbThreadCount", "thread_count");
+		put("tfBackupGDest", "backup_dest_dir");
+		put("tfBackupGDestEnabled", "backup_dest_dir_enabled");
 	}};
 
 	public SettingsForm()

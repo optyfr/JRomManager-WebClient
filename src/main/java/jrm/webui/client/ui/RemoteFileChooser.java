@@ -94,6 +94,7 @@ public final class RemoteFileChooser extends Window
 				case "tfSWDest":
 				case "tfSWDisksDest":
 				case "tfSamplesDest":
+				case "tfBackupDest":
 					selMode = SelMode.DIR;
 					isMultiple = false;
 					isChoose = true;

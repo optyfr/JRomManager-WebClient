@@ -145,7 +145,14 @@ public class Client implements EntryPoint
 					mainWindow.update(new A_Global.SetMemory(a));
 					break;
 				case "Global.updateProperty":
-					new A_Global.UpdateProperty(a).getProperties().forEach((k, v) -> session.setSetting(k, v));
+					new A_Global.UpdateProperty(a).getProperties().forEach((k, v) -> {
+						if(v instanceof String)
+							session.setSetting(k, (String)v);
+						else if(v instanceof Boolean)
+							session.setSetting(k, (Boolean)v);
+						else if(v instanceof Integer)
+							session.setSetting(k, (Integer)v);
+					});
 					break;
 				case "Global.warn":
 					SC.warn(new A_Global.Warn(a).getMsg());

@@ -161,6 +161,32 @@ public final class ScannerDirPanel extends DynamicForm
 					Client.sendMsg(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty("samples_dest_dir_enabled", selected)));
 				});
 			}},
+			new TextItem("tfBackupDest",Client.getSession().getMsg("MainFrame.lblBackupDest.text")) {{
+				setWidth("*");
+				setCanEdit(false);
+				setDisabled(true);
+				setEndRow(false);
+			}},
+			new ButtonItem("tfBackupDestBtn") {{
+				setStartRow(false);
+				setIcon("icons/disk.png");
+				setTitle(null);
+				setDisabled(true);
+				setValueIconRightPadding(0);
+				setEndRow(false);
+				addClickHandler(event->new RemoteFileChooser("tfBackupDest", null, records->setPropertyItemValue("tfBackupDest", "backup_dest_dir", records[0].path)));
+			}},
+			new CheckboxItem("tfBackupDestCbx") {{
+				setStartRow(false);
+				setShowLabel(false);
+				setShowTitle(false);
+				addChangedHandler(event->{
+					boolean selected = (boolean)event.getValue();
+					ScannerDirPanel.this.getField("tfBackupDestBtn").setDisabled(!selected);
+					ScannerDirPanel.this.getField("tfBackupDest").setDisabled(!selected);
+					Client.sendMsg(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty("backup_dest_dir_enabled", selected)));
+				});
+			}},
 			new SelectItem("listSrcDir",Client.getSession().getMsg("MainFrame.lblSrcDir.text")) {{
 				setWidth("*");
 				setID("listSrcDir");
@@ -290,7 +316,7 @@ public final class ScannerDirPanel extends DynamicForm
 				else if(formItem instanceof SelectItem)
 				{
 					SelectItem selitem = (SelectItem)formItem;
-					if(selitem.isMultiple())
+					if(Boolean.TRUE.equals(selitem.isMultiple()))
 					{
 						selitem.setValueMap();
 						Optional.of(jso.getString(name, false)).ifPresent(strs->selitem.setValueMap(strs.split("\\|")));
@@ -314,6 +340,8 @@ public final class ScannerDirPanel extends DynamicForm
 		initPropertyItemValue("tfSWDisksDest", "swdisks_dest_dir", settings);
 		initPropertyItemValue("tfSamplesDestCbx", "samples_dest_dir_enabled", settings);
 		initPropertyItemValue("tfSamplesDest", "samples_dest_dir", settings);
+		initPropertyItemValue("tfBackupDestCbx", "backup_dest_dir_enabled", settings);
+		initPropertyItemValue("tfBackupDest", "backup_dest_dir", settings);
 		initPropertyItemValue("listSrcDir", "src_dir", settings);
 	}
 }
