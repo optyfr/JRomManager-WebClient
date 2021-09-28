@@ -218,6 +218,7 @@ public class MainWindow extends Window
 			scannerPanel.scannerDirPanel.initPropertyItemValues(settings);
 			scannerPanel.scannerSettingsPanel.initPropertyItemValues(settings);
 			scannerPanel.scannerFiltersPanel.systems.setData(Record.convertToRecordArray(params.getSystems()));
+			scannerPanel.scannerFiltersPanel.sources.setData(Record.convertToRecordArray(params.getSources()));
 			JsArrayString jsarrstr = params.getYears();
 			ArrayList<String> arrlststr = new ArrayList<>();
 			for(int i = 0; i < jsarrstr.length(); i++)

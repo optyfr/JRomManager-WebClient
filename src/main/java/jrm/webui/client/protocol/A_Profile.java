@@ -60,6 +60,11 @@ public class A_Profile extends A_	//NOSONAR
 		{
 			return params.getJSAJSO("systems");
 		}
+
+		public final JsArray<JavaScriptObject> getSources()
+		{
+			return params.getJSAJSO("sources");
+		}
 	}
 
 	

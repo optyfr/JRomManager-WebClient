@@ -26,13 +26,14 @@ import jrm.webui.client.Client;
 import jrm.webui.client.protocol.Q_Profile;
 import jrm.webui.client.utils.EnhJSO;
 
-public final class ScannerFiltersPanel extends HLayout
+public final class ScannerFiltersPanel extends HLayout	//NOSONAR
 {
 	Systems systems;
+	Sources sources;
 	private boolean canResetPV = true;
 	FilterForm filterForm;
 	
-	class Systems extends ListGrid
+	class Systems extends ListGrid	//NOSONAR
 	{
 		private boolean setproperty = true;
 		
@@ -106,7 +107,59 @@ public final class ScannerFiltersPanel extends HLayout
 		}
 	}
 
-	class FilterForm extends SettingsForm
+	class Sources extends ListGrid	//NOSONAR
+	{
+		private boolean setproperty = true;
+		
+		public Sources()
+		{
+			setShowAllRecords(true);
+			setAlternateRecordStyles(false);
+			setSelectionProperty("selected");
+			setFields(new ListGridField("name",Client.getSession().getMsg("MainFrame.sourcesFilter.viewportBorderTitle")));
+			setSelectionAppearance(SelectionAppearance.CHECKBOX);
+			setShowSelectedStyle(false);
+			setCanEdit(false);
+			setCanRemoveRecords(false);
+			addSelectionChangedHandler(event->{
+				if(setproperty)
+				{
+					Client.sendMsg(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty(event.getRecord().getAttribute("property"), event.getState())));
+					if(canResetPV)
+						resetProfileViewer();
+				}
+			});
+			setContextMenu(new Menu() {{
+				addItem(new MenuItem(Client.getSession().getMsg("MainFrame.mntmSelectAll.text")) {{
+					addClickHandler(event->resetProfileViewer(()->sources.selectAllRecords()));
+				}});
+				addItem(new MenuItem(Client.getSession().getMsg("MainFrame.mntmSelectNone.text")) {{
+					addClickHandler(event->resetProfileViewer(()->sources.deselectAllRecords()));
+				}});
+				addItem(new MenuItem(Client.getSession().getMsg("MainFrame.mntmInvertSelection.text")) {{
+					addClickHandler(event->resetProfileViewer(()->{
+						ListGridRecord[] to_unselect = sources.getSelectedRecords();
+						List<ListGridRecord> to_unselect_list = Arrays.asList(to_unselect);
+						ListGridRecord[] to_select = Stream.of(sources.getRecords()).filter(r->!to_unselect_list.contains(r)).collect(Collectors.toList()).toArray(new ListGridRecord[0]);
+						sources.deselectRecords(to_unselect);
+						sources.selectRecords(to_select);
+					}));
+				}});
+			}});
+		}
+		
+		@Override
+		public void setData(Record[] data)
+		{
+			resetProfileViewer(()->{
+				setproperty=false;
+				super.setData(data);
+				setproperty=true;
+			});
+		}
+	}
+
+	class FilterForm extends SettingsForm	//NOSONAR
 	{
 		public FilterForm()
 		{
@@ -195,23 +248,27 @@ public final class ScannerFiltersPanel extends HLayout
 		super();
 		setWidth100();
 		setHeight100();
-		setMembers(
-			new VLayout() {{
-				setShowResizeBar(true);
-				addMember(new LayoutSpacer("*", "*"));
-				addMember(filterForm = new FilterForm());
-				addMember(new LayoutSpacer("*", "*"));
-			}},
-			systems = new Systems()
-		);
+		final var left = new VLayout();
+		left.setShowResizeBar(true);
+		left.addMember(new LayoutSpacer("*", "*"));
+		filterForm = new FilterForm();
+		left.addMember(filterForm);
+		left.addMember(new LayoutSpacer("*", "*"));
+		final var right = new VLayout();
+		systems = new Systems();
+		systems.setShowResizeBar(true);
+		right.addMember(systems);
+		sources = new Sources();
+		right.addMember(sources);
+		setMembers(left, right);
 	}
 	
-	interface resetProfileViewerCB
+	interface ResetProfileViewerCB
 	{
 		void apply();
 	}
 	
-	public void resetProfileViewer(resetProfileViewerCB cb)
+	public void resetProfileViewer(ResetProfileViewerCB cb)
 	{
 		canResetPV=false;
 		cb.apply();
@@ -230,9 +287,8 @@ public final class ScannerFiltersPanel extends HLayout
 				@Override
 				public void run()
 				{
-					if (canResetPV)
-						if (Client.getMainWindow().scannerPanel.profileViewer != null && Client.getChildWindows().contains(Client.getMainWindow().scannerPanel.profileViewer))
-							Client.getMainWindow().scannerPanel.profileViewer.anywareListList.reset();
+					if (canResetPV && Client.getMainWindow().scannerPanel.profileViewer != null && Client.getChildWindows().contains(Client.getMainWindow().scannerPanel.profileViewer))
+						Client.getMainWindow().scannerPanel.profileViewer.anywareListList.reset();
 				}
 			};
 		}
