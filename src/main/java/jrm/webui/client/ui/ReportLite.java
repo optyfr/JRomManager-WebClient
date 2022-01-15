@@ -9,8 +9,7 @@ import com.smartgwt.client.widgets.layout.LayoutSpacer;
 
 import jrm.webui.client.Client;
 
-@SuppressWarnings("serial")
-final public class ReportLite extends Window implements ReportStatus
+public final class ReportLite extends Window implements ReportStatus
 {
 	private ReportTree tree;
 	
@@ -31,18 +30,19 @@ final public class ReportLite extends Window implements ReportStatus
 		setShowMaximizeButton(true);
 		setShowStatusBar(true);
 		setShowFooter(true);
-		setHeaderIconDefaults(new HashMap<String,Object>() {{
-			put("width", 16);
-			put("height", 16);
-			put("src", "rom.png");
-		}});
+		final var map = new HashMap<String,Object>();
+		map.put("width", 16);
+		map.put("height", 16);
+		map.put("src", "rom.png");
+		setHeaderIconDefaults(map);
 		setShowHeaderIcon(true);
 		addCloseClickHandler(event->ReportLite.this.markForDestroy());
-		addItem(tree = new ReportTree(src,this));
-		addItem(new HLayout() {{
-			addMember(new LayoutSpacer("*",20));
-			addMember(new IButton("Close", e->ReportLite.this.markForDestroy()));
-		}});
+		tree = new ReportTree(src,this);
+		addItem(tree);
+		final var hlayout = new HLayout();
+		hlayout.addMember(new LayoutSpacer("*",20));
+		hlayout.addMember(new IButton("Close", e->ReportLite.this.markForDestroy()));
+		addItem(hlayout);
 		show();
 	}
 
@@ -63,4 +63,15 @@ final public class ReportLite extends Window implements ReportStatus
 		super.onDestroy();
 	}
 	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return super.equals(obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return super.hashCode();
+	}
 }

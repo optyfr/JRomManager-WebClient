@@ -6,8 +6,7 @@ import com.smartgwt.client.widgets.Window;
 
 import jrm.webui.client.Client;
 
-@SuppressWarnings("serial")
-final public class ReportViewer extends Window implements ReportStatus
+public final class ReportViewer extends Window implements ReportStatus
 {
 	private ReportTree tree;
 	
@@ -24,14 +23,15 @@ final public class ReportViewer extends Window implements ReportStatus
 		setCanDragResize(true);
 		setShowHeaderIcon(true);
 		setShowMaximizeButton(true);
-		setHeaderIconDefaults(new HashMap<String,Object>() {{
-			put("width", 16);
-			put("height", 16);
-			put("src", "rom.png");
-		}});
+		final var map = new HashMap<String,Object>();
+		map.put("width", 16);
+		map.put("height", 16);
+		map.put("src", "rom.png");
+		setHeaderIconDefaults(map);
 		setShowHeaderIcon(true);
 		addCloseClickHandler(event->ReportViewer.this.markForDestroy());
-		addItem(tree = new ReportTree(null, this));
+		tree = new ReportTree(null, this);
+		addItem(tree);
 		setShowFooter(true);
 		setShowStatusBar(true);
 		show();
@@ -54,4 +54,15 @@ final public class ReportViewer extends Window implements ReportStatus
 		super.onDestroy();
 	}
 	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return super.equals(obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return super.hashCode();
+	}
 }
