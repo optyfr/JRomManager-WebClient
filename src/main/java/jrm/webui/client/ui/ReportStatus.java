@@ -1,6 +1,8 @@
 package jrm.webui.client.ui;
 
+import com.smartgwt.client.widgets.Window;
+
 public interface ReportStatus
 {
-	void setStatus(String status);
+	Window setStatus(String status);
 }

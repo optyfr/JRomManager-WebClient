@@ -43,8 +43,8 @@ apply plugin: 'de.undercouch.download'
 
 task downloadSmartGWT(type: Download) {
 	src([
-		'https://www.smartclient.com/builds/SmartGWT/12.0p/LGPL/latest/smartgwt.jar',
-		'https://www.smartclient.com/builds/SmartGWT/12.0p/LGPL/latest/smartgwt-skins.jar'
+		'https://www.smartclient.com/builds/SmartGWT/13.0p/LGPL/latest/smartgwt.jar',
+		'https://www.smartclient.com/builds/SmartGWT/13.0p/LGPL/latest/smartgwt-skins.jar'
 	])
 	dest "$buildDir/SmartGWT"
 	onlyIfModified true
@@ -66,7 +66,7 @@ apply plugin: 'de.esoco.gwt'
 dependencies {
 	implementation files(SmartGWT)
 	implementation files(SmartGWTSkins)
-	implementation group: 'com.sksamuel.gwt', name: 'gwt-websockets', version: '1.+'
+//	implementation group: 'com.sksamuel.gwt', name: 'gwt-websockets', version: '1.+'
 }
 
 sourceSets {

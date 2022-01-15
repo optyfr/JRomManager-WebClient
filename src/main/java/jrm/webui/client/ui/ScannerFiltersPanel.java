@@ -97,13 +97,14 @@ public final class ScannerFiltersPanel extends HLayout	//NOSONAR
 		}
 		
 		@Override
-		public void setData(Record[] data)
+		public ListGrid setData(ListGridRecord... data)
 		{
 			resetProfileViewer(()->{
 				setproperty=false;
 				super.setData(data);
 				setproperty=true;
 			});
+			return this;
 		}
 	}
 
@@ -149,13 +150,14 @@ public final class ScannerFiltersPanel extends HLayout	//NOSONAR
 		}
 		
 		@Override
-		public void setData(Record[] data)
+		public ListGrid setData(Record[] data)
 		{
 			resetProfileViewer(()->{
 				setproperty=false;
 				super.setData(data);
 				setproperty=true;
 			});
+			return this;
 		}
 	}
 
