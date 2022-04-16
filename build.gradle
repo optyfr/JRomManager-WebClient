@@ -130,7 +130,7 @@ gwt {
 	}
 }
 
-task webZip(type: Zip) {
+task webZip(type: Zip, dependsOn: gwtCompile) {
 	from ("$buildDir/gwt/out/smartgwt")
 	into "webclient"
 	archiveBaseName = 'release'
