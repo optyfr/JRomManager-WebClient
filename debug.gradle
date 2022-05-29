@@ -90,7 +90,7 @@ gwt {
 	compile {
 		/** The level of logging detail (ERROR, WARN, INFO, TRACE, 
 		 * DEBUG, SPAM, ALL) */
-		logLevel = "TRACE"
+		logLevel = "INFO"
 		/** Compile a report that tells the "Story of Your Compile". */
 		compileReport = true
 		/** Compile quickly with minimal optimizations. */
@@ -122,11 +122,40 @@ gwt {
 		/** shown all compile errors */
         strict = false
 
+		war = "$buildDir/gwt/debug"
+
 		/** Java args */
 		javaArgs=["-Dfile.encoding": 'UTF-8']
 		maxHeapSize="1024m"
 		minHeapSize="512m"
 //		maxPermSize="128m"
+	}
+}
+
+gwtCompile {
+	doFirst {
+		delete {
+			delete "$buildDir/gwt/debug"
+		}
+	}
+}
+
+war
+{
+	duplicatesStrategy 'exclude'
+	from "war"
+	rootSpec.exclude("**/jrm")
+	rootSpec.exclude("**/*.jar")
+	archiveBaseName = "debug"
+	archiveVersion = null
+	doFirst {
+		delete {
+			delete "war/smartgwt"
+		}
+		copy {
+			from "$buildDir/gwt/debug"
+			into "war"
+		}
 	}
 }
 
@@ -140,22 +169,3 @@ task webZip(type: Zip, dependsOn: gwtCompile) {
 
 build.dependsOn webZip
 
-gwtCompile {
-	doLast {
-		delete {
-			delete "war/webclient/deferredjs"
-			delete fileTree("war").matching {
-				include "**/*.cache.js"
-				include "**/*.cache.js.gz"
-			}
-		}
-		copy {
-			from "$buildDir/gwt/out"
-			into "war"
-		}
-	}
-}
-
-war {
-	archiveBaseName = 'debug'
-}

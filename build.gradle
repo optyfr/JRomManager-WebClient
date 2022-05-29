@@ -122,6 +122,8 @@ gwt {
 		/** shown all compile errors */
         strict = false
 
+		war = "$buildDir/gwt/release"
+
 		/** Java args */
 		javaArgs=["-Dfile.encoding": 'UTF-8']
 		maxHeapSize="1024m"
@@ -129,6 +131,51 @@ gwt {
 //		maxPermSize="128m"
 	}
 }
+
+gwtCompile {
+	doFirst {
+		delete {
+			delete "$buildDir/gwt/release"
+		}
+	}
+}
+
+war
+{
+	duplicatesStrategy 'exclude'
+	from "war"
+	rootSpec.exclude("**/jrm")
+	rootSpec.exclude("**/*.jar")
+	archiveBaseName = "release"
+	archiveVersion = null
+	doFirst {
+		delete {
+			delete "war/smartgwt"
+		}
+		copy {
+			from "$buildDir/gwt/release"
+			into "war"
+		}
+	}
+}
+
+jar {
+	dependsOn gwtCompile
+	archiveBaseName = 'jrm-webui'
+	exclude '/jrm'
+	from ("$buildDir/gwt/release") {
+		into('webclient')
+	}
+	from ("$projectDir/war/index.html") {
+		into('webclient')
+	}
+	from ("$projectDir/certs") {
+		into('certs')
+	}
+}
+
+build.dependsOn jar
+
 
 task webZip(type: Zip, dependsOn: gwtCompile) {
 	from ("$buildDir/gwt/out/smartgwt")
