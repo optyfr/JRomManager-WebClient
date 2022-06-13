@@ -161,7 +161,6 @@ war
 
 jar {
 	dependsOn gwtCompile
-	archiveBaseName = 'jrm-webui'
 	exclude '/jrm'
 	from ("$buildDir/gwt/release") {
 		into('webclient')
