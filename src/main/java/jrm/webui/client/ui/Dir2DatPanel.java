@@ -168,7 +168,7 @@ public class Dir2DatPanel extends VLayout
 						setTitle(null);
 						setValueIconRightPadding(0);
 						setEndRow(false);
-						addClickHandler(event->new RemoteFileChooser("tfDisksDest",  null, infos->{
+						addClickHandler(event->new RemoteFileChooser("tfSrcDir",  null, infos->{
 							setGPropertyItemValue("txtSrcDir", fname2name.get("txtSrcDir"), infos[0].path);
 							event.getForm().getItem("txtSrcDir").setValue(infos[0].path);
 						}));
@@ -201,7 +201,7 @@ public class Dir2DatPanel extends VLayout
 						setIcon("icons/disk.png");
 						setTitle(null);
 						setValueIconRightPadding(0);
-						addClickHandler(event->new RemoteFileChooser("tfDisksDest", null, infos->{
+						addClickHandler(event->new RemoteFileChooser("tfDstDat", null, infos->{
 							setGPropertyItemValue("txtDstDat", fname2name.get("txtDstDat"), infos[0].path);
 							event.getForm().getItem("txtDstDat").setValue(infos[0].path);
 						}));

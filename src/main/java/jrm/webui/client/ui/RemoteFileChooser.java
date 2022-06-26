@@ -136,6 +136,16 @@ public final class RemoteFileChooser extends Window
 					isMultiple = true;
 					isChoose = true;
 					break;
+				case "tfSrcDir": 
+					selMode = SelMode.DIR;
+					isMultiple = false;
+					isChoose = true;
+					break;
+				case "tfDstDat": 
+					selMode = SelMode.FILE;
+					isMultiple = false;
+					isChoose = true;
+					break;
 				default:
 					selMode = SelMode.FILE;
 					isMultiple = false;
