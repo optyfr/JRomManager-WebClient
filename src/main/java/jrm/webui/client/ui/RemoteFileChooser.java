@@ -266,7 +266,7 @@ public final class RemoteFileChooser extends Window
 			setShowHover(true);
 			setCanHover(true);
 			setHoverWidth(200);
-			setAutoFetchData(true);
+		//	setAutoFetchData(true);
 			setSelectionType(options.isMultiple?SelectionStyle.MULTIPLE:SelectionStyle.SINGLE);
 			addEditFailedHandler(event->startEditing(event.getRowNum(),event.getColNum()));
 			addEditCompleteHandler(event->{
