@@ -1,7 +1,6 @@
 package jrm.webui.client.ui;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -13,20 +12,11 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.smartgwt.client.data.DSCallback;
 import com.smartgwt.client.data.DSRequest;
 import com.smartgwt.client.data.DSResponse;
-import com.smartgwt.client.data.OperationBinding;
 import com.smartgwt.client.data.Record;
-import com.smartgwt.client.data.RestDataSource;
 import com.smartgwt.client.data.ResultSet;
 import com.smartgwt.client.data.SortSpecifier;
 import com.smartgwt.client.data.XMLTools;
-import com.smartgwt.client.data.fields.DataSourceBooleanField;
-import com.smartgwt.client.data.fields.DataSourceDateTimeField;
-import com.smartgwt.client.data.fields.DataSourceIntegerField;
-import com.smartgwt.client.data.fields.DataSourceTextField;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.DSDataFormat;
-import com.smartgwt.client.types.DSOperationType;
-import com.smartgwt.client.types.DSProtocol;
 import com.smartgwt.client.types.DateDisplayFormat;
 import com.smartgwt.client.types.FormMethod;
 import com.smartgwt.client.types.SelectionStyle;
@@ -50,6 +40,8 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 
 import jrm.webui.client.Client;
+import jrm.webui.client.datasources.DSRemoteFileChooser;
+import jrm.webui.client.datasources.DSRemoteRootChooser;
 import jrm.webui.client.protocol.Q_Global;
 import jrm.webui.client.ui.RemoteFileChooser.Options.SelMode;
 import jrm.webui.client.utils.CaseInsensitiveString;
@@ -213,7 +205,7 @@ public final class RemoteFileChooser extends Window
 							params.put("initialPath", options.initialPath);
 						initial = false;
 					}
-					list.getDataSource().setRequestProperties(new DSRequest() {{setData(params);}});
+					list.ds.setExtraData(params);
 				//	if(list.getTotalRows()>0)
 						list.invalidateCache();
 				//	else
@@ -224,27 +216,22 @@ public final class RemoteFileChooser extends Window
 				if(getSelectedRecord()==null)
 					selectRecord(0);
 			});
-			setDataSource(new RestDataSource() {{
-					setID("remoteRootChooser");
-					setDataURL("/datasources/"+getID());
-					setRequestProperties(new DSRequest() {{setData(Collections.singletonMap("context", options.context));}});
-					setDataFormat(DSDataFormat.XML);
-					setOperationBindings(
-						new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}}
-					);
-					DataSourceTextField nameField = new DataSourceTextField("Name");
-					DataSourceTextField pathField = new DataSourceTextField("Path");
-					pathField.setHidden(true);
-					pathField.setPrimaryKey(true);
-					setFields(nameField, pathField);
-				}},	new ListGridField("Type") {{
-					setWidth(20);
-					setMaxWidth(20);
-					setCellFormatter((value,record,rowNum,colNum)->"<img src='/images/icons/drive.png'/>");
-				}},
-				new ListGridField("Name") {{
-					setWidth("*");
-				}}
+			setDataSource(
+				DSRemoteRootChooser.getInstance(options.context), 
+				new ListGridField("Type")
+				{
+					{
+						setWidth(20);
+						setMaxWidth(20);
+						setCellFormatter((value, record, rowNum, colNum) -> "<img src='/images/icons/drive.png'/>");
+					}
+				}, 
+				new ListGridField("Name")
+				{
+					{
+						setWidth("*");
+					}
+				}
 			);
 		}		
 	}
@@ -253,13 +240,21 @@ public final class RemoteFileChooser extends Window
 	{
 		private int tot;
 		private float val[];
-		private Options options;
+		private final Options options;
+		private final DSRemoteFileChooser ds;
 		
 		@SuppressWarnings("serial")
 		public UploadList(Options options, CallBack cb)
 		{
 			super();
 			this.options = options;
+			ds = DSRemoteFileChooser.getInstance(options.context);
+			ds.setCB((data)->{
+				root = XMLTools.selectString(data, "/response/root");
+				parent = XMLTools.selectString(data, "/response/parent");
+				relparent = XMLTools.selectString(data, "/response/relparent");
+				parentLab.setContents(XMLTools.selectString(data, "/response/parentRelative"));
+			});
 			setID("RemoteFileChooser_UploadList_"+options.context);
 			setBorder("2px solid lightgrey");
 			setShowFilterEditor(false);
@@ -373,46 +368,8 @@ public final class RemoteFileChooser extends Window
 				}
 			});
 			setInitialSort(new SortSpecifier("isDir", SortDirection.DESCENDING),new SortSpecifier("Name", SortDirection.ASCENDING));
-			setDataSource(new RestDataSource() {
-				{
-					setID("remoteFileChooser");
-					setDataURL("/datasources/"+getID());
-					setRequestProperties(new DSRequest() {{setData(Collections.singletonMap("context", options.context));}});
-					setDataFormat(DSDataFormat.XML);
-					setOperationBindings(
-						new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}},
-						new OperationBinding(){{setOperationType(DSOperationType.REMOVE);setDataProtocol(DSProtocol.POSTXML);}},
-						new OperationBinding(){{setOperationType(DSOperationType.ADD);setDataProtocol(DSProtocol.POSTXML);}},
-						new OperationBinding(){{setOperationType(DSOperationType.UPDATE);setDataProtocol(DSProtocol.POSTXML);}},
-						new OperationBinding(){{setOperationType(DSOperationType.CUSTOM);setDataProtocol(DSProtocol.POSTXML);}}
-					);
-					DataSourceTextField nameField = new DataSourceTextField("Name");
-					nameField.setPrimaryKey(true);
-					DataSourceTextField pathField = new DataSourceTextField("Path");
-					pathField.setHidden(true);
-					DataSourceBooleanField isDir = new DataSourceBooleanField("isDir");
-					isDir.setCanEdit(false);
-					DataSourceIntegerField sizefield = new DataSourceIntegerField("Size");
-					sizefield.setCanEdit(false);
-					DataSourceDateTimeField modifiedfield = new DataSourceDateTimeField("Modified") {{
-						setDatetimeFormatter(DateDisplayFormat.TOSERIALIZEABLEDATE);
-						setCanEdit(false);
-					}};
-					setFields(isDir, nameField, pathField, sizefield, modifiedfield);
-				}
-				@Override
-				protected void transformResponse(DSResponse dsResponse, DSRequest dsRequest, Object data) {
-					if (dsResponse.getStatus() == 0)
-					{
-						root = XMLTools.selectString(data, "/response/root");
-						parent = XMLTools.selectString(data, "/response/parent");
-						relparent = XMLTools.selectString(data, "/response/relparent");
-						parentLab.setContents(XMLTools.selectString(data, "/response/parentRelative"));
-						
-					}
-					super.transformResponse(dsResponse, dsRequest, data);
-				};
-			});
+			setDatetimeFormatter(DateDisplayFormat.TOSERIALIZEABLEDATE);
+			setDataSource(ds);
 			SortNormalizer normalizer = (record, fieldName) -> record.getAttribute("Name").equals("..") ? "\0" : record.getAttribute(fieldName);
 			setFields(
 					new ListGridField("isDir") {{
@@ -446,14 +403,11 @@ public final class RemoteFileChooser extends Window
 		public void enterDir(ListGridRecord record)
 		{
 			String path = record.getAttribute("Path");
-			getDataSource().setRequestProperties(new DSRequest() {{
-				Map<String,String> params = new HashMap<>();
-				params.put("context", options.context);
-				params.put("parent", path);
-				params.put("root", root);
-				//setParams(params);
-				setData(params);
-			}});
+			Map<String,String> params = new HashMap<>();
+			params.put("context", options.context);
+			params.put("parent", path);
+			params.put("root", root);
+			ds.setExtraData(params);
 			invalidateCache();
 		}
 

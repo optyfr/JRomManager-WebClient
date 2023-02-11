@@ -1,5 +1,6 @@
 package jrm.webui.client.ui;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -12,18 +13,9 @@ import com.smartgwt.client.data.DSCallback;
 import com.smartgwt.client.data.DSRequest;
 import com.smartgwt.client.data.DSResponse;
 import com.smartgwt.client.data.DataSource;
-import com.smartgwt.client.data.OperationBinding;
 import com.smartgwt.client.data.Record;
-import com.smartgwt.client.data.RestDataSource;
 import com.smartgwt.client.data.ResultSet;
-import com.smartgwt.client.data.XMLTools;
-import com.smartgwt.client.data.fields.DataSourceBooleanField;
-import com.smartgwt.client.data.fields.DataSourceIntegerField;
-import com.smartgwt.client.data.fields.DataSourceTextField;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.DSDataFormat;
-import com.smartgwt.client.types.DSOperationType;
-import com.smartgwt.client.types.DSProtocol;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SelectionType;
 import com.smartgwt.client.util.SC;
@@ -40,6 +32,9 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 import jrm.webui.client.Client;
+import jrm.webui.client.datasources.DSAnyware;
+import jrm.webui.client.datasources.DSAnywareList;
+import jrm.webui.client.datasources.DSAnywareListList;
 
 public class ProfileViewer extends Window
 {
@@ -56,10 +51,12 @@ public class ProfileViewer extends Window
 			put("PARTIAL","/images/disk_multiple_orange.png");
 			put("UNKNOWN","/images/disk_multiple_gray.png");
 		}};
-
+		private final DSAnywareListList ds;
+		
 		public AnywareListList()
 		{
 			super();
+			ds = DSAnywareListList.getInstance();
 			setCanEdit(false);
 			setCanRemoveRecords(false);
 			setCanHover(true);
@@ -76,27 +73,12 @@ public class ProfileViewer extends Window
 					anywareList.reset(event.getRecord(), getDataSource());
 			});
 			addDataArrivedHandler(event->{
-				getDataSource().setRequestProperties(new DSRequest());
+				ds.setExtraData(Collections.emptyMap());
 				if(getTotalRows()>0 && !Boolean.TRUE.equals(anySelected()))
 					selectSingleRecord(0);
 			});
 			setDataSource(
-				new RestDataSource() {{
-					setID("AnywareListList");
-					setDataURL("/datasources/"+getID());
-					setDataFormat(DSDataFormat.XML);
-					setOperationBindings(
-						new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}}
-					);
-					setFields(
-						new DataSourceTextField("status"),
-						new DataSourceTextField("name",Client.getSession().getMsg("SoftwareListListRenderer.Name")) {{
-							setPrimaryKey(true);
-						}},
-						new DataSourceTextField("description", Client.getSession().getMsg("SoftwareListListRenderer.Description")),
-						new DataSourceTextField("have", Client.getSession().getMsg("SoftwareListListRenderer.Have"))
-					);
-				}}, 
+				ds, 
 				new ListGridField("name") {{
 					setMinWidth(80);
 					setWidth("25%");
@@ -125,12 +107,7 @@ public class ProfileViewer extends Window
 		
 		public void reset()
 		{
-			getDataSource().setRequestProperties(new DSRequest() {{
-				setBypassCache(true);
-				setData(new HashMap<String,String>(){{
-					put("reset","true");
-				}});
-			}});
+			ds.setExtraData(Collections.singletonMap("reset", "true"));
 			if(Boolean.TRUE.equals(willFetchData(null)))
 				fetchData();
 			else
@@ -157,8 +134,11 @@ public class ProfileViewer extends Window
 		
 		private Integer to_select = null;
 		
+		private final DSAnywareList ds;
+		
 		public AnywareList()
 		{
+			ds = DSAnywareList.getInstance();
 			setCanEdit(true);
 			setDataProperties(new ResultSet() {{
 				setUseClientFiltering(false);
@@ -192,7 +172,7 @@ public class ProfileViewer extends Window
 					anyware.reset(event.getRecord(), getDataSource());
 			});
 			addDataArrivedHandler(event->{
-				getDataSource().setRequestProperties(new DSRequest());
+				ds.setExtraData(Collections.emptyMap());
 				if(getTotalRows()>0)
 				{
 					if(to_select!=null)
@@ -231,57 +211,16 @@ public class ProfileViewer extends Window
 					}
 				};
 				if(field.getName().equals("cloneof"))
-					getDataSource().performCustomOperation("find", new Record(getCriteria().getValues()) {{
+					ds.performCustomOperation("find", new Record(getCriteria().getValues()) {{
 						setAttribute("find", event.getRecord().getAttribute("cloneof"));
 					}}, cb);
 				else if(field.getName().equals("romof"))
-					getDataSource().performCustomOperation("find", new Record(getCriteria().getValues()) {{
+					ds.performCustomOperation("find", new Record(getCriteria().getValues()) {{
 						setAttribute("find", event.getRecord().getAttribute("romof"));
 					}}, cb);
 			});
 			setDataSource(
-				new RestDataSource()
-				{
-					{
-						setID("AnywareList");
-						setDataURL("/datasources/"+getID());
-						setDataFormat(DSDataFormat.XML);
-						setOperationBindings(
-							new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}},
-							new OperationBinding(){{setOperationType(DSOperationType.UPDATE);setDataProtocol(DSProtocol.POSTXML);}},
-							new OperationBinding(){{setOperationType(DSOperationType.CUSTOM);setDataProtocol(DSProtocol.POSTXML);}}
-						);
-						setFields(
-							new DataSourceTextField("status"),
-							new DataSourceTextField("list") {{
-								setPrimaryKey(true);
-								setHidden(true);
-								setForeignKey("AnywareListList.name");
-							}},
-							new DataSourceTextField("name") {{
-								setPrimaryKey(true);
-							}},
-							new DataSourceTextField("type"),
-							new DataSourceTextField("description"),
-							new DataSourceTextField("have"),
-							new DataSourceTextField("cloneof"),
-							new DataSourceTextField("cloneof_status"),
-							new DataSourceTextField("romof"),
-							new DataSourceTextField("romof_status"),
-							new DataSourceTextField("sampleof"),
-							new DataSourceTextField("sampleof_status"),
-							new DataSourceBooleanField("selected")
-						);
-					}
-					
-					@Override
-					protected void transformResponse(DSResponse dsResponse, DSRequest dsRequest, Object data)
-					{
-						if(dsResponse.getStatus()==0)
-							dsResponse.setAttribute("found", XMLTools.selectString(data, "/response/found"));
-						super.transformResponse(dsResponse, dsRequest, data);
-					}
-				}, 
+				ds, 
 				new ListGridField("status",Client.getSession().getMsg("MachineListRenderer.Status"),24) {{
 					setValueIcons(status_icons);
 					setShowValueIconOnly(true);
@@ -349,11 +288,7 @@ public class ProfileViewer extends Window
 		
 		public void reset(Record record, DataSource ds)
 		{
-			getDataSource().setRequestProperties(new DSRequest() {{
-				setData(new HashMap<String,String>(){{
-					put("reset","true");
-				}});
-			}});
+			this.ds.setExtraData(Collections.singletonMap("reset", "true"));
 			ismachinelist =  "*".equals(record.getAttribute("name"));
 			if(Boolean.TRUE.equals(willFetchData(new Criteria() {{addCriteria("list", record.getAttribute("name"));}})))
 				fetchRelatedData(record, ds);
@@ -381,9 +316,12 @@ public class ProfileViewer extends Window
 			put("SAMPLE","/images/icons/sound.png");
 		}};
 		
+		private final DSAnyware ds;
+		
 		public Anyware()
 		{
 			super();
+			ds = DSAnyware.getInstance();
 			setDataProperties(new ResultSet() {{
 				setUseClientFiltering(false);
 				setUseClientSorting(false);
@@ -441,37 +379,10 @@ public class ProfileViewer extends Window
 				);
 			}});
 			addDataArrivedHandler(event->{
-				getDataSource().setRequestProperties(new DSRequest());
+				ds.setExtraData(Collections.emptyMap());
 			});
 			setDataSource(
-				new RestDataSource() {{
-					setID("Anyware");
-					setDataURL("/datasources/"+getID());
-					setDataFormat(DSDataFormat.XML);
-					setOperationBindings(
-						new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}}
-					);
-					setFields(
-						new DataSourceTextField("list") {{
-							setPrimaryKey(true);
-							setHidden(true);
-							setForeignKey("AnywareList.list");
-						}},
-						new DataSourceTextField("ware") {{
-							setPrimaryKey(true);
-							setHidden(true);
-							setForeignKey("AnywareList.name");
-						}},
-						new DataSourceTextField("name") {{
-							setPrimaryKey(true);
-						}},
-						new DataSourceTextField("status"),
-						new DataSourceIntegerField("size"),
-						new DataSourceTextField("crc"),
-						new DataSourceTextField("md5"),
-						new DataSourceTextField("sha1")
-					);
-				}}, 
+				ds, 
 				new ListGridField("status",Client.getSession().getMsg("AnywareRenderer.Status"),24) {{
 					setValueIcons(status_icons);
 					setShowValueIconOnly(true);
@@ -539,11 +450,7 @@ public class ProfileViewer extends Window
 
 		public void reset(Record record, DataSource ds)
 		{
-			getDataSource().setRequestProperties(new DSRequest() {{
-				setData(new HashMap<String,String>(){{
-					put("reset","true");
-				}});
-			}});
+			this.ds.setExtraData(Collections.singletonMap("reset", "true"));
 			if(Boolean.TRUE.equals(willFetchData(new Criteria() {{addCriteria("list", record.getAttribute("list"));addCriteria("ware", record.getAttribute("name"));}})))
 				fetchRelatedData(record, ds);
 			else

@@ -1,23 +1,12 @@
 package jrm.webui.client.ui;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Optional;
 
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.http.client.URL;
-import com.smartgwt.client.data.DSRequest;
-import com.smartgwt.client.data.DSResponse;
-import com.smartgwt.client.data.OperationBinding;
 import com.smartgwt.client.data.Record;
-import com.smartgwt.client.data.RestDataSource;
 import com.smartgwt.client.data.XMLTools;
-import com.smartgwt.client.data.fields.DataSourceBooleanField;
-import com.smartgwt.client.data.fields.DataSourceIntegerField;
-import com.smartgwt.client.data.fields.DataSourceTextField;
-import com.smartgwt.client.types.DSDataFormat;
-import com.smartgwt.client.types.DSOperationType;
-import com.smartgwt.client.types.DSProtocol;
 import com.smartgwt.client.types.FetchMode;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Dialog;
@@ -25,9 +14,9 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeGridField;
-import com.smartgwt.client.widgets.tree.events.DataArrivedEvent;
 
 import jrm.webui.client.Client;
+import jrm.webui.client.datasources.DSReportTree;
 import jrm.webui.client.protocol.Q_Report;
 
 final class ReportTree extends TreeGrid
@@ -106,51 +95,6 @@ final class ReportTree extends TreeGrid
 		}
 	}
 
-	class DS extends RestDataSource
-	{
-		private String status;
-
-		DS(String src)
-		{
-			setID("Report");
-			setTitleField(TITLE);
-			if (src != null)
-			{
-				final var req = new DSRequest();
-				req.setData(Collections.singletonMap("src", src));
-				setRequestProperties(req);
-			}
-			final var fetch = new OperationBinding();
-			fetch.setOperationType(DSOperationType.FETCH);
-			fetch.setDataProtocol(DSProtocol.POSTXML);
-			final var custom = new OperationBinding();
-			custom.setOperationType(DSOperationType.CUSTOM);
-			custom.setDataProtocol(DSProtocol.POSTXML);
-			setOperationBindings(fetch, custom);
-			setDataFormat(DSDataFormat.XML);
-			setDataURL("/datasources/" + getID());
-			DataSourceTextField nameField = new DataSourceTextField(TITLE);
-			DataSourceIntegerField idField = new DataSourceIntegerField("ID");
-			idField.setPrimaryKey(true);
-			idField.setRequired(true);
-			DataSourceIntegerField parentIDField = new DataSourceIntegerField(PARENT_ID);
-			parentIDField.setRequired(true);
-			parentIDField.setForeignKey(id + ".ID");
-			parentIDField.setRootValue(0);
-			DataSourceTextField classField = new DataSourceTextField("class");
-			DataSourceTextField statusField = new DataSourceTextField(STATUS);
-			DataSourceBooleanField hasNotesField = new DataSourceBooleanField("hasNotes");
-			DataSourceBooleanField isFixableField = new DataSourceBooleanField(IS_FIXABLE);
-			setFields(nameField, idField, parentIDField, classField, statusField, hasNotesField, isFixableField);
-		}
-		
-		@Override
-		protected void transformResponse(DSResponse dsResponse, DSRequest dsRequest, Object data)
-		{
-			status = XMLTools.selectString(data, "/response/infos");
-			super.transformResponse(dsResponse, dsRequest, data);
-		}
-	}
 	
 	public ReportTree(final String src, ReportStatus status)
 	{
@@ -163,10 +107,9 @@ final class ReportTree extends TreeGrid
 		setShowOpenIcons(true);
 		setShowCustomIconOpen(true);
 		setDataFetchMode(FetchMode.PAGED);
-		DS ds = new DS(src);
-		addDataArrivedHandler((DataArrivedEvent e) -> {
-			if (status != null)
-				status.setStatus(ds.status);
+		final var ds = DSReportTree.getInstance(src);
+		ds.setCB((data) -> {
+			status.setStatus(XMLTools.selectString(data, "/response/infos"));
 		});
 		setDataSource(ds,new TreeGridField(TITLE));
 		setContextMenu(new ReportMenu(src));

@@ -37,6 +37,7 @@ import com.smartgwt.client.widgets.menu.MenuItemStringFunction;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 
 import jrm.webui.client.Client;
+import jrm.webui.client.datasources.DSBatchTrntChkReportTree;
 import jrm.webui.client.protocol.Q_Global;
 import jrm.webui.client.protocol.Q_TrntChk;
 import jrm.webui.client.ui.RemoteFileChooser.PathInfo;
@@ -220,43 +221,17 @@ public class BatchTrrntChkPanel extends VLayout
 								}}
 							);
 						}});
-						setDataSource(new RestDataSource() {
+						final var ds = new DSBatchTrntChkReportTree();
+						ds.setCB((data) -> {
+							showok = Optional.ofNullable(XMLTools.selectString(data, "/response/showOK")).map(Boolean::valueOf).orElse(true);
+						}).setExtraData(new HashMap<String, String>()
+						{
 							{
-								setID("BatchTrntChkReportTree");
-								setDataURL("/datasources/"+getID());
-								setDataFormat(DSDataFormat.XML);
-								setRequestProperties(new DSRequest() {{
-									setData(new HashMap<String,String>() {{
-										put("src", record.getAttribute("src"));
-										put("showOK", Boolean.toString(showok==null||showok==true));
-									}});
-								}});
-								setOperationBindings(
-									new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}}
-								);
-								setFields(
-									new DataSourceIntegerField("ID") {{
-										setPrimaryKey(true);
-										setRequired(true);
-									}},
-									new DataSourceIntegerField("ParentID") {{
-								        setRequired(true);  
-								        setForeignKey(id + ".ID");  
-								        setRootValue(0);
-									}},
-									new DataSourceTextField("title"),
-									new DataSourceIntegerField("length"),
-									new DataSourceTextField("status")
-								);
+								put("src", record.getAttribute("src"));
+								put("showOK", Boolean.toString(showok == null || showok == true));
 							}
-							
-							protected void transformResponse(DSResponse dsResponse, DSRequest dsRequest, Object data)
-							{
-								if(dsResponse.getStatus()==0)
-									showok = Optional.ofNullable(XMLTools.selectString(data, "/response/showOK")).map(Boolean::valueOf).orElse(true);
-								super.transformResponse(dsResponse, dsRequest, data);
-							};
 						});
+						setDataSource(ds);
 						setFields(
 							new ListGridField("title") {{
 								setHoverCustomizer(new HoverCustomizer()
