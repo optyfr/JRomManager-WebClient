@@ -1,15 +1,9 @@
 package jrm.webui.client.ui;
 
 import com.google.gwt.core.client.JsonUtils;
-import com.smartgwt.client.data.OperationBinding;
 import com.smartgwt.client.data.Record;
-import com.smartgwt.client.data.RestDataSource;
-import com.smartgwt.client.data.fields.DataSourceTextField;
 import com.smartgwt.client.rpc.RPCManager;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.DSDataFormat;
-import com.smartgwt.client.types.DSOperationType;
-import com.smartgwt.client.types.DSProtocol;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
@@ -22,6 +16,7 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 
 import jrm.webui.client.Client;
+import jrm.webui.client.datasources.DSBatchCompressorFR;
 import jrm.webui.client.protocol.Q_Compressor;
 import jrm.webui.client.protocol.Q_Global;
 import jrm.webui.client.ui.RemoteFileChooser.PathInfo;
@@ -71,8 +66,6 @@ public class BatchCompressorPanel extends VLayout
 
 	private static final class Grid extends ListGrid
 	{
-		private static final String RESULT = "result";
-
 		private Grid()
 		{
 			setHeight100();
@@ -82,7 +75,7 @@ public class BatchCompressorPanel extends VLayout
 			setHoverAutoFitMaxWidth("50%");
 			setSelectionType(SelectionStyle.MULTIPLE);
 			setCanSort(false);
-			setAutoFitExpandField(RESULT);
+			setAutoFitExpandField("result");
 			setAutoFitFieldsFillViewport(true);
 			setAutoFetchData(true);
 			final var menu = new Menu();
@@ -105,33 +98,10 @@ public class BatchCompressorPanel extends VLayout
 			delete.addClickHandler(e -> Grid.this.removeSelectedData());
 			menu.addItem(delete);
 			setContextMenu(menu);
-			final var ds = new RestDataSource();
-			ds.setID("BatchCompressorFR");
-			ds.setDataURL("/datasources/"+getID());
-			ds.setDataFormat(DSDataFormat.XML);
-			final var fetchop = new OperationBinding();
-			fetchop.setOperationType(DSOperationType.FETCH);
-			fetchop.setDataProtocol(DSProtocol.POSTXML);
-			final var addop = new OperationBinding();
-			addop.setOperationType(DSOperationType.ADD);
-			addop.setDataProtocol(DSProtocol.POSTXML);
-			final var removeop = new OperationBinding();
-			removeop.setOperationType(DSOperationType.REMOVE);
-			removeop.setDataProtocol(DSProtocol.POSTXML);
-			final var updateop = new OperationBinding();
-			updateop.setOperationType(DSOperationType.UPDATE);
-			updateop.setDataProtocol(DSProtocol.POSTXML);
-			final var customop = new OperationBinding();
-			customop.setOperationType(DSOperationType.CUSTOM);
-			customop.setDataProtocol(DSProtocol.POSTXML);
-			ds.setOperationBindings(fetchop, addop, removeop, updateop, customop);
-			final var id =new DataSourceTextField("id");
-			id.setPrimaryKey(true);
-			ds.setFields(id, new DataSourceTextField("file"), new DataSourceTextField(RESULT));
-			setDataSource(ds);
+			setDataSource(DSBatchCompressorFR.getInstance());
 			setFields(
 				new ListGridField("file",Client.getSession().getMsg("BatchCompressorPanel.Archives")), //$NON-NLS-2$
-				new ListGridField(RESULT,Client.getSession().getMsg("BatchCompressorPanel.Result")) //$NON-NLS-2$
+				new ListGridField("result",Client.getSession().getMsg("BatchCompressorPanel.Result")) //$NON-NLS-2$
 			);
 		}
 	}
