@@ -15,27 +15,29 @@ public class DSBatchDat2DirResult extends RestDataSource
 	public DSBatchDat2DirResult(String foreignKey)
 	{
 		setID(BASENAME);
-		setDataURL("/datasources/"+BASENAME);
+		setDataURL("/datasources/" + BASENAME);
 		setDataFormat(DSDataFormat.XML);
-		setOperationBindings(
-			new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}}
-		);
+		OperationBinding fetchob = new OperationBinding();
+		fetchob.setOperationType(DSOperationType.FETCH);
+		fetchob.setDataProtocol(DSProtocol.POSTXML);
+		setOperationBindings(fetchob);
+		DataSourceTextField srcField = new DataSourceTextField("src", "Dat/XML");
+		srcField.setPrimaryKey(true);
+		srcField.setForeignKey(foreignKey);
 		setFields(
-			new DataSourceTextField("src","Dat/XML") {{
-				setPrimaryKey(true);
-				setForeignKey(foreignKey);
-			}},
-			new DataSourceIntegerField("have"),
-			new DataSourceIntegerField("create"),
-			new DataSourceIntegerField("fix"),
-			new DataSourceIntegerField("miss"),
+			srcField, 
+			new DataSourceIntegerField("have"), 
+			new DataSourceIntegerField("create"), 
+			new DataSourceIntegerField("fix"), 
+			new DataSourceIntegerField("miss"), 
 			new DataSourceIntegerField("total")
 		);
 	}
 
 	public static DSBatchDat2DirResult getInstance(String foreignKey)
 	{
-		if(null == get(BASENAME)) return new DSBatchDat2DirResult(foreignKey);
-		return (DSBatchDat2DirResult)get(BASENAME);
+		if (null == get(BASENAME))
+			return new DSBatchDat2DirResult(foreignKey);
+		return (DSBatchDat2DirResult) get(BASENAME);
 	}
 }

@@ -2,16 +2,17 @@ package jrm.webui.client.datasources;
 
 import com.smartgwt.client.data.OperationBinding;
 import com.smartgwt.client.data.RestDataSource;
+import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 import com.smartgwt.client.types.DSDataFormat;
 import com.smartgwt.client.types.DSOperationType;
 import com.smartgwt.client.types.DSProtocol;
 
-public class DSBatchDat2DirSrc extends RestDataSource
+public final class DSBatchTrntChkSDR extends RestDataSource
 {
-	private static final String BASENAME = "BatchDat2DirSrc";
+	private static final String BASENAME = "BatchTrntChkSDR";
 
-	private DSBatchDat2DirSrc()
+	private DSBatchTrntChkSDR()
 	{
 		setID(BASENAME);
 		setDataURL("/datasources/"+BASENAME);
@@ -25,17 +26,25 @@ public class DSBatchDat2DirSrc extends RestDataSource
 		OperationBinding removeob = new OperationBinding();
 		removeob.setOperationType(DSOperationType.REMOVE);
 		removeob.setDataProtocol(DSProtocol.POSTXML);
-		setOperationBindings(fetchob, addob, removeob);
-		DataSourceTextField nameField = new DataSourceTextField("name");
-		nameField.setPrimaryKey(true);
+		OperationBinding updateob = new OperationBinding();
+		updateob.setOperationType(DSOperationType.UPDATE);
+		updateob.setDataProtocol(DSProtocol.POSTXML);
+		setOperationBindings(fetchob, addob, removeob, updateob);
+		DataSourceTextField idField = new DataSourceTextField("id");
+		idField.setPrimaryKey(true);
 		setFields(
-			nameField
+			idField,
+			new DataSourceTextField("src"),
+			new DataSourceTextField("dst"),
+			new DataSourceTextField("result"),
+			new DataSourceBooleanField("selected")
 		);
 	}
-	
-	public static DSBatchDat2DirSrc getInstance()
+
+
+	public static DSBatchTrntChkSDR getInstance()
 	{
-		if(null == get(BASENAME)) return new DSBatchDat2DirSrc();
-		return (DSBatchDat2DirSrc)get(BASENAME);
+		if(null == get(BASENAME)) return new DSBatchTrntChkSDR();
+		return (DSBatchTrntChkSDR)get(BASENAME);
 	}
 }

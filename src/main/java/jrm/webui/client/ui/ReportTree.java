@@ -108,9 +108,7 @@ final class ReportTree extends TreeGrid
 		setShowCustomIconOpen(true);
 		setDataFetchMode(FetchMode.PAGED);
 		final var ds = DSReportTree.getInstance(src);
-		ds.setCB((data) -> {
-			status.setStatus(XMLTools.selectString(data, "/response/infos"));
-		});
+		ds.setCB(data -> status.setStatus(XMLTools.selectString(data, "/response/infos")));
 		setDataSource(ds,new TreeGridField(TITLE));
 		setContextMenu(new ReportMenu(src));
 	}

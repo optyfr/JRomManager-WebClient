@@ -21,30 +21,27 @@ public class DSAnyware extends RestDataSource
 
 	private DSAnyware()
 	{
-		setID("Anyware");
+		setID(BASENAME);
 		setDataURL("/datasources/" + BASENAME);
 		setDataFormat(DSDataFormat.XML);
-		setOperationBindings(new OperationBinding()
-		{
-			{
-				setOperationType(DSOperationType.FETCH);
-				setDataProtocol(DSProtocol.POSTXML);
-			}
-		});
+		OperationBinding operationBinding = new OperationBinding();
+		operationBinding.setOperationType(DSOperationType.FETCH);
+		operationBinding.setDataProtocol(DSProtocol.POSTXML);
+		setOperationBindings(operationBinding);
+		DataSourceTextField listField = new DataSourceTextField("list");
+		listField.setPrimaryKey(true);
+		listField.setHidden(true);
+		listField.setForeignKey("AnywareList.list");
+		DataSourceTextField wareField = new DataSourceTextField("ware");
+		wareField.setPrimaryKey(true);
+		wareField.setHidden(true);
+		wareField.setForeignKey("AnywareList.name");
+		DataSourceTextField nameField = new DataSourceTextField("name");
+		nameField.setPrimaryKey(true);
 		setFields(
-			new DataSourceTextField("list") {{
-				setPrimaryKey(true);
-				setHidden(true);
-				setForeignKey("AnywareList.list");
-			}},
-			new DataSourceTextField("ware") {{
-				setPrimaryKey(true);
-				setHidden(true);
-				setForeignKey("AnywareList.name");
-			}},
-			new DataSourceTextField("name") {{
-				setPrimaryKey(true);
-			}},
+			listField,
+			wareField,
+			nameField,
 			new DataSourceTextField("status"),
 			new DataSourceIntegerField("size"),
 			new DataSourceTextField("crc"),

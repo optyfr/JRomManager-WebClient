@@ -28,24 +28,27 @@ public class DSBatchTrntChkReportTree extends RestDataSource
 
 	private ResponseCB cb = null;
 
-	public DSBatchTrntChkReportTree()
+	private DSBatchTrntChkReportTree()
 	{
 		setID(BASENAME);
 		setDataURL("/datasources/"+BASENAME);
 		setDataFormat(DSDataFormat.XML);
+		OperationBinding operationBinding = new OperationBinding();
+		operationBinding.setOperationType(DSOperationType.FETCH);
+		operationBinding.setDataProtocol(DSProtocol.POSTXML);
 		setOperationBindings(
-			new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}}
+			operationBinding
 		);
+		DataSourceIntegerField idField = new DataSourceIntegerField("ID");
+		idField.setPrimaryKey(true);
+		idField.setRequired(true);
+		DataSourceIntegerField parentIdField = new DataSourceIntegerField("ParentID");
+		parentIdField.setRequired(true);  
+		parentIdField.setForeignKey(id + ".ID");  
+		parentIdField.setRootValue(0);
 		setFields(
-			new DataSourceIntegerField("ID") {{
-				setPrimaryKey(true);
-				setRequired(true);
-			}},
-			new DataSourceIntegerField("ParentID") {{
-		        setRequired(true);  
-		        setForeignKey(id + ".ID");  
-		        setRootValue(0);
-			}},
+			idField,
+			parentIdField,
 			new DataSourceTextField("title"),
 			new DataSourceIntegerField("length"),
 			new DataSourceTextField("status")
@@ -81,7 +84,7 @@ public class DSBatchTrntChkReportTree extends RestDataSource
 		super.transformResponse(dsResponse, dsRequest, data);
 	}
 
-	public static DSBatchTrntChkReportTree getInstance(String context)
+	public static DSBatchTrntChkReportTree getInstance()
 	{
 		if(null == get(BASENAME)) return new DSBatchTrntChkReportTree();
 		return (DSBatchTrntChkReportTree)get(BASENAME);

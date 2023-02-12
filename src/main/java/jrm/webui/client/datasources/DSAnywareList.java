@@ -23,24 +23,31 @@ public class DSAnywareList extends RestDataSource
 
 	private DSAnywareList()
 	{
-		setID("AnywareList");
+		setID(BASENAME);
 		setDataURL("/datasources/"+BASENAME);
 		setDataFormat(DSDataFormat.XML);
-		setOperationBindings(
-			new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}},
-			new OperationBinding(){{setOperationType(DSOperationType.UPDATE);setDataProtocol(DSProtocol.POSTXML);}},
-			new OperationBinding(){{setOperationType(DSOperationType.CUSTOM);setDataProtocol(DSProtocol.POSTXML);}}
-		);
+		
+		OperationBinding fetchob = new OperationBinding();
+		fetchob.setOperationType(DSOperationType.FETCH);
+		fetchob.setDataProtocol(DSProtocol.POSTXML);
+		OperationBinding updateob = new OperationBinding();
+		updateob.setOperationType(DSOperationType.UPDATE);
+		updateob.setDataProtocol(DSProtocol.POSTXML);
+		OperationBinding customob = new OperationBinding();
+		customob.setOperationType(DSOperationType.CUSTOM);
+		customob.setDataProtocol(DSProtocol.POSTXML);
+		setOperationBindings(fetchob, updateob, customob);
+		
+		DataSourceTextField listField = new DataSourceTextField("list");
+		listField.setPrimaryKey(true);
+		listField.setHidden(true);
+		listField.setForeignKey("AnywareListList.name");
+		DataSourceTextField nameField = new DataSourceTextField("name");
+		nameField.setPrimaryKey(true);
 		setFields(
 			new DataSourceTextField("status"),
-			new DataSourceTextField("list") {{
-				setPrimaryKey(true);
-				setHidden(true);
-				setForeignKey("AnywareListList.name");
-			}},
-			new DataSourceTextField("name") {{
-				setPrimaryKey(true);
-			}},
+			listField,
+			nameField,
 			new DataSourceTextField("type"),
 			new DataSourceTextField("description"),
 			new DataSourceTextField("have"),

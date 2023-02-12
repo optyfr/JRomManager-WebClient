@@ -25,14 +25,15 @@ public class DSAnywareListList extends RestDataSource
 		setID(BASENAME);
 		setDataURL("/datasources/"+BASENAME);
 		setDataFormat(DSDataFormat.XML);
-		setOperationBindings(
-			new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}}
-		);
+		OperationBinding fetchob = new OperationBinding();
+		fetchob.setOperationType(DSOperationType.FETCH);
+		fetchob.setDataProtocol(DSProtocol.POSTXML);
+		setOperationBindings(fetchob);
+		DataSourceTextField nameField = new DataSourceTextField("name", Client.getSession().getMsg("SoftwareListListRenderer.Name"));
+		nameField.setPrimaryKey(true);
 		setFields(
 			new DataSourceTextField("status"),
-			new DataSourceTextField("name",Client.getSession().getMsg("SoftwareListListRenderer.Name")) {{
-				setPrimaryKey(true);
-			}},
+			nameField,
 			new DataSourceTextField("description", Client.getSession().getMsg("SoftwareListListRenderer.Description")),
 			new DataSourceTextField("have", Client.getSession().getMsg("SoftwareListListRenderer.Have"))
 		);

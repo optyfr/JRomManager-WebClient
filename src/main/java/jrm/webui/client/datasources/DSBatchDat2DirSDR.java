@@ -17,16 +17,23 @@ public class DSBatchDat2DirSDR extends RestDataSource
 		setID(BASENAME);
 		setDataURL("/datasources/"+BASENAME);
 		setDataFormat(DSDataFormat.XML);
-		setOperationBindings(
-			new OperationBinding(){{setOperationType(DSOperationType.FETCH);setDataProtocol(DSProtocol.POSTXML);}},
-			new OperationBinding(){{setOperationType(DSOperationType.ADD);setDataProtocol(DSProtocol.POSTXML);}},
-			new OperationBinding(){{setOperationType(DSOperationType.REMOVE);setDataProtocol(DSProtocol.POSTXML);}},
-			new OperationBinding(){{setOperationType(DSOperationType.UPDATE);setDataProtocol(DSProtocol.POSTXML);}}
-		);
+		OperationBinding fetchob = new OperationBinding();
+		fetchob.setOperationType(DSOperationType.FETCH);
+		fetchob.setDataProtocol(DSProtocol.POSTXML);
+		OperationBinding addob = new OperationBinding();
+		addob.setOperationType(DSOperationType.ADD);
+		addob.setDataProtocol(DSProtocol.POSTXML);
+		OperationBinding removeob = new OperationBinding();
+		removeob.setOperationType(DSOperationType.REMOVE);
+		removeob.setDataProtocol(DSProtocol.POSTXML);
+		OperationBinding updateob = new OperationBinding();
+		updateob.setOperationType(DSOperationType.UPDATE);
+		updateob.setDataProtocol(DSProtocol.POSTXML);
+		setOperationBindings(fetchob, addob, removeob, updateob);
+		DataSourceTextField idField = new DataSourceTextField("id");
+		idField.setPrimaryKey(true);
 		setFields(
-			new DataSourceTextField("id") {{
-				setPrimaryKey(true);
-			}},
+			idField,
 			new DataSourceTextField("src"),
 			new DataSourceTextField("dst"),
 			new DataSourceTextField("result"),
