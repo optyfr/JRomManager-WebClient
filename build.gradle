@@ -16,7 +16,7 @@ repositories {
 	mavenCentral()
 }
 
-sonarqube {
+sonar {
   properties {
     property "sonar.projectKey", "optyfr_JRomManager-WebClient"
     property "sonar.organization", "optyfr"
