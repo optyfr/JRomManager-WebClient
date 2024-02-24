@@ -1,5 +1,6 @@
 package jrm.webui.client.ui;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -179,6 +180,10 @@ public class Progress extends Window
 		packHeight();
 	}
 
+	private static final String colorNormal = "rgb(70% 70% 70%)";
+	private static final String colorLight = "rgb(80% 80% 80%)";
+	private static final String colorLighter = "rgb(90% 90% 90%)";
+	
 	public void setInfos(int threadCnt, Boolean multipleSubInfos)
 	{
 		panel.removeMembers(panel.getMembers());
@@ -188,48 +193,73 @@ public class Progress extends Window
 
 		for (int i = 0; i < threadCnt; i++)
 		{
-			lblInfo[i] = new Label();
-			lblInfo[i].setWidth100();
-			lblInfo[i].setHeight(20);
-			lblInfo[i].setBorder("2px inset");
-			lblInfo[i].setBackgroundColor("#DDDDDD");
-			lblInfo[i].setWrap(false);
-			lblInfo[i].setOverflow(Overflow.CLIP_H);
-			lblInfo[i].setShowClippedTitleOnHover(true);
-			lblInfo[i].setShowHover(true);
+			lblInfo[i] = buildLabel(isOdd(i) ? colorNormal : colorLight);
 			panel.addMember(lblInfo[i]);
 
-			if (multipleSubInfos!=null && multipleSubInfos)
+			if (Boolean.TRUE.equals(multipleSubInfos))
 			{
-				lblSubInfo[i] = new Label();
-				lblSubInfo[i].setWidth100();
-				lblSubInfo[i].setHeight(20);
-				lblSubInfo[i].setBorder("2px inset");
-				lblSubInfo[i].setBackgroundColor("#DDDDDD");
-				lblSubInfo[i].setWrap(false);
-				lblSubInfo[i].setOverflow(Overflow.CLIP_H);
-				lblSubInfo[i].setShowClippedTitleOnHover(true);
-				lblSubInfo[i].setShowHover(true);
+				lblSubInfo[i] = buildLabel(isOdd(i) ? colorNormal : colorLight);
 				panel.addMember(lblSubInfo[i]);
 			}
 		}
 		if (multipleSubInfos!=null && !multipleSubInfos)
 		{
-			lblSubInfo[0] = new Label();
-			lblSubInfo[0].setWidth100();
-			lblSubInfo[0].setHeight(20);
-			lblSubInfo[0].setBorder("2px inset");
-			lblSubInfo[0].setBackgroundColor("#DDDDDD");
-			lblSubInfo[0].setWrap(false);
-			lblSubInfo[0].setOverflow(Overflow.CLIP_H);
-			lblSubInfo[0].setShowClippedTitleOnHover(true);
-			lblSubInfo[0].setShowHover(true);
+			lblSubInfo[0] = buildLabel(colorLighter);
 			panel.addMember(lblSubInfo[0]);
 		}
-		if (isVisible() && isDrawn())
+		if (isVisible() && Boolean.TRUE.equals(isDrawn()))
 			packHeight();
 	}
 
+	public void extendInfos(int threadCnt, Boolean multipleSubInfos)
+	{
+		if(lblInfo == null || lblInfo.length == threadCnt)
+			return;
+
+		if(Boolean.TRUE.equals(multipleSubInfos) && lblSubInfo == null)
+			return;
+
+		final var oldThreadCnt = lblInfo.length;
+
+		lblInfo = Arrays.copyOf(lblInfo, threadCnt);
+		if (Boolean.TRUE.equals(multipleSubInfos))
+			lblSubInfo = Arrays.copyOf(lblSubInfo, threadCnt);
+
+		for (int i = oldThreadCnt; i < threadCnt; i++)
+		{
+			lblInfo[i] = buildLabel(isOdd(i) ? colorNormal : colorLight);
+			panel.addMember(lblInfo[i]);
+
+			if (Boolean.TRUE.equals(multipleSubInfos))
+			{
+				lblSubInfo[i] = buildLabel(isOdd(i) ? colorNormal : colorLight);
+				panel.addMember(lblSubInfo[i]);
+			}
+		}
+
+		if (isVisible() && Boolean.TRUE.equals(isDrawn()))
+			packHeight();
+	}
+
+	private boolean isOdd(int i)
+	{
+		return (i % 2) != 0;
+	}
+
+	private Label buildLabel(String color)
+	{
+		final var label = new Label();
+		label.setWidth100();
+		label.setHeight(20);
+		label.setBorder("2px inset");
+		label.setBackgroundColor(color);
+		label.setWrap(false);
+		label.setOverflow(Overflow.CLIP_H);
+		label.setShowClippedTitleOnHover(true);
+		label.setShowHover(true);
+		return label;
+	}
+	
 	public void clearInfos()
 	{
 		for (Label label : lblInfo)
@@ -333,7 +363,7 @@ public class Progress extends Window
 
 	private void packHeight()
 	{
-		// markForRedraw();
+		//markForRedraw();
 	}
 
 	@Override

@@ -77,6 +77,32 @@ public class A_Progress extends A_	//NOSONAR
 		}
 	}
 
+	public static class ExtendInfos extends A_
+	{
+		private EnhJSO params;
+		
+		public ExtendInfos(final A_ a)
+		{
+			this(a.response);
+		}
+		
+		public ExtendInfos(final EnhJSO response)
+		{
+			super(response);
+			params = response.getJSO(PARAMS_STR);
+		}
+		
+		public final int getThreadCnt()
+		{
+			return params.getInt("threadCnt");
+		}
+		
+		public final Boolean getMultipleSubInfos()
+		{
+			return params.getBoolean("multipleSubInfos");
+		}
+	}
+
 	public static class CanCancel extends A_
 	{
 		private EnhJSO params;

@@ -78,6 +78,9 @@ public class Client implements EntryPoint
 				case "Progress.setInfos":
 					mainWindow.update(new A_Progress.SetInfos(a));
 					break;
+				case "Progress.extendInfos":
+					mainWindow.update(new A_Progress.ExtendInfos(a));
+					break;
 				case "Progress.clearInfos":
 					mainWindow.update(new A_Progress.ClearInfos(a));
 					break;

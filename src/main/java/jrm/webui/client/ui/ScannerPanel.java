@@ -171,7 +171,7 @@ public final class ScannerPanel extends VLayout
 			lblProfileinfo = new Label() {{
 				setWidth100();
 				setHeight(20);
-				setBackgroundColor("ActiveCaption");
+				setBackgroundColor("#DDDDDD");
 				setBorder("1px inset");
 			}}
 		);

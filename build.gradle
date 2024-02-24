@@ -8,12 +8,20 @@ buildscript {
 }
 
 plugins {
-	id "de.esoco.gwt" version "1.1.0"
+	id "de.esoco.gwt" version "1.2.0"
 	id "org.sonarqube"
 }
 
 repositories {
 	mavenCentral()
+}
+
+configurations.all {
+	resolutionStrategy.dependencySubstitution {
+		substitute module('com.google.gwt:gwt-user') using module('org.gwtproject:gwt-user:2.11.0')
+		substitute module('com.google.gwt:gwt-dev') using module('org.gwtproject:gwt-dev:2.11.0')
+		substitute module('com.google.gwt:gwt-codeserver') using module('org.gwtproject:gwt-codeserver:2.11.0')
+	}
 }
 
 sonar {
@@ -26,8 +34,8 @@ sonar {
 
 apply plugin: 'java'
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 apply plugin: 'eclipse'
 
@@ -82,7 +90,7 @@ sourceSets {
 gwt {
     module 'jrm.webui.Client'
 	/** GWT version */
-	gwtVersion = '2.9.0'
+	gwtVersion = '2.11.0'
 	/** Add the gwt-servlet lib */
 	gwtServletLib = false
 	/** Add the gwt-elemental lib */

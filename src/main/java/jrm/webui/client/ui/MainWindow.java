@@ -153,6 +153,11 @@ public class MainWindow extends Window
 		progress.setInfos(params.getThreadCnt(), params.getMultipleSubInfos());		
 	}
 	
+	public void update(A_Progress.ExtendInfos params)
+	{
+		progress.extendInfos(params.getThreadCnt(), params.getMultipleSubInfos());		
+	}
+	
 	public void update(A_Progress.CanCancel params)
 	{
 		progress.canCancel(params.canCancel());		
