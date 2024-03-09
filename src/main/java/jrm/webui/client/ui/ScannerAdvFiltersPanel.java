@@ -88,7 +88,11 @@ public final class ScannerAdvFiltersPanel extends HLayout
 			setCanRemoveRecords(false);
 			addSelectionChangedHandler(event -> {
 				if(enableEvents)
+				{
 					Client.sendMsg(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty(event.getRecord().getAttribute("ID"), event.getState())));
+					if(ProfileViewer.canResetPV)
+						ProfileViewer.reset();
+				}
 			});
 			addDataArrivedHandler(event->enableEvents = true);
 			setDataSource(new DataSource());
@@ -188,7 +192,11 @@ public final class ScannerAdvFiltersPanel extends HLayout
 			setFolderIcon(null);
 			addSelectionChangedHandler(event -> {
 				if(enableEvents)
+				{
 					Client.sendMsg(JsonUtils.stringify(Q_Profile.SetProperty.instantiate().setProperty(event.getRecord().getAttribute("ID"), !isPartiallySelected(event.getRecord()) && event.getState())));
+					if(ProfileViewer.canResetPV)
+						ProfileViewer.reset();
+				}
 			});
 			addDataArrivedHandler((DataArrivedEvent event) -> {
 				enableEvents = true;

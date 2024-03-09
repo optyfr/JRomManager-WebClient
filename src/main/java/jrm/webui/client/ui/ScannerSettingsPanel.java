@@ -1,9 +1,19 @@
 package jrm.webui.client.ui;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import com.smartgwt.client.data.Record;
+import com.smartgwt.client.data.RecordList;
+import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.form.fields.CanvasItem;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.grid.ListGrid;
+import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 
@@ -23,8 +33,8 @@ public final class ScannerSettingsPanel extends SettingsForm
 		super(settings);
 		setID("ScannerSettingsPanel");
 		setWidth100();
-		setNumCols(4);
-		setColWidths("*","*","*","*");
+		setNumCols(6);
+		setColWidths("*","*","*","*","*","*");
 		setWrapItemTitles(false);
 		setContextMenu(new Menu() {{
 			addItem(new MenuItem() {{
@@ -110,6 +120,54 @@ public final class ScannerSettingsPanel extends SettingsForm
 				});
 				setDefaultValue(true);
 			}},
+			new CanvasItem("gridExclusions") {{
+				setShowTitle(false);
+				setColSpan(2);
+				setRowSpan(10);
+				setAlign(Alignment.CENTER);
+				final ListGrid grid = new ListGrid();
+				grid.setMinWidth(75);
+				grid.setMaxWidth(150);
+				grid.setWidth("*");
+				grid.setHeight(250);
+				grid.setContextMenu(new Menu() {{
+					addItem(new MenuItem("Add") {{
+						addClickHandler(event -> {
+							grid.startEditingNew();
+						});
+					}});
+					addItem(new MenuItem("Edit") {{
+						setEnableIfCondition((target, menu, item)->grid.anySelected());
+						addClickHandler(event -> {
+							grid.startEditing(grid.getRecordIndex(grid.getSelectedRecord()));
+						});
+					}});
+					addItem(new MenuItem("Delete") {{
+						addClickHandler(event -> {
+							grid.removeSelectedData();
+						});
+					}});
+				}});
+				grid.setFields(new ListGridField("Filter","Dst Exclude glob"));
+				grid.addEditCompleteHandler(event -> {
+					final var list = grid.getDataAsRecordList();
+					final var value = Stream.of(list.toArray()).map(r -> r.getAttributeAsString("Filter")).filter(s -> !s.isEmpty()).collect(Collectors.joining("|"));
+					storeValue(value);
+				});
+				setCanvas(grid);
+				addShowValueHandler(event -> {
+					final var value = (String)event.getDataValue();
+					final var list = new RecordList();
+					SC.logWarn("addShowValueHandler:"+value);
+					if(value != null)
+					{
+						for(final var filter : value.split("\\|"))
+							list.add(new Record(Collections.singletonMap("Filter", filter)));
+					}
+					grid.setData(list);
+				});
+				addChangedHandler(event -> setPropertyItemValue(getName(), "exclusion_glob_list", (String)getValue()));
+			}},
 			new CheckboxItem("chckbxUseParallelism", Client.getSession().getMsg("MainFrame.chckbxUseParallelism.text")) {{
 				addChangedHandler(event->setPropertyItemValue(getName(), "use_parallelism", (boolean)getValue()));
 				setDefaultValue(true);
@@ -143,6 +201,10 @@ public final class ScannerSettingsPanel extends SettingsForm
 			}},
 			new CheckboxItem("chckbxBackup", Client.getSession().getMsg("MainFrame.chckbxBackup.text")) {{
 				addChangedHandler(event->setPropertyItemValue(getName(), "backup", (boolean)getValue()));
+				setDefaultValue(true);
+			}},
+			new CheckboxItem("chckbxZeroEntryMatters", Client.getSession().getMsg("MainFrame.chckbxZeroEntryMatters.text")) {{
+				addChangedHandler(event->setPropertyItemValue(getName(), "zero_entry_matters", (boolean)getValue()));
 				setDefaultValue(true);
 			}},
 			new SelectItem("cbCompression", Client.getSession().getMsg("MainFrame.lblCompression.text")) {{

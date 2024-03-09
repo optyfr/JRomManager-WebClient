@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.gwt.http.client.URL;
+import com.google.gwt.user.client.Timer;
 import com.smartgwt.client.data.Criteria;
 import com.smartgwt.client.data.DSCallback;
 import com.smartgwt.client.data.DSRequest;
@@ -669,5 +670,41 @@ public class ProfileViewer extends Window
 		Client.getChildWindows().remove(this);
 		super.onDestroy();
 	}
+	
+	public static boolean canResetPV = true;
+	
+	interface ResetCB
+	{
+		void apply();
+	}
+	
+	public static void reset(ResetCB cb)
+	{
+		canResetPV=false;
+		cb.apply();
+		canResetPV=true;
+		reset();
+	}
+	
+	private static Timer resetTimer = null;
+	
+	public static void reset()
+	{
+		if(resetTimer == null)
+		{
+			resetTimer = new Timer()
+			{
+				@Override
+				public void run()
+				{
+					if (canResetPV && Client.getMainWindow().scannerPanel.profileViewer != null && Client.getChildWindows().contains(Client.getMainWindow().scannerPanel.profileViewer))
+						Client.getMainWindow().scannerPanel.profileViewer.anywareListList.reset();
+				}
+			};
+		}
+		resetTimer.cancel();
+		resetTimer.schedule(1000);
+	}
+	
 	
 }

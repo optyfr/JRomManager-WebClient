@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.CanvasItem;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
@@ -34,6 +35,7 @@ abstract class SettingsForm extends DynamicForm
 		put("chckbxExcludeGames","exclude_games");
 		put("chckbxExcludeMachines","exclude_machines");
 		put("chckbxBackup","backup");
+		put("chckbxZeroEntryMatters","zero_entry_matters");
 		put("cbCompression","format");
 		put("cbbxMergeMode","merge_mode");
 		put("cbHashCollision","hash_collision_mode");
@@ -77,6 +79,7 @@ abstract class SettingsForm extends DynamicForm
 		put("cbThreadCount", "thread_count");
 		put("tfBackupGDest", "backup_dest_dir");
 		put("tfBackupGDestEnabled", "backup_dest_dir_enabled");
+		put("gridExclusions", "exclusion_glob_list");
 	}};
 
 	public SettingsForm()
@@ -172,16 +175,26 @@ abstract class SettingsForm extends DynamicForm
 						formItem.setValue(jso.get(name));
 					else if(formItem instanceof RadioGroupItem)
 						formItem.setValue(jso.get(name));
+					else if(formItem instanceof CanvasItem)
+						formItem.setValue(jso.get(name));
 					else if(formItem instanceof SelectItem)
 					{
 						SelectItem selitem = (SelectItem)formItem;
-						if(selitem.isMultiple())
+						if(Boolean.TRUE.equals(selitem.isMultiple()))
 							selitem.setValueMap(jso.get(name).split("\\|"));
 						else
 							selitem.setValue(jso.get(name));
 					}
 				}
+				else if (jso.isVoid(name) && (formItem instanceof TextItem || formItem instanceof CanvasItem))
+					formItem.clearValue();
 			}
+		}
+		else
+		{
+			FormItem formItem = getItem(field);
+			if (formItem != null && (formItem instanceof TextItem || formItem instanceof CanvasItem))
+				formItem.clearValue();
 		}
 	}
 	
