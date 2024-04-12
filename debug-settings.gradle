@@ -1,6 +1,6 @@
 pluginManagement {
 	plugins {
-		id "org.sonarqube" version "release.latest"
+		id "org.sonarqube" version "latest.release"
 	}
 }
 rootProject.name = 'WebClient'
