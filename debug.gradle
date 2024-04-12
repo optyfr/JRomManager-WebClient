@@ -34,8 +34,8 @@ sonar {
 
 apply plugin: 'java'
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 apply plugin: 'eclipse'
 
@@ -115,7 +115,7 @@ gwt {
 		/** Fail compilation if any input file contains an error. */
 		failOnError = false
 		/** Specifies Java source level. ("1.6", "1.7")*/
-		sourceLevel = "11"
+		sourceLevel = "auto"
 		/** The number of local workers for compiling permutations. */
 		localWorkers = 4
 		/** The maximum memory to be used by local workers. */
