@@ -161,7 +161,7 @@ gwt {
 
 		/** Java args */
         def lombokJar = project.configurations.annotationProcessor.filter { it.name.contains('lombok') }.singleFile
-        javaArgs=['-Dfile.encoding' : 'UTF-8', ('-javaagent:'+lombokJar) : 'ECJ', '--enable-final-field-mutation' : 'ALL-UNNAMED']
+        javaArgs=['-Dfile.encoding' : 'UTF-8', ('-javaagent:'+lombokJar) : 'ECJ']
 		maxHeapSize="1024m"
 		minHeapSize="512m"
 //		maxPermSize="128m"
