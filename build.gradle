@@ -59,21 +59,21 @@ apply plugin: 'de.undercouch.download'
 
 task downloadSmartGWT(type: Download) {
     src([
-        "https://www.smartclient.com/builds/SmartGWT/${scversion}/LGPL/${scdate}/smartgwt.jar",
-        "https://www.smartclient.com/builds/SmartGWT/${scversion}/LGPL/${scdate}/smartgwt-skins.jar"
+        "https://www.smartclient.com/builds/SmartGWT/${scversion}p/LGPL/${scdate}/smartgwt.jar",
+        "https://www.smartclient.com/builds/SmartGWT/${scversion}p/LGPL/${scdate}/smartgwt-skins.jar"
     ])
-    dest "$buildDir/smartgwt-${scversion}"
+    dest "$buildDir/smartgwt-${scversion}p"
     onlyIfModified true
 }
 
 task dlSmartGWT(type: Download) {
-    src "https://www.smartclient.com/builds/SmartGWT/${scversion}/LGPL/${scdate}/smartgwt-${scversion}.zip"
+    src "https://www.smartclient.com/builds/SmartGWT/${scversion}p/LGPL/${scdate}/smartgwt-${scversion}p.zip"
     dest buildDir
     onlyIfModified true
 }
 
 task extractSmartGWT(dependsOn: dlSmartGWT, type: Copy) {
-    from(zipTree("$buildDir/smartgwt-${scversion}.zip")) { 
+    from(zipTree("$buildDir/smartgwt-${scversion}p.zip")) { 
         include '**/smartgwt.jar'
         include '**/smartgwt-skins.jar'
         includeEmptyDirs = false
@@ -83,12 +83,12 @@ task extractSmartGWT(dependsOn: dlSmartGWT, type: Copy) {
 
 task SmartGWT {
     dependsOn extractSmartGWT
-    outputs.file "$buildDir/smartgwt-${scversion}/smartgwt.jar" 
+    outputs.file "$buildDir/smartgwt-${scversion}p/smartgwt.jar" 
 }
 
 task SmartGWTSkins {
     dependsOn extractSmartGWT
-    outputs.file "$buildDir/smartgwt-${scversion}/smartgwt-skins.jar" 
+    outputs.file "$buildDir/smartgwt-${scversion}p/smartgwt-skins.jar" 
 }
 
 apply plugin: 'war'
@@ -225,4 +225,40 @@ build.dependsOn webZip
 
 tasks.named("jar") {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+task delombok(type: JavaExec) {
+    def lombokJar = configurations.annotationProcessor.filter { it.name.contains('lombok') }
+    classpath = lombokJar
+    mainClass = 'lombok.launch.Main'
+    jvmArgs = ['--sun-misc-unsafe-memory-access=allow']
+
+    doFirst {
+        args = [
+            "delombok",
+            "src/main/java",
+            "-d", "$buildDir/generated/delombok/src/main/java",
+            "--classpath", (sourceSets.main.compileClasspath + lombokJar).asPath
+        ]
+    }
+}
+
+
+javadoc {
+    dependsOn delombok
+    source = fileTree("$buildDir/generated/delombok/src/main/java") {
+        include '**/*.java'
+    }
+    classpath = sourceSets.main.output.classesDirs + configurations.compileClasspath
+    exclude '**/*.xml', '**/*.properties'
+    options {
+        encoding = 'UTF-8'
+        memberLevel = JavadocMemberLevel.PACKAGE
+        outputLevel = JavadocOutputLevel.QUIET
+        addBooleanOption('Xdoclint:none', true)
+        addStringOption('Xmaxwarns', '0')
+        links("https://docs.oracle.com/en/java/javase/${java.targetCompatibility}/docs/api/")
+        links("https://smartclient.com/smartgwt-${scversion}/javadoc/")
+        links("https://www.gwtproject.org/javadoc/latest/")
+    }
 }
