@@ -231,7 +231,6 @@ task delombok(type: JavaExec) {
     def lombokJar = configurations.annotationProcessor.filter { it.name.contains('lombok') }
     classpath = lombokJar
     mainClass = 'lombok.launch.Main'
-    jvmArgs = ['--sun-misc-unsafe-memory-access=allow']
 
     doFirst {
         args = [
