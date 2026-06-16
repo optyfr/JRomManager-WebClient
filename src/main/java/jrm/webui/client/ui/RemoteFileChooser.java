@@ -670,7 +670,7 @@ public final class RemoteFileChooser extends Window {
             if (!close.isDisabled())
                 RemoteFileChooser.this.markForDestroy();
         });
-        
+
         parentLab = new Label("parent");
         parentLab.setWidth100();
         parentLab.setBorder("1px inset");
@@ -683,7 +683,7 @@ public final class RemoteFileChooser extends Window {
         splitPane.setDetailToolButtons(parentLab);
         splitPane.setNavigationPaneWidth(100);
         addItem(splitPane);
-        
+
         addItem(new HLayout() {
             {
                 setHeight(20);
@@ -914,7 +914,7 @@ public final class RemoteFileChooser extends Window {
         else if (paths != null && paths.length > 0 && paths[0].parent != null)
             Q_Global.SetProperty.instantiate().setProperty("dir." + context, paths[0].parent).send();
         switch (context) {
-            case "addArc": 
+            case "addArc":
                 addArc(cb, paths);
                 break;
             default:
@@ -926,7 +926,7 @@ public final class RemoteFileChooser extends Window {
 
     private void addArc(CallBack cb, PathInfo[] paths) {
         final var request = new DSRequest();
-        request.setData( Map.of("paths", Stream.of(paths).map(p -> p.path).toArray()));
+        request.setData(Map.of("paths", Stream.of(paths).map(p -> p.path).toArray()));
         list.getDataSource().performCustomOperation("expand", null, (dsResponse, data, dsRequest) -> {
             if (cb != null)
                 cb.apply(Stream.of(dsResponse.getData()).map(PathInfo::new).toList().toArray(new PathInfo[0]));

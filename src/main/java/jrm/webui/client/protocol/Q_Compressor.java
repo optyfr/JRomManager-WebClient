@@ -1,6 +1,6 @@
 package jrm.webui.client.protocol;
 
-//NOSONAR
+// NOSONAR
 public class Q_Compressor extends Q_ // NOSONAR
 {
     protected Q_Compressor() {

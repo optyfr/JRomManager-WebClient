@@ -53,7 +53,8 @@ public final class ScannerSettingsPanel extends SettingsForm {
                                                             options.put("chckbxCreateOnlyComplete", false);
                                                             options.put("chckbxIgnoreUnneededContainers", false);
                                                             options.put("chckbxIgnoreUnneededEntries", false);
-                                                            options.put("chckbxIgnoreUnknownContainers", true); // Don't remove _ReadMe_.txt
+                                                            options.put("chckbxIgnoreUnknownContainers", true); // Don't remove
+                                                                                                                // _ReadMe_.txt
                                                             options.put("chckbxUseImplicitMerge", true);
                                                             options.put("chckbxIgnoreMergeNameDisks", true);
                                                             options.put("chckbxIgnoreMergeNameRoms", false);
@@ -76,7 +77,8 @@ public final class ScannerSettingsPanel extends SettingsForm {
                                                             options.put("chckbxCreateOnlyComplete", false);
                                                             options.put("chckbxIgnoreUnneededContainers", false);
                                                             options.put("chckbxIgnoreUnneededEntries", false);
-                                                            options.put("chckbxIgnoreUnknownContainers", true); // Don't remove _ReadMe_.txt
+                                                            options.put("chckbxIgnoreUnknownContainers", true); // Don't remove
+                                                                                                                // _ReadMe_.txt
                                                             options.put("chckbxUseImplicitMerge", true);
                                                             options.put("chckbxIgnoreMergeNameDisks", true);
                                                             options.put("chckbxIgnoreMergeNameRoms", false);
@@ -98,7 +100,8 @@ public final class ScannerSettingsPanel extends SettingsForm {
                                                             options.put("chckbxCreateOnlyComplete", false);
                                                             options.put("chckbxIgnoreUnneededContainers", false);
                                                             options.put("chckbxIgnoreUnneededEntries", false);
-                                                            options.put("chckbxIgnoreUnknownContainers", true); // Don't remove _ReadMe_.txt
+                                                            options.put("chckbxIgnoreUnknownContainers", true); // Don't remove
+                                                                                                                // _ReadMe_.txt
                                                             options.put("chckbxUseImplicitMerge", true);
                                                             options.put("chckbxIgnoreMergeNameDisks", true);
                                                             options.put("chckbxIgnoreMergeNameRoms", false);

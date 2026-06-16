@@ -167,7 +167,7 @@ public final class ScannerAdvFiltersPanel extends HLayout {
             setCanEdit(false);
             setCanRemoveRecords(false);
             setAutoFetchData(true);
-//			setCellHeight(16);
+            // setCellHeight(16);
             Tree tree = new Tree();
             tree.setModelType(TreeModelType.PARENT);
             tree.setRootValue(1);

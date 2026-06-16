@@ -139,6 +139,7 @@ public class EnhJSO extends JavaScriptObject {
      * will return the value of a property as a nullable string
      * 
      * @param name
+     * 
      * @return a string for value of property {@code name} or null in other cases
      */
     public final String get(final String name) {
@@ -185,8 +186,8 @@ public class EnhJSO extends JavaScriptObject {
      * will return the value of a property as a non null string
      * 
      * @param name the name of the property to return
-     * @return the value of property {@code name} as a string otherwise an empty
-     *         string
+     * 
+     * @return the value of property {@code name} as a string otherwise an empty string
      */
     public final String getString(final String name) {
         return getString(name, true);
@@ -195,10 +196,11 @@ public class EnhJSO extends JavaScriptObject {
     /**
      * will return the value of a property as a non null string
      * 
-     * @param name   the name of the property to return
+     * @param name the name of the property to return
      * @param nonull set it to true to return non null strings
-     * @return the value of property {@code name} as a string otherwise an empty
-     *         string (if {@code nonull} is true) or a {@code null} value
+     * 
+     * @return the value of property {@code name} as a string otherwise an empty string (if {@code nonull} is true) or a
+     *         {@code null} value
      */
     public final String getString(final String name, final boolean nonull) {
         return nonull && EnhJSO.isVoid(this, name) ? "" : EnhJSO.getString(this, name);
