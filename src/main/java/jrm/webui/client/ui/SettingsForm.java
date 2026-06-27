@@ -16,71 +16,69 @@ import jrm.webui.client.protocol.Q_Global;
 import jrm.webui.client.protocol.Q_Profile;
 import jrm.webui.client.utils.EnhJSO;
 
-abstract class SettingsForm extends DynamicForm {
+class SettingsForm extends DynamicForm {
     protected boolean hasSettings = false;
 
-    final static protected Map<String, String> fname2name = new HashMap<String, String>() {
-        {
-            put("chckbxNeedSHA1", "need_sha1_or_md5");
-            put("chckbxUseParallelism", "use_parallelism");
-            put("chckbxCreateMissingSets", "create_mode");
-            put("chckbxCreateOnlyComplete", "createfull_mode");
-            put("chckbxIgnoreUnneededContainers", "ignore_unneeded_containers");
-            put("chckbxIgnoreUnneededEntries", "ignore_unneeded_entries");
-            put("chckbxIgnoreUnknownContainers", "ignore_unknown_containers");
-            put("chckbxUseImplicitMerge", "implicit_merge");
-            put("chckbxIgnoreMergeNameRoms", "ignore_merge_name_roms");
-            put("chckbxIgnoreMergeNameDisks", "ignore_merge_name_disks");
-            put("chckbxExcludeGames", "exclude_games");
-            put("chckbxExcludeMachines", "exclude_machines");
-            put("chckbxBackup", "backup");
-            put("chckbxZeroEntryMatters", "zero_entry_matters");
-            put("cbCompression", "format");
-            put("cbbxMergeMode", "merge_mode");
-            put("cbHashCollision", "hash_collision_mode");
-            put("chckbxIncludeClones", "filter.InclClones");
-            put("chckbxIncludeDisks", "filter.InclDisks");
-            put("chckbxIncludeSamples", "filter.InclSamples");
-            put("cbMachineType", "filter.CabinetType");
-            put("cbOrientation", "filter.DisplayOrientation");
-            put("cbDriverStatus", "filter.DriverStatus");
-            put("cbSwMinSupport", "filter.MinSoftwareSupportedLevel");
-            put("cbYearMin", "filter.YearMin");
-            put("cbYearMax", "filter.YearMax");
-            put("chckbxScanSubfolders", "dir2dat.scan_subfolders");
-            put("chckbxDeepScan", "dir2dat.deep_scan");
-            put("chckbxAddMD5", "dir2dat.add_md5");
-            put("chckbxAddSHA1", "dir2dat.add_sha1");
-            put("chckbxJunkFolders", "dir2dat.junk_folders");
-            put("chckbxDoNotScanArchives", "dir2dat.do_not_scan_archives");
-            put("chckbxMatchProfile", "dir2dat.match_profile");
-            put("chckbxIncludeEmptyDirs", "dir2dat.include_empty_dirs");
-            put("txtSrcDir", "dir2dat_src_dir");
-            put("txtDstDat", "dir2dat_dst_file");
-            put("rgFormat", "dir2dat_format");
-            put("tfDir2DatName", "dir2dat.name"); //$NON-NLS-1$
-            put("tfDir2DatDescription", "dir2dat.description"); //$NON-NLS-1$
-            put("tfDir2DatVersion", "dir2dat.version"); //$NON-NLS-1$
-            put("tfDir2DatAuthor", "dir2dat.author"); //$NON-NLS-1$
-            put("tfDir2DatComment", "dir2dat.comment"); //$NON-NLS-1$
-            put("tfDir2DatCategory", "dir2dat.category"); //$NON-NLS-1$
-            put("tfDir2DatDate", "dir2dat.date"); //$NON-NLS-1$
-            put("tfDir2DatEMail", "dir2dat.email"); //$NON-NLS-1$
-            put("tfDir2DatHomepage", "dir2dat.homepage"); //$NON-NLS-1$
-            put("tfDir2DatURL", "dir2dat.url"); //$NON-NLS-1$
-            put("cbZipTempThreshold", "zip_temp_threshold");
-            put("cbZipLevel", "zip_compression_level");
-            put("cbZipELevel", "zip_level");
-            put("cb7ZLevel", "7z_level");
-            put("txt7ZThreads", "7z_threads");
-            put("chkbx7ZSolid", "7z_solid");
-            put("cbDbgLevel", "debug_level");
-            put("cbThreadCount", "thread_count");
-            put("tfBackupGDest", "backup_dest_dir");
-            put("tfBackupGDestEnabled", "backup_dest_dir_enabled");
-            put("gridExclusions", "exclusion_glob_list");
-        }
-    };
+    public static final Map<String, String> fname2name = Map.ofEntries(
+            Map.entry("chckbxNeedSHA1", "need_sha1_or_md5"),
+            Map.entry("chckbxUseParallelism", "use_parallelism"),
+            Map.entry("chckbxCreateMissingSets", "create_mode"),
+            Map.entry("chckbxCreateOnlyComplete", "createfull_mode"),
+            Map.entry("chckbxIgnoreUnneededContainers", "ignore_unneeded_containers"),
+            Map.entry("chckbxIgnoreUnneededEntries", "ignore_unneeded_entries"),
+            Map.entry("chckbxIgnoreUnknownContainers", "ignore_unknown_containers"),
+            Map.entry("chckbxUseImplicitMerge", "implicit_merge"),
+            Map.entry("chckbxIgnoreMergeNameRoms", "ignore_merge_name_roms"),
+            Map.entry("chckbxIgnoreMergeNameDisks", "ignore_merge_name_disks"),
+            Map.entry("chckbxExcludeGames", "exclude_games"),
+            Map.entry("chckbxExcludeMachines", "exclude_machines"),
+            Map.entry("chckbxBackup", "backup"),
+            Map.entry("chckbxZeroEntryMatters", "zero_entry_matters"),
+            Map.entry("cbCompression", "format"),
+            Map.entry("cbbxMergeMode", "merge_mode"),
+            Map.entry("cbHashCollision", "hash_collision_mode"),
+            Map.entry("chckbxIncludeClones", "filter.InclClones"),
+            Map.entry("chckbxIncludeDisks", "filter.InclDisks"),
+            Map.entry("chckbxIncludeSamples", "filter.InclSamples"),
+            Map.entry("cbMachineType", "filter.CabinetType"),
+            Map.entry("cbOrientation", "filter.DisplayOrientation"),
+            Map.entry("cbDriverStatus", "filter.DriverStatus"),
+            Map.entry("cbSwMinSupport", "filter.MinSoftwareSupportedLevel"),
+            Map.entry("cbYearMin", "filter.YearMin"),
+            Map.entry("cbYearMax", "filter.YearMax"),
+            Map.entry("chckbxScanSubfolders", "dir2dat.scan_subfolders"),
+            Map.entry("chckbxDeepScan", "dir2dat.deep_scan"),
+            Map.entry("chckbxAddMD5", "dir2dat.add_md5"),
+            Map.entry("chckbxAddSHA1", "dir2dat.add_sha1"),
+            Map.entry("chckbxJunkFolders", "dir2dat.junk_folders"),
+            Map.entry("chckbxDoNotScanArchives", "dir2dat.do_not_scan_archives"),
+            Map.entry("chckbxMatchProfile", "dir2dat.match_profile"),
+            Map.entry("chckbxIncludeEmptyDirs", "dir2dat.include_empty_dirs"),
+            Map.entry("txtSrcDir", "dir2dat_src_dir"),
+            Map.entry("txtDstDat", "dir2dat_dst_file"),
+            Map.entry("rgFormat", "dir2dat_format"),
+            Map.entry("tfDir2DatName", "dir2dat.name"),
+            Map.entry("tfDir2DatDescription", "dir2dat.description"),
+            Map.entry("tfDir2DatVersion", "dir2dat.version"),
+            Map.entry("tfDir2DatAuthor", "dir2dat.author"),
+            Map.entry("tfDir2DatComment", "dir2dat.comment"),
+            Map.entry("tfDir2DatCategory", "dir2dat.category"),
+            Map.entry("tfDir2DatDate", "dir2dat.date"),
+            Map.entry("tfDir2DatEMail", "dir2dat.email"),
+            Map.entry("tfDir2DatHomepage", "dir2dat.homepage"),
+            Map.entry("tfDir2DatURL", "dir2dat.url"),
+            Map.entry("cbZipTempThreshold", "zip_temp_threshold"),
+            Map.entry("cbZipLevel", "zip_compression_level"),
+            Map.entry("cbZipELevel", "zip_level"),
+            Map.entry("cb7ZLevel", "7z_level"),
+            Map.entry("txt7ZThreads", "7z_threads"),
+            Map.entry("chkbx7ZSolid", "7z_solid"),
+            Map.entry("cbDbgLevel", "debug_level"),
+            Map.entry("cbThreadCount", "thread_count"),
+            Map.entry("tfBackupGDest", "backup_dest_dir"),
+            Map.entry("tfBackupGDestEnabled", "backup_dest_dir_enabled"),
+            Map.entry("gridExclusions", "exclusion_glob_list")
+    );
 
     public SettingsForm() {
         this(null);
@@ -119,19 +117,19 @@ abstract class SettingsForm extends DynamicForm {
             Q_Profile.SetProperty.instantiate().setProperty(name, value).send();
     }
 
-    protected void setGPropertyItemValue(String field, String name, boolean value) {
+    public void setGPropertyItemValue(String field, String name, boolean value) {
         getItem(field).setValue(value);
         if (!hasSettings)
             Q_Global.SetProperty.instantiate().setProperty(name, value).send();
     }
 
-    protected void setGPropertyItemValue(String field, String name, int value) {
+    public void setGPropertyItemValue(String field, String name, int value) {
         getItem(field).setValue(value);
         if (!hasSettings)
             Q_Global.SetProperty.instantiate().setProperty(name, value).send();
     }
 
-    protected void setGPropertyItemValue(String field, String name, String value) {
+    public void setGPropertyItemValue(String field, String name, String value) {
         getItem(field).setValue(value);
         if (!hasSettings)
             Q_Global.SetProperty.instantiate().setProperty(name, value).send();

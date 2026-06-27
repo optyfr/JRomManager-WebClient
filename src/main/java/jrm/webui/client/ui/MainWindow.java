@@ -38,7 +38,10 @@ import jrm.webui.client.protocol.A_ReportLite;
 import jrm.webui.client.protocol.A_TrntChk;
 import jrm.webui.client.utils.EnhJSO;
 
-public class MainWindow extends Window {
+public class MainWindow extends Window //NOSONAR
+{
+    private static final String SCANNER = "scanner";
+
     TabSet mainPane;
     ProfilePanel profilePanel;
     ScannerPanel scannerPanel;
@@ -104,8 +107,8 @@ public class MainWindow extends Window {
         scannerPanel.btnScan.setDisabled(!params.getSuccess());
         scannerPanel.btnFix.setDisabled(true);
         if (params.getSuccess()) {
-            mainPane.enableTab("scanner");
-            mainPane.selectTab("scanner");
+            mainPane.enableTab(SCANNER);
+            mainPane.selectTab(SCANNER);
             EnhJSO settings = params.getSettings();
             scannerPanel.scannerDirPanel.initPropertyItemValues(settings);
             scannerPanel.scannerSettingsPanel.initPropertyItemValues(settings);
@@ -124,12 +127,13 @@ public class MainWindow extends Window {
         } else {
             if (mainPane.getSelectedTabNumber() == 1)
                 mainPane.selectTab(0);
-            mainPane.disableTab("scanner");
+            mainPane.disableTab(SCANNER);
         }
         profilePanel.refreshListGrid();
     }
 
-    public void update(A_Progress params) {
+    public void update(A_Progress params) //NOSONAR
+    {
         progress = new Progress();
     }
 
@@ -151,27 +155,32 @@ public class MainWindow extends Window {
         progress.canCancel(params.canCancel());
     }
 
-    public void update(A_Progress.ClearInfos params) {
+    public void update(A_Progress.ClearInfos params) //NOSONAR
+    {
         progress.clearInfos();
     }
 
-    public void update(A_Progress.SetFullProgress params) {
+    public void update(A_Progress.SetFullProgress params) //NOSONAR
+    {
         progress.setFullProgress(params.getParams());
     }
 
-    public void update(A_CatVer.Loaded params) {
+    public void update(A_CatVer.Loaded params) //NOSONAR
+    {
         scannerPanel.scannerAdvFiltersPanel.catver_path.setValue(params.getPath());
         scannerPanel.scannerAdvFiltersPanel.catver_tree.enableEvents = false;
         scannerPanel.scannerAdvFiltersPanel.catver_tree.invalidateCache();
     }
 
-    public void update(A_NPlayers.Loaded params) {
+    public void update(A_NPlayers.Loaded params) //NOSONAR
+    {
         scannerPanel.scannerAdvFiltersPanel.nplayers_path.setValue(params.getPath());
         scannerPanel.scannerAdvFiltersPanel.nplayers_list.enableEvents = false;
         scannerPanel.scannerAdvFiltersPanel.nplayers_list.invalidateCache();
     }
 
-    public void update(A_Profile.Scanned params) {
+    public void update(A_Profile.Scanned params) //NOSONAR
+    {
         if (params.getSuccess()) {
             scannerPanel.btnFix.setDisabled(params.getActions() == null || params.getActions() == 0);
             if (params.hasReport()) {
@@ -212,7 +221,8 @@ public class MainWindow extends Window {
         batchDirUpd8rPanel.report.reload();
     }
 
-    public void update(A_Dat2Dir.ClearResults params) {
+    public void update(A_Dat2Dir.ClearResults params) //NOSONAR
+    {
         RecordList list = batchDirUpd8rPanel.sdr.getResultSet().getAllCachedRows();
         for (int i = 0; i < list.getLength(); i++)
             batchDirUpd8rPanel.sdr.setEditValue(i, 3, ""); //$NON-NLS-1$
@@ -224,8 +234,9 @@ public class MainWindow extends Window {
         batchDirUpd8rPanel.sdr.setEditValue(row, 3, result);
     }
 
-    public void update(A_Dat2Dir.End params) {
-        mainPane.disableTab("scanner");
+    public void update(A_Dat2Dir.End params) //NOSONAR
+    {
+        mainPane.disableTab(SCANNER);
         batchDirUpd8rPanel.sdr.cancelEditing();
         batchDirUpd8rPanel.sdr.refreshData((dsResponse, data, dsRequest) -> {
             ListGridRecord[] records = batchDirUpd8rPanel.sdr.getExpandedRecords();
@@ -238,7 +249,8 @@ public class MainWindow extends Window {
         batchDirUpd8rPanel.showSettings(params.getSettings(), params.getSrcs());
     }
 
-    public void update(A_TrntChk.ClearResults params) {
+    public void update(A_TrntChk.ClearResults params) //NOSONAR
+    {
         RecordList list = batchTrrntChkPanel.sdr.getResultSet().getAllCachedRows();
         for (int i = 0; i < list.getLength(); i++)
             batchTrrntChkPanel.sdr.setEditValue(i, 3, ""); //$NON-NLS-1$
@@ -250,7 +262,8 @@ public class MainWindow extends Window {
         batchTrrntChkPanel.sdr.setEditValue(row, 3, result);
     }
 
-    public void update(A_TrntChk.End params) {
+    public void update(A_TrntChk.End params) //NOSONAR
+    {
         batchTrrntChkPanel.sdr.cancelEditing();
         batchTrrntChkPanel.sdr.refreshData((dsResponse, data, dsRequest) -> {
             ListGridRecord[] records = batchTrrntChkPanel.sdr.getExpandedRecords();
@@ -259,7 +272,8 @@ public class MainWindow extends Window {
         });
     }
 
-    public void update(A_Compressor.ClearResults params) {
+    public void update(A_Compressor.ClearResults params) //NOSONAR
+    {
         for (int i = 0; i < batchCompressorPanel.fr.getTotalRows(); i++)
             batchCompressorPanel.fr.setEditValue(i, 1, ""); //$NON-NLS-1$
     }
@@ -276,7 +290,8 @@ public class MainWindow extends Window {
         batchCompressorPanel.fr.setEditValue(row, 0, file);
     }
 
-    public void update(A_Compressor.End params) {
+    public void update(A_Compressor.End params) //NOSONAR
+    {
         batchCompressorPanel.fr.discardAllEdits();
         batchCompressorPanel.fr.refreshData();
     }
@@ -336,81 +351,85 @@ public class MainWindow extends Window {
      * @return
      */
     private Tab getBatchTab() {
-        return new Tab() {
-            {
-                setIcon("icons/application_osx_terminal.png"); //$NON-NLS-1$
-                setTitle(Client.getSession().getMsg("MainFrame.BatchTools")); //$NON-NLS-1$
-                setPane(new TabSet() {
-                    {
-                        setPaneMargin(0);
-                        setTabBarControls(
-                                TabBarControls.TAB_SCROLLER,
-                                TabBarControls.TAB_PICKER);
-                        addTab(new Tab() {
-                            {
-                                setTitle(Client.getSession().getMsg("MainFrame.panelBatchToolsDat2Dir.title")); //$NON-NLS-1$
-                                setIcon("icons/application_cascade.png"); //$NON-NLS-1$
-                                setPane(batchDirUpd8rPanel = new BatchDirUpd8rPanel());
-                            }
-                        });
-                        addTab(new Tab() {
-                            {
-                                setTitle(Client.getSession().getMsg("MainFrame.panelBatchToolsDir2Torrent.title")); //$NON-NLS-1$
-                                setIcon("icons/drive_web.png"); //$NON-NLS-1$
-                                setPane(batchTrrntChkPanel = new BatchTrrntChkPanel());
-                            }
-                        });
-                        addTab(new Tab() {
-                            {
-                                setTitle(Client.getSession().getMsg("BatchPanel.Compressor")); //$NON-NLS-1$
-                                setIcon("icons/compress.png"); //$NON-NLS-1$
-                                setPane(batchCompressorPanel = new BatchCompressorPanel());
-                            }
-                        });
-                    }
-                });
-            }
-        };
+        Tab tab = new Tab();
+        tab.setIcon("icons/application_osx_terminal.png"); //$NON-NLS-1$
+        tab.setTitle(Client.getSession().getMsg("MainFrame.BatchTools")); //$NON-NLS-1$
+        tab.setPane(buildBatchTabSet());
+        return tab;
+    }
+
+    private TabSet buildBatchTabSet() {
+        TabSet tabSet = new TabSet();
+        tabSet.setPaneMargin(0);
+        tabSet.setTabBarControls(TabBarControls.TAB_SCROLLER, TabBarControls.TAB_PICKER);
+        tabSet.addTab(buildBatchDat2DirTab());
+        tabSet.addTab(buildBatchTrrntChkTab());
+        tabSet.addTab(buildBatchCompressorTab());
+        return tabSet;
+    }
+
+    private Tab buildBatchDat2DirTab() {
+        Tab tab = new Tab();
+        tab.setTitle(Client.getSession().getMsg("MainFrame.panelBatchToolsDat2Dir.title")); //$NON-NLS-1$
+        tab.setIcon("icons/application_cascade.png"); //$NON-NLS-1$
+        batchDirUpd8rPanel = new BatchDirUpd8rPanel();
+        tab.setPane(batchDirUpd8rPanel);
+        return tab;
+    }
+
+    private Tab buildBatchTrrntChkTab() {
+        Tab tab = new Tab();
+        tab.setTitle(Client.getSession().getMsg("MainFrame.panelBatchToolsDir2Torrent.title")); //$NON-NLS-1$
+        tab.setIcon("icons/drive_web.png"); //$NON-NLS-1$
+        batchTrrntChkPanel = new BatchTrrntChkPanel();
+        tab.setPane(batchTrrntChkPanel);
+        return tab;
+    }
+
+    private Tab buildBatchCompressorTab() {
+        Tab tab = new Tab();
+        tab.setTitle(Client.getSession().getMsg("BatchPanel.Compressor")); //$NON-NLS-1$
+        tab.setIcon("icons/compress.png"); //$NON-NLS-1$
+        batchCompressorPanel = new BatchCompressorPanel();
+        tab.setPane(batchCompressorPanel);
+        return tab;
     }
 
     /**
      * @return
      */
     private Tab getDir2DatTab() {
-        return new Tab() {
-            {
-                setIcon("icons/drive_go.png"); //$NON-NLS-1$
-                setTitle(Client.getSession().getMsg("MainFrame.Dir2Dat")); //$NON-NLS-1$
-                setPane(dir2datPanel = new Dir2DatPanel());
-            }
-        };
+        Tab tab = new Tab();
+        tab.setIcon("icons/drive_go.png"); //$NON-NLS-1$
+        tab.setTitle(Client.getSession().getMsg("MainFrame.Dir2Dat")); //$NON-NLS-1$
+        dir2datPanel = new Dir2DatPanel();
+        tab.setPane(dir2datPanel);
+        return tab;
     }
 
     /**
      * @return
      */
     private Tab getScannerTab() {
-        return new Tab() {
-            {
-                setName("scanner");
-                setIcon("icons/drive_magnify.png"); //$NON-NLS-1$
-                setTitle(Client.getSession().getMsg("MainFrame.Scanner")); //$NON-NLS-1$
-                setDisabled(true);
-                setPane(scannerPanel = new ScannerPanel());
-            }
-        };
+        Tab tab = new Tab();
+        tab.setName(SCANNER);
+        tab.setIcon("icons/drive_magnify.png"); //$NON-NLS-1$
+        tab.setTitle(Client.getSession().getMsg("MainFrame.Scanner")); //$NON-NLS-1$
+        tab.setDisabled(true);
+        scannerPanel = new ScannerPanel();
+        tab.setPane(scannerPanel);
+        return tab;
     }
 
     /**
      * @return
      */
     private Tab getProfileTab() {
-        return new Tab() {
-            {
-                setIcon("icons/script.png"); //$NON-NLS-1$
-                setTitle(Client.getSession().getMsg("MainFrame.Profiles")); //$NON-NLS-1$
-                setPane(profilePanel = new ProfilePanel());
-            }
-        };
+        Tab tab = new Tab();
+        tab.setIcon("icons/script.png"); //$NON-NLS-1$
+        tab.setTitle(Client.getSession().getMsg("MainFrame.Profiles")); //$NON-NLS-1$
+        profilePanel = new ProfilePanel();
+        tab.setPane(profilePanel);
+        return tab;
     }
 }

@@ -15,13 +15,20 @@ import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.Progressbar;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 import jrm.webui.client.Client;
 import jrm.webui.client.protocol.A_Progress;
 import jrm.webui.client.protocol.Q_Progress;
 
-public class Progress extends Window {
+public class Progress extends Window /* NOSONAR */ {
+    private static final String LOADING_IMG = "<center><img height='16' width='16' src='/images/loading.gif'></center>";
+
+    private static final String LABEL = "label";
+
+    private static final String TIME_TIME = "<code>--:--:--/--:--:--</code>";
+
     private VLayout panel;
 
     /** The lbl info. */
@@ -62,9 +69,7 @@ public class Progress extends Window {
         setWidth(500);
         setHeight(250);
         setMinHeight(150);
-        // setBackgroundColor("#EEEEEE");
         setCanDragResize(true);
-        // setParentCanvas(parent);
         setID("Progress");
         setTitle("Progression");
         Map<String, Object> headerIconDefaults = new HashMap<>();
@@ -75,21 +80,13 @@ public class Progress extends Window {
         setShowHeaderIcon(true);
         setShowCloseButton(false);
 
-        panel = new VLayout() {
-            {
-                setMembersMargin(2);
-                setWidth100();
-                setHeight100();
-                // setBackgroundColor("#EEEEEE");
-                setOverflow(Overflow.AUTO);
-            }
-        };
+        panel = buildPanel();
         setInfos(1, false);
 
         progressBar = new Progressbar();
         progressBar.setLength("100%");
 
-        lblTimeleft = new Label("<code>--:--:--/--:--:--</code>");
+        lblTimeleft = new Label(TIME_TIME);
         lblTimeleft.setWidth("*");
         lblTimeleft.setWrap(false);
         lblTimeleft.setHeight(20);
@@ -100,12 +97,12 @@ public class Progress extends Window {
         progressBarLabel.setWidth100();
         progressBarLabel.setAlign(Alignment.CENTER);
         progressBarLabel.setWrap(false);
-        progressBar.addChild(progressBarLabel, "label", true);
+        progressBar.addChild(progressBarLabel, LABEL, true);
 
         progressBar2 = new Progressbar();
         progressBar2.setLength("100%");
 
-        lblTimeLeft2 = new Label("<code>--:--:--/--:--:--</code>");
+        lblTimeLeft2 = new Label(TIME_TIME);
         lblTimeLeft2.setWidth("*");
         lblTimeLeft2.setWrap(false);
         lblTimeLeft2.setHeight(20);
@@ -116,12 +113,12 @@ public class Progress extends Window {
         progressBarLabel2.setWidth100();
         progressBarLabel2.setAlign(Alignment.CENTER);
         progressBarLabel2.setWrap(false);
-        progressBar2.addChild(progressBarLabel2, "label", true);
+        progressBar2.addChild(progressBarLabel2, LABEL, true);
 
         progressBar3 = new Progressbar();
         progressBar3.setLength("100%");
 
-        lblTimeLeft3 = new Label("<code>--:--:--/--:--:--</code>");
+        lblTimeLeft3 = new Label(TIME_TIME);
         lblTimeLeft3.setWidth("*");
         lblTimeLeft3.setWrap(false);
         lblTimeLeft3.setHeight(20);
@@ -132,7 +129,7 @@ public class Progress extends Window {
         progressBarLabel3.setWidth100();
         progressBarLabel3.setAlign(Alignment.CENTER);
         progressBarLabel3.setWrap(false);
-        progressBar3.addChild(progressBarLabel3, "label", true);
+        progressBar3.addChild(progressBarLabel3, LABEL, true);
 
         btnCancel = new IButton("Cancel");
         btnCancel.setPadding(2);
@@ -140,60 +137,40 @@ public class Progress extends Window {
         btnCancel.addClickHandler(e -> cancel());
         btnCancel.setIcon("icons/stop.png");
 
-        addItem(new VLayout() {
-            {
-                setWidth100();
-                setHeight100();
-                setLayoutMargin(2);
-                setMembersMargin(2);
-                addMembers(panel, new HLayout() {
-                    {
-                        setWidth100();
-                        setMembersMargin(2);
-                        addMembers(progressBar, lblTimeleft);
-                    }
-                }, new HLayout() {
-                    {
-                        setWidth100();
-                        setMembersMargin(2);
-                        addMembers(progressBar2, lblTimeLeft2);
-                    }
-                }, new HLayout() {
-                    {
-                        setWidth100();
-                        setMembersMargin(2);
-                        addMembers(progressBar3, lblTimeLeft3);
-                    }
-                }, btnCancel);
-            }
-        });
+        addItem(buildMainLayout());
 
         centerInPage();
         show();
         packHeight();
     }
 
-    private static final String colorNormal = "rgb(70% 70% 70%)";
-    private static final String colorLight = "rgb(80% 80% 80%)";
-    private static final String colorLighter = "rgb(90% 90% 90%)";
+    private static final String COLOR_NORMAL = "rgb(70% 70% 70%)";
+    private static final String COLOR_LIGHT = "rgb(80% 80% 80%)";
+    private static final String COLOR_LIGHTER = "rgb(90% 90% 90%)";
+    private static final String CODE_OPEN = "<code>";
+    private static final String CODE_CLOSE = "</code>";
 
     public void setInfos(int threadCnt, Boolean multipleSubInfos) {
         panel.removeMembers(panel.getMembers());
 
         lblInfo = new Label[threadCnt];
-        lblSubInfo = new Label[multipleSubInfos == null ? 0 : (multipleSubInfos ? threadCnt : 1)];
+        int subInfoSize = 0;
+        if (multipleSubInfos != null) {
+            subInfoSize = multipleSubInfos ? threadCnt : 1;
+        }
+        lblSubInfo = new Label[subInfoSize];
 
         for (int i = 0; i < threadCnt; i++) {
-            lblInfo[i] = buildLabel(isOdd(i) ? colorNormal : colorLight);
+            lblInfo[i] = buildLabel(isOdd(i) ? COLOR_NORMAL : COLOR_LIGHT);
             panel.addMember(lblInfo[i]);
 
             if (Boolean.TRUE.equals(multipleSubInfos)) {
-                lblSubInfo[i] = buildLabel(isOdd(i) ? colorNormal : colorLight);
+                lblSubInfo[i] = buildLabel(isOdd(i) ? COLOR_NORMAL : COLOR_LIGHT);
                 panel.addMember(lblSubInfo[i]);
             }
         }
         if (multipleSubInfos != null && !multipleSubInfos) {
-            lblSubInfo[0] = buildLabel(colorLighter);
+            lblSubInfo[0] = buildLabel(COLOR_LIGHTER);
             panel.addMember(lblSubInfo[0]);
         }
         if (isVisible() && Boolean.TRUE.equals(isDrawn()))
@@ -214,17 +191,50 @@ public class Progress extends Window {
             lblSubInfo = Arrays.copyOf(lblSubInfo, threadCnt);
 
         for (int i = oldThreadCnt; i < threadCnt; i++) {
-            lblInfo[i] = buildLabel(isOdd(i) ? colorNormal : colorLight);
+            lblInfo[i] = buildLabel(isOdd(i) ? COLOR_NORMAL : COLOR_LIGHT);
             panel.addMember(lblInfo[i]);
 
             if (Boolean.TRUE.equals(multipleSubInfos)) {
-                lblSubInfo[i] = buildLabel(isOdd(i) ? colorNormal : colorLight);
+                lblSubInfo[i] = buildLabel(isOdd(i) ? COLOR_NORMAL : COLOR_LIGHT);
                 panel.addMember(lblSubInfo[i]);
             }
         }
 
         if (isVisible() && Boolean.TRUE.equals(isDrawn()))
             packHeight();
+    }
+
+    private VLayout buildPanel() {
+        VLayout p = new VLayout();
+        p.setMembersMargin(2);
+        p.setWidth100();
+        p.setHeight100();
+        p.setOverflow(Overflow.AUTO);
+        return p;
+    }
+
+    private VLayout buildMainLayout() {
+        VLayout main = new VLayout();
+        main.setWidth100();
+        main.setHeight100();
+        main.setLayoutMargin(2);
+        main.setMembersMargin(2);
+        main.addMembers(
+            panel,
+            buildProgressBarRow(progressBar, lblTimeleft),
+            buildProgressBarRow(progressBar2, lblTimeLeft2),
+            buildProgressBarRow(progressBar3, lblTimeLeft3),
+            btnCancel
+        );
+        return main;
+    }
+
+    private Layout buildProgressBarRow(Progressbar pb, Label timeLabel) {
+        HLayout row = new HLayout();
+        row.setWidth100();
+        row.setMembersMargin(2);
+        row.addMembers(pb, timeLabel);
+        return row;
     }
 
     private boolean isOdd(int i) {
@@ -256,66 +266,33 @@ public class Progress extends Window {
             lblInfo[i].setContents(Optional.ofNullable(pd.getInfos().get(i)).orElse(""));
         for (int i = 0; i < lblSubInfo.length; i++)
             lblSubInfo[i].setContents(Optional.ofNullable(pd.getSubInfos().get(i)).orElse(""));
-        if (progressBar.isVisible() != pd.getPB1().isVisible()) {
-            progressBar.setVisibility(pd.getPB1().isVisible() ? Visibility.INHERIT : Visibility.HIDDEN);
-            lblTimeleft.setVisibility(progressBar.getVisibility());
+        updateProgressBar(progressBar, progressBarLabel, lblTimeleft, pd.getPB1(), false);
+        updateProgressBar(progressBar2, progressBarLabel2, lblTimeLeft2, pd.getPB2(), true);
+        updateProgressBar(progressBar3, progressBarLabel3, lblTimeLeft3, pd.getPB3(), true);
+    }
+
+    private void updateProgressBar(Progressbar pb, Label pbLabel, Label timeLabel,
+            A_Progress.SetFullProgress.ProgressData.Progress pbData, boolean usePercCheck) {
+        if (pb.isVisible() != pbData.isVisible()) {
+            pb.setVisibility(pbData.isVisible() ? Visibility.INHERIT : Visibility.HIDDEN);
+            timeLabel.setVisibility(pb.getVisibility());
             packHeight();
         }
-        if (pd.getPB1().isVisible()) {
-            if (pd.getPB1().isIndeterminate()) {
-                progressBar.setPercentDone(0);
-                progressBarLabel.setContents("<center><img height='16' width='16' src='/images/loading.gif'></center>");
-            } else if (pd.getPB1().getVal() > 0) {
-                if (progressBar.getPercentDone() != (int) pd.getPB1().getPerc())
-                    progressBar.setPercentDone((int) pd.getPB1().getPerc());
-                if (pd.getPB1().hasStringPainted())
-                    progressBarLabel.setContents(Optional.ofNullable(pd.getPB1().getMsg()).orElse(""));
-                else
-                    progressBarLabel.setContents("");
-                lblTimeleft.setContents("<code>" + pd.getPB1().getTimeleft() + "</code>");
-            } else
-                lblTimeleft.setContents("<code>--:--:--/--:--:--</code>");
-        }
-        if (progressBar2.isVisible() != pd.getPB2().isVisible()) {
-            progressBar2.setVisibility(pd.getPB2().isVisible() ? Visibility.INHERIT : Visibility.HIDDEN);
-            lblTimeLeft2.setVisibility(progressBar2.getVisibility());
-            packHeight();
-        }
-        if (pd.getPB2().isVisible()) {
-            if (pd.getPB2().isIndeterminate()) {
-                progressBar2.setPercentDone(0);
-                progressBarLabel2.setContents("<center><img height='16' width='16' src='/images/loading.gif'></center>");
-            } else if (pd.getPB2().getPerc() >= 0) {
-                if (progressBar2.getPercentDone() != (int) pd.getPB2().getPerc())
-                    progressBar2.setPercentDone((int) pd.getPB2().getPerc());
-                if (pd.getPB2().hasStringPainted())
-                    progressBarLabel2.setContents(Optional.ofNullable(pd.getPB2().getMsg()).orElse(""));
-                else
-                    progressBarLabel2.setContents("");
-                lblTimeLeft2.setContents("<code>" + pd.getPB2().getTimeleft() + "</code>");
-            } else
-                lblTimeLeft2.setContents("<code>--:--:--/--:--:--</code>");
-        }
-        if (progressBar3.isVisible() != pd.getPB3().isVisible()) {
-            progressBar3.setVisibility(pd.getPB3().isVisible() ? Visibility.INHERIT : Visibility.HIDDEN);
-            lblTimeLeft3.setVisibility(progressBar3.getVisibility());
-            packHeight();
-        }
-        if (pd.getPB3().isVisible()) {
-            if (pd.getPB3().isIndeterminate()) {
-                progressBar3.setPercentDone(0);
-                progressBarLabel3.setContents("<center><img height='16' width='16' src='/images/loading.gif'></center>");
-            } else if (pd.getPB3().getPerc() >= 0) {
-                if (progressBar3.getPercentDone() != (int) pd.getPB3().getPerc())
-                    progressBar3.setPercentDone((int) pd.getPB3().getPerc());
-                if (pd.getPB3().hasStringPainted())
-                    progressBarLabel3.setContents(Optional.ofNullable(pd.getPB3().getMsg()).orElse(""));
-                else
-                    progressBarLabel3.setContents("");
-                lblTimeLeft3.setContents("<code>" + pd.getPB3().getTimeleft() + "</code>");
-            } else
-                lblTimeLeft3.setContents("<code>--:--:--/--:--:--</code>");
-        }
+        if (!pbData.isVisible())
+            return;
+        if (pbData.isIndeterminate()) {
+            pb.setPercentDone(0);
+            pbLabel.setContents(LOADING_IMG);
+        } else if (usePercCheck ? pbData.getPerc() >= 0 : pbData.getVal() > 0) {
+            if (pb.getPercentDone() != (int) pbData.getPerc())
+                pb.setPercentDone((int) pbData.getPerc());
+            if (pbData.hasStringPainted())
+                pbLabel.setContents(Optional.ofNullable(pbData.getMsg()).orElse(""));
+            else
+                pbLabel.setContents("");
+            timeLabel.setContents(CODE_OPEN + pbData.getTimeleft() + CODE_CLOSE);
+        } else
+            timeLabel.setContents(TIME_TIME);
     }
 
     public void cancel() {
@@ -325,7 +302,7 @@ public class Progress extends Window {
     }
 
     private void packHeight() {
-        // markForRedraw();
+        // Reserved for future use - currently not needed as SmartGWT handles layout automatically
     }
 
     @Override

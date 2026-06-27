@@ -1,7 +1,6 @@
 package jrm.webui.client.ui;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -10,9 +9,6 @@ import java.util.stream.Stream;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Timer;
 import com.smartgwt.client.data.Criteria;
-import com.smartgwt.client.data.DSCallback;
-import com.smartgwt.client.data.DSRequest;
-import com.smartgwt.client.data.DSResponse;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.ResultSet;
@@ -37,752 +33,605 @@ import jrm.webui.client.datasources.DSAnyware;
 import jrm.webui.client.datasources.DSAnywareList;
 import jrm.webui.client.datasources.DSAnywareListList;
 
-public class ProfileViewer extends Window {
-    AnywareListList anywareListList;
-    AnywareList anywareList;
-    Anyware anyware;
+public class ProfileViewer extends Window //NOSONAR
+{
+	private static final String STATUS_COMPLETE = "COMPLETE";
+	private static final String STATUS_MISSING = "MISSING";
+	private static final String STATUS_PARTIAL = "PARTIAL";
+	private static final String STATUS_UNKNOWN = "UNKNOWN";
+	private static final String STATUS = "status";
+	private static final String RESET = "reset";
 
-    class AnywareListList extends ListGrid {
-        private HashMap<String, String> status_icons = new HashMap<String, String>() {
-            {
-                put("COMPLETE", "/images/disk_multiple_green.png");
-                put("MISSING", "/images/disk_multiple_red.png");
-                put("PARTIAL", "/images/disk_multiple_orange.png");
-                put("UNKNOWN", "/images/disk_multiple_gray.png");
-            }
-        };
-        private final DSAnywareListList ds;
+	AnywareListList anywareListList;
+	AnywareList anywareList;
+	Anyware anyware;
 
-        public AnywareListList() {
-            super();
-            ds = DSAnywareListList.getInstance();
-            setCanEdit(false);
-            setCanRemoveRecords(false);
-            setCanHover(true);
-            setHoverAutoFitWidth(true);
-            setHoverAutoFitMaxWidth("50%");
-            setSelectionType(SelectionStyle.SINGLE);
-            setDataProperties(new ResultSet() {
-                {
-                    setUseClientFiltering(false);
-                    setUseClientSorting(false);
-                }
-            });
-            setCanSort(false);
-            addSelectionChangedHandler(event -> {
-                if (event.getState())
-                    anywareList.reset(event.getRecord(), getDataSource());
-            });
-            addDataArrivedHandler(event -> {
-                ds.setExtraData(Collections.emptyMap());
-                if (getTotalRows() > 0 && !Boolean.TRUE.equals(anySelected()))
-                    selectSingleRecord(0);
-            });
-            setDataSource(
-                    ds,
-                    new ListGridField("name") {
-                        {
-                            setMinWidth(80);
-                            setWidth("25%");
-                        }
-                    },
-                    new ListGridField("description") {
-                        {
-                            setMinWidth(20);
-                        }
-                    },
-                    new ListGridField("have") {
-                        {
-                            setAlign(Alignment.CENTER);
-                            setMinWidth(80);
-                            setWidth("25%");
-                        }
-                    });
-        }
+	private static ResultSet buildServerResultSet() {
+		var rs = new ResultSet();
+		rs.setUseClientFiltering(false);
+		rs.setUseClientSorting(false);
+		return rs;
+	}
 
-        @Override
-        public String getValueIcon(ListGridField field, Object value, ListGridRecord record) {
-            switch (field.getName()) {
-                case "name":
-                    return status_icons.get(record.getAttribute("status"));
-            }
-            return super.getValueIcon(field, value, record);
-        };
+	class AnywareListList extends ListGrid //NOSONAR
+    {
+		private static final Map<String, String> STATUS_ICONS = Map.of(
+				STATUS_COMPLETE, "/images/disk_multiple_green.png",
+				STATUS_MISSING, "/images/disk_multiple_red.png",
+				STATUS_PARTIAL, "/images/disk_multiple_orange.png",
+				STATUS_UNKNOWN, "/images/disk_multiple_gray.png");
+		private final DSAnywareListList ds;
 
-        public void reset() {
-            ds.setExtraData(Collections.singletonMap("reset", "true"));
-            if (Boolean.TRUE.equals(willFetchData(null)))
-                fetchData();
-            else
-                refreshData();
-        }
-    }
+		public AnywareListList() {
+			super();
+			ds = DSAnywareListList.getInstance();
+			setCanEdit(false);
+			setCanRemoveRecords(false);
+			setCanHover(true);
+			setHoverAutoFitWidth(true);
+			setHoverAutoFitMaxWidth("50%");
+			setSelectionType(SelectionStyle.SINGLE);
+			setDataProperties(buildServerResultSet());
+			setCanSort(false);
+			addSelectionChangedHandler(event -> {
+				if (event.getState())
+					anywareList.reset(event.getRecord(), getDataSource());
+			});
+			addDataArrivedHandler(event -> {
+				ds.setExtraData(Collections.emptyMap());
+				if (getTotalRows() > 0 && !Boolean.TRUE.equals(anySelected()))
+					selectSingleRecord(0);
+			});
+			setDataSource(ds,
+					buildField("name", 80, "25%", null),
+					buildField("description", 20, null, null),
+					buildField("have", 80, "25%", Alignment.CENTER));
+		}
 
-    class AnywareList extends ListGrid {
-        private HashMap<String, String> status_icons = new HashMap<String, String>() {
-            {
-                put("COMPLETE", "/images/folder_closed_green.png");
-                put("MISSING", "/images/folder_closed_red.png");
-                put("PARTIAL", "/images/folder_closed_orange.png");
-                put("UNKNOWN", "/images/folder_closed_gray.png");
-            }
-        };
-        private HashMap<String, String> type_icons = new HashMap<String, String>() {
-            {
-                put("BIOS", "/images/icons/application_osx_terminal.png");
-                put("DEVICE", "/images/icons/computer.png");
-                put("MECHANICAL", "/images/icons/wrench.png");
-                put("STANDARD", "/images/icons/joystick.png");
-            }
-        };
-        private boolean ismachinelist = false;
+		@Override
+		public String getValueIcon(ListGridField field, Object value, ListGridRecord recrd) {
+			if ("name".equals(field.getName()))
+				return STATUS_ICONS.get(recrd.getAttribute(STATUS));
+			return super.getValueIcon(field, value, recrd);
+		}
 
-        private Integer to_select = null;
+		public void reset() {
+			ds.setExtraData(Collections.singletonMap(RESET, "true"));
+			if (Boolean.TRUE.equals(willFetchData(null)))
+				fetchData();
+			else
+				refreshData();
+		}
+	}
 
-        private final DSAnywareList ds;
+	private static ListGridField buildField(String name, int minWidth, String width, Alignment align) {
+		var field = new ListGridField(name);
+		field.setMinWidth(minWidth);
+		if (width != null)
+			field.setWidth(width);
+		if (align != null)
+			field.setAlign(align);
+		return field;
+	}
 
-        public AnywareList() {
-            ds = DSAnywareList.getInstance();
-            setCanEdit(true);
-            setDataProperties(new ResultSet() {
-                {
-                    setUseClientFiltering(false);
-                    setUseClientSorting(false);
-                }
-            });
-            setCanRemoveRecords(false);
-            setShowFilterEditor(true);
-            setSelectionType(SelectionStyle.SINGLE);
-            setCanHover(true);
-            setHoverAutoFitWidth(true);
-            setHoverAutoFitMaxWidth("50%");
-            setAllowFilterOperators(false);
-            setContextMenu(new Menu() {
-                {
-                    setItems(
-                            new MenuItem(Client.getSession().getMsg("ProfileViewer.mntmCollectKeywords.text")) {
-                                {
+	private static ListGridField buildField(String name, String title, int minWidth, String width,
+			Alignment align, boolean canEdit, boolean canFilter) {
+		var field = new ListGridField(name, title);
+		field.setMinWidth(minWidth);
+		if (width != null)
+			field.setWidth(width);
+		if (align != null)
+			field.setAlign(align);
+		field.setCanEdit(canEdit);
+		field.setCanFilter(canFilter);
+		return field;
+	}
 
-                                }
-                            },
-                            new MenuItem(Client.getSession().getMsg("ProfileViewer.mntmSelectNone.text")) {
-                                {
-                                    addClickHandler(event -> AnywareList.this.getDataSource().performCustomOperation("selectNone",
-                                            new Record(AnywareList.this.getCriteria().getValues()), (dsResponse, data, dsRequest) -> AnywareList.this.refreshData()));
-                                }
-                            },
-                            new MenuItem(Client.getSession().getMsg("ProfileViewer.mntmSelectAll.text")) {
-                                {
-                                    addClickHandler(event -> AnywareList.this.getDataSource().performCustomOperation("selectAll",
-                                            new Record(AnywareList.this.getCriteria().getValues()), (dsResponse, data, dsRequest) -> AnywareList.this.refreshData()));
-                                }
-                            },
-                            new MenuItem(Client.getSession().getMsg("ProfileViewer.mntmSelectInvert.text")) {
-                                {
-                                    addClickHandler(event -> AnywareList.this.getDataSource().performCustomOperation("selectInvert",
-                                            new Record(AnywareList.this.getCriteria().getValues()), (dsResponse, data, dsRequest) -> AnywareList.this.refreshData()));
-                                }
-                            });
-                }
-            });
-            addSelectionChangedHandler(event -> {
-                if (event.getState())
-                    anyware.reset(event.getRecord(), getDataSource());
-            });
-            addDataArrivedHandler(event -> {
-                ds.setExtraData(Collections.emptyMap());
-                if (getTotalRows() > 0) {
-                    if (to_select != null) {
-                        selectSingleRecord(to_select);
-                        to_select = null;
-                    } else if (!Boolean.TRUE.equals(anySelected()))
-                        selectSingleRecord(0);
-                }
-                refreshFields();
-            });
-            addCellDoubleClickHandler(event -> {
-                ListGridField field = getField(event.getColNum());
-                DSCallback cb = new DSCallback() {
-                    @Override
-                    public void execute(DSResponse dsResponse, Object data, DSRequest dsRequest) {
-                        try {
-                            final var idx = Integer.valueOf(dsResponse.getAttribute("found"));
-                            if (idx != null) {
-                                final var record = getRecordList().get(idx);
-                                if (record == null || record.getAttribute("name") == null)
-                                    to_select = idx;
-                                else
-                                    selectSingleRecord(idx);
-                                scrollToRow(idx);
-                            }
-                        } catch (NumberFormatException e) {
-                            // do nothing
-                        }
-                    }
-                };
-                if (field.getName().equals("cloneof"))
-                    ds.performCustomOperation("find", new Record(getCriteria().getValues()) {
-                        {
-                            setAttribute("find", event.getRecord().getAttribute("cloneof"));
-                        }
-                    }, cb);
-                else if (field.getName().equals("romof"))
-                    ds.performCustomOperation("find", new Record(getCriteria().getValues()) {
-                        {
-                            setAttribute("find", event.getRecord().getAttribute("romof"));
-                        }
-                    }, cb);
-            });
-            setDataSource(
-                    ds,
-                    new ListGridField("status", Client.getSession().getMsg("MachineListRenderer.Status"), 24) {
-                        {
-                            setValueIcons(status_icons);
-                            setShowValueIconOnly(true);
-                            setAlign(Alignment.CENTER);
-                            setCanEdit(false);
-                            setCanFilter(false);
-                        }
-                    },
-                    new ListGridField("name", Client.getSession().getMsg("MachineListRenderer.Name")) {
-                        {
-                            setMinWidth(70);
-                            setWidth("15%");
-                            setCanEdit(false);
-                        }
-                    },
-                    new ListGridField("description", Client.getSession().getMsg("MachineListRenderer.Description")) {
-                        {
-                            setCanEdit(false);
-                        }
-                    },
-                    new ListGridField("have", Client.getSession().getMsg("MachineListRenderer.Have")) {
-                        {
-                            setMinWidth(40);
-                            setWidth("8%");
-                            setAlign(Alignment.CENTER);
-                            setCanEdit(false);
-                            setCanFilter(false);
-                            setCanSort(false);
-                        }
-                    },
-                    new ListGridField("cloneof", Client.getSession().getMsg("MachineListRenderer.CloneOf")) {
-                        {
-                            setMinWidth(70);
-                            setWidth("15%");
-                            setCanEdit(false);
-                        }
-                    },
-                    new ListGridField("romof", Client.getSession().getMsg("MachineListRenderer.RomOf")) {
-                        {
-                            setMinWidth(70);
-                            setWidth("15%");
-                            setCanEdit(false);
-                            setShowIfCondition((grid, field, fieldNum) -> ismachinelist);
-                        }
-                    },
-                    new ListGridField("sampleof", Client.getSession().getMsg("MachineListRenderer.SampleOf")) {
-                        {
-                            setMinWidth(70);
-                            setWidth("15%");
-                            setCanEdit(false);
-                            setShowIfCondition((grid, field, fieldNum) -> ismachinelist);
-                        }
-                    },
-                    new ListGridField("selected", Client.getSession().getMsg("MachineListRenderer.Selected"), 20) {
-                        {
-                            setAlign(Alignment.CENTER);
-                            setCanToggle(true);
-                            setCanSort(false);
-                        }
-                    });
-        }
+	class AnywareList extends ListGrid //NOSONAR
+    {
+		private static final String NAME = "name";
+		private static final Map<String, String> STATUS_ICONS = Map.of(
+				STATUS_COMPLETE, "/images/folder_closed_green.png",
+				STATUS_MISSING, "/images/folder_closed_red.png",
+				STATUS_PARTIAL, "/images/folder_closed_orange.png",
+				STATUS_UNKNOWN, "/images/folder_closed_gray.png");
+		private static final String CLONEOF = "cloneof";
+		private static final String ROMOF = "romof";
+		private static final Map<String, String> TYPE_ICONS = Map.of(
+				"BIOS", "/images/icons/application_osx_terminal.png",
+				"DEVICE", "/images/icons/computer.png",
+				"MECHANICAL", "/images/icons/wrench.png",
+				"STANDARD", "/images/icons/joystick.png");
+		private boolean ismachinelist = false;
+		private Integer toSelect = null;
+		private final DSAnywareList ds;
 
-        @Override
-        public String getValueIcon(ListGridField field, Object value, ListGridRecord record) {
-            switch (field.getName()) {
-                case "name":
-                    return type_icons.get(record.getAttribute("type"));
-                case "cloneof":
-                    return status_icons.get(record.getAttribute("cloneof_status"));
-                case "romof":
-                    return status_icons.get(record.getAttribute("romof_status"));
-                case "sampleof":
-                    return status_icons.get(record.getAttribute("sampleof_status"));
-            }
-            return super.getValueIcon(field, value, record);
-        };
+		public AnywareList() //NOSONAR
+		{
+			ds = DSAnywareList.getInstance();
+			setCanEdit(true);
+			setDataProperties(buildServerResultSet());
+			setCanRemoveRecords(false);
+			setShowFilterEditor(true);
+			setSelectionType(SelectionStyle.SINGLE);
+			setCanHover(true);
+			setHoverAutoFitWidth(true);
+			setHoverAutoFitMaxWidth("50%");
+			setAllowFilterOperators(false);
+			setContextMenu(buildAnywareListMenu());
+			addSelectionChangedHandler(event -> {
+				if (event.getState())
+					anyware.reset(event.getRecord(), getDataSource());
+			});
+			addDataArrivedHandler(event -> {
+				ds.setExtraData(Collections.emptyMap());
+				if (getTotalRows() > 0) {
+					if (toSelect != null) {
+						selectSingleRecord(toSelect);
+						toSelect = null;
+					} else if (!Boolean.TRUE.equals(anySelected()))
+						selectSingleRecord(0);
+				}
+				refreshFields();
+			});
+			addCellDoubleClickHandler(event -> {
+				var field = getField(event.getColNum());
+				var fieldName = field.getName();
+				if (CLONEOF.equals(fieldName) || ROMOF.equals(fieldName)) {
+					var rec = new Record(getCriteria().getValues());
+					rec.setAttribute("find", event.getRecord().getAttribute(fieldName));
+					ds.performCustomOperation("find", rec, (dsResponse, data, dsRequest) -> {
+						try {
+							var idx = Integer.valueOf(dsResponse.getAttribute("found"));
+							var recrd = getRecordList().get(idx);
+							if (recrd == null || recrd.getAttribute(NAME) == null)
+								toSelect = idx;
+							else
+								selectSingleRecord(idx);
+							scrollToRow(idx);
+						} catch (NumberFormatException e) {
+							// do nothing
+						}
+					});
+				}
+			});
+			setDataSource(ds,
+					buildStatusField(STATUS, Client.getSession().getMsg("MachineListRenderer.Status"), STATUS_ICONS),
+					buildField(NAME, Client.getSession().getMsg("MachineListRenderer.Name"), 70, "15%", null, false, true),
+					buildField("description", Client.getSession().getMsg("MachineListRenderer.Description"), 0, null, null, false, true),
+					buildField("have", Client.getSession().getMsg("MachineListRenderer.Have"), 40, "8%", Alignment.CENTER, false, false),
+					buildField(CLONEOF, Client.getSession().getMsg("MachineListRenderer.CloneOf"), 70, "15%", null, false, true),
+					buildRomOfField(),
+					buildSampleOfField(),
+					buildSelectedField());
+			getField("have").setCanSort(false);
+		}
 
-        public void reset(Record record, DataSource ds) {
-            this.ds.setExtraData(Collections.singletonMap("reset", "true"));
-            ismachinelist = "*".equals(record.getAttribute("name"));
-            if (Boolean.TRUE.equals(willFetchData(new Criteria() {
-                {
-                    addCriteria("list", record.getAttribute("name"));
-                }
-            })))
-                fetchRelatedData(record, ds);
-            else
-                refreshData();
-        }
-    }
+		private Menu buildAnywareListMenu() {
+			var menu = new Menu();
+			var collectKeywords = new MenuItem(Client.getSession().getMsg("ProfileViewer.mntmCollectKeywords.text"));
+			var selectNone = new MenuItem(Client.getSession().getMsg("ProfileViewer.mntmSelectNone.text"));
+			selectNone.addClickHandler(event -> getDataSource().performCustomOperation("selectNone",
+					new Record(getCriteria().getValues()), (dsResponse, data, dsRequest) -> refreshData()));
+			var selectAll = new MenuItem(Client.getSession().getMsg("ProfileViewer.mntmSelectAll.text"));
+			selectAll.addClickHandler(event -> getDataSource().performCustomOperation("selectAll",
+					new Record(getCriteria().getValues()), (dsResponse, data, dsRequest) -> refreshData()));
+			var selectInvert = new MenuItem(Client.getSession().getMsg("ProfileViewer.mntmSelectInvert.text"));
+			selectInvert.addClickHandler(event -> getDataSource().performCustomOperation("selectInvert",
+					new Record(getCriteria().getValues()), (dsResponse, data, dsRequest) -> refreshData()));
+			menu.setItems(collectKeywords, selectNone, selectAll, selectInvert);
+			return menu;
+		}
 
-    class Anyware extends ListGrid {
-        private HashMap<String, String> status_icons = new HashMap<String, String>() {
-            {
-                put("OK", "/images/icons/bullet_green.png");
-                put("KO", "/images/icons/bullet_red.png");
-                put("UNKNOWN", "/images/icons/bullet_black.png");
-            }
-        };
-        private HashMap<String, String> dumpstatus_icons = new HashMap<String, String>() {
-            {
-                put("verified", "/images/icons/star.png");
-                put("good", "/images/icons/tick.png");
-                put("baddump", "/images/icons/delete.png");
-                put("nodump", "/images/icons/error.png");
-            }
-        };
-        private HashMap<String, String> type_icons = new HashMap<String, String>() {
-            {
-                put("ROM", "/images/rom_small.png");
-                put("DISK", "/images/icons/drive.png");
-                put("SAMPLE", "/images/icons/sound.png");
-            }
-        };
+		private ListGridField buildStatusField(String name, String title, Map<String, String> icons) {
+			var field = new ListGridField(name, title, 24);
+			field.setValueIcons(icons);
+			field.setShowValueIconOnly(true);
+			field.setAlign(Alignment.CENTER);
+			field.setCanEdit(false);
+			field.setCanFilter(false);
+			return field;
+		}
 
-        private final DSAnyware ds;
+		private ListGridField buildRomOfField() {
+			var field = new ListGridField(ROMOF, Client.getSession().getMsg("MachineListRenderer.RomOf"));
+			field.setMinWidth(70);
+			field.setWidth("15%");
+			field.setCanEdit(false);
+			field.setShowIfCondition((grid, f, fieldNum) -> ismachinelist);
+			return field;
+		}
 
-        public Anyware() {
-            super();
-            ds = DSAnyware.getInstance();
-            setDataProperties(new ResultSet() {
-                {
-                    setUseClientFiltering(false);
-                    setUseClientSorting(false);
-                }
-            });
-            setCanEdit(false);
-            setCanRemoveRecords(false);
-            setSelectionType(SelectionStyle.SINGLE);
-            setCanHover(true);
-            setHoverAutoFitWidth(true);
-            setHoverAutoFitMaxWidth("50%");
-            setAlternateRecordStyles(true);
-            setCanSort(false);
-            setContextMenu(new Menu() {
-                {
-                    Dialog dialog = new Dialog();
-                    dialog.setWidth(350);
-                    setItems(
-                            new MenuItem("Copy CRC") {
-                                {
-                                    addClickHandler(event -> {
-                                        final Record record = Anyware.this.getSelectedRecord();
-                                        if (record != null)
-                                            SC.askforValue("Copy", "Select and Copy the text below", record.getAttribute("crc"), v -> {
-                                            }, dialog);
-                                    });
-                                    setEnableIfCondition((target, menu, item) -> Anyware.this.getSelectedRecord() != null);
-                                }
-                            },
-                            new MenuItem("Copy SHA1") {
-                                {
-                                    addClickHandler(event -> {
-                                        final Record record = Anyware.this.getSelectedRecord();
-                                        if (record != null)
-                                            SC.askforValue("Copy", "Select and Copy the text below", record.getAttribute("sha1"), v -> {
-                                            }, dialog);
-                                    });
-                                    setEnableIfCondition((target, menu, item) -> Anyware.this.getSelectedRecord() != null);
-                                }
-                            },
-                            new MenuItem("Copy Name") {
-                                {
-                                    addClickHandler(event -> {
-                                        final Record record = Anyware.this.getSelectedRecord();
-                                        if (record != null)
-                                            SC.askforValue("Copy", "Select and Copy the text below", record.getAttribute("name"), v -> {
-                                            }, dialog);
-                                    });
-                                    setEnableIfCondition((target, menu, item) -> Anyware.this.getSelectedRecord() != null);
-                                }
-                            },
-                            new MenuItem("Search on the Web") {
-                                {
-                                    addClickHandler(event -> {
-                                        final Record record = Anyware.this.getSelectedRecord();
-                                        if (record != null) {
-                                            final String name = record.getAttribute("name");
-                                            final String crc = record.getAttribute("crc");
-                                            final String sha1 = record.getAttribute("sha1");
-                                            final String hash = Optional.ofNullable(Optional.ofNullable(crc).orElse(sha1)).map(h -> '+' + h).orElse("");
-                                            com.google.gwt.user.client.Window.open("https://google.com/search?q=" + URL.encodeQueryString('"' + name + '"') + hash, "_blank", null);
-                                        }
-                                    });
-                                    setEnableIfCondition((target, menu, item) -> Anyware.this.getSelectedRecord() != null);
-                                }
-                            });
-                }
-            });
-            addDataArrivedHandler(event -> {
-                ds.setExtraData(Collections.emptyMap());
-            });
-            setDataSource(
-                    ds,
-                    new ListGridField("status", Client.getSession().getMsg("AnywareRenderer.Status"), 24) {
-                        {
-                            setValueIcons(status_icons);
-                            setShowValueIconOnly(true);
-                            setAlign(Alignment.CENTER);
-                            setCanEdit(false);
-                        }
-                    },
-                    new ListGridField("name", Client.getSession().getMsg("AnywareRenderer.Name")) {
-                        {
-                            setMinWidth(128);
-                            setWidth("*");
-                        }
-                    },
-                    new ListGridField("size", Client.getSession().getMsg("AnywareRenderer.Size")) {
-                        {
-                            setMinWidth(48);
-                            setAutoFitWidth(true);
-                        }
-                    },
-                    new ListGridField("crc") {
-                        {
-                            setMinWidth(48);
-                            setAutoFitWidth(true);
-                            setCellFormatter((value, record, rowNum, colNum) -> {
-                                if (value != null)
-                                    return "<code>" + value + "</code>";
-                                return null;
-                            });
-                        }
-                    },
-                    new ListGridField("md5") {
-                        {
-                            setMinWidth(100);
-                            setAutoFitWidth(true);
-                            setCellFormatter((value, record, rowNum, colNum) -> {
-                                if (value != null)
-                                    return "<code>" + value + "</code>";
-                                return null;
-                            });
-                        }
-                    },
-                    new ListGridField("sha1") {
-                        {
-                            setMinWidth(160);
-                            setAutoFitWidth(true);
-                            setCellFormatter((value, record, rowNum, colNum) -> {
-                                if (value != null)
-                                    return "<code>" + value + "</code>";
-                                return null;
-                            });
-                        }
-                    },
-                    new ListGridField("merge", Client.getSession().getMsg("AnywareRenderer.Merge")) {
-                        {
-                            setMinWidth(128);
-                            setAutoFitWidth(true);
-                        }
-                    },
-                    new ListGridField("dumpstatus", Client.getSession().getMsg("AnywareRenderer.DumpStatus"), 24) {
-                        {
-                            setValueIcons(dumpstatus_icons);
-                            setShowValueIconOnly(true);
-                            setAlign(Alignment.CENTER);
-                            setCanEdit(false);
-                        }
-                    });
-        }
+		private ListGridField buildSampleOfField() {
+			var field = new ListGridField("sampleof", Client.getSession().getMsg("MachineListRenderer.SampleOf"));
+			field.setMinWidth(70);
+			field.setWidth("15%");
+			field.setCanEdit(false);
+			field.setShowIfCondition((grid, f, fieldNum) -> ismachinelist);
+			return field;
+		}
 
-        @Override
-        public String getValueIcon(ListGridField field, Object value, ListGridRecord record) {
-            switch (field.getName()) {
-                case "name":
-                    return type_icons.get(record.getAttribute("type"));
-            }
-            return super.getValueIcon(field, value, record);
-        };
+		private ListGridField buildSelectedField() {
+			var field = new ListGridField("selected", Client.getSession().getMsg("MachineListRenderer.Selected"), 20);
+			field.setAlign(Alignment.CENTER);
+			field.setCanToggle(true);
+			field.setCanSort(false);
+			return field;
+		}
 
-        public void reset(Record record, DataSource ds) {
-            this.ds.setExtraData(Collections.singletonMap("reset", "true"));
-            if (Boolean.TRUE.equals(willFetchData(new Criteria() {
-                {
-                    addCriteria("list", record.getAttribute("list"));
-                    addCriteria("ware", record.getAttribute("name"));
-                }
-            })))
-                fetchRelatedData(record, ds);
-            else
-                refreshData();
-        }
-    }
+		@Override
+		public String getValueIcon(ListGridField field, Object value, ListGridRecord recrd) {
+			return switch (field.getName()) {
+				case NAME -> TYPE_ICONS.get(recrd.getAttribute("type"));
+				case CLONEOF -> STATUS_ICONS.get(recrd.getAttribute("cloneof_status"));
+				case ROMOF -> STATUS_ICONS.get(recrd.getAttribute("romof_status"));
+				case "sampleof" -> STATUS_ICONS.get(recrd.getAttribute("sampleof_status"));
+				default -> super.getValueIcon(field, value, recrd);
+			};
+		}
 
-    public ProfileViewer() {
-        super();
-        Client.getChildWindows().add(this);
-        setTitle(Client.getSession().getMsg("ProfileViewer.this.title"));
-        setWidth("80%");
-        setHeight("80%");
-        setAnimateMinimize(true);
-        setCanDragReposition(true);
-        setCanDragResize(true);
-        setShowHeaderIcon(true);
-        setShowMaximizeButton(true);
-        Map<String, Object> headerIconDefaults = new HashMap<>();
-        headerIconDefaults.put("width", 16);
-        headerIconDefaults.put("height", 16);
-        headerIconDefaults.put("src", "rom.png");
-        setHeaderIconDefaults(headerIconDefaults);
-        setShowHeaderIcon(true);
-        addCloseClickHandler(event -> ProfileViewer.this.markForDestroy());
-        addItem(new VLayout() {
-            {
-                addMember(new HLayout() {
-                    {
-                        setHeight("60%");
-                        addMember(new VLayout() {
-                            private final ToolStripButton[] all_btn = new ToolStripButton[4];
+		public void reset(Record recrd, DataSource ds) {
+			this.ds.setExtraData(Collections.singletonMap(RESET, "true"));
+			ismachinelist = "*".equals(recrd.getAttribute(NAME));
+			var criteria = new Criteria();
+			criteria.addCriteria("list", recrd.getAttribute(NAME));
+			if (Boolean.TRUE.equals(willFetchData(criteria)))
+				fetchRelatedData(recrd, ds);
+			else
+				refreshData();
+		}
+	}
 
-                            {
-                                setWidth("30%");
-                                addMember(anywareListList = new AnywareListList());
-                                addMember(new ToolStrip() {
-                                    {
-                                        addButton(all_btn[0] = new ToolStripButton() {
-                                            {
-                                                setName("UNKNOWN");
-                                                setIcon("/images/disk_multiple_gray.png");
-                                                setActionType(SelectionType.CHECKBOX);
-                                                setShowFocused(false);
-                                                setSelected(true);
-                                                setPrompt(Client.getSession().getMsg("ProfileViewer.tglbtnUnknownWL.toolTipText"));
-                                                addClickHandler(e -> updateFilter());
-                                            }
-                                        });
-                                        addButton(all_btn[1] = new ToolStripButton() {
-                                            {
-                                                setName("MISSING");
-                                                setIcon("/images/disk_multiple_red.png");
-                                                setActionType(SelectionType.CHECKBOX);
-                                                setShowFocused(false);
-                                                setSelected(true);
-                                                setPrompt(Client.getSession().getMsg("ProfileViewer.tglbtnMissingWL.toolTipText"));
-                                                addClickHandler(e -> updateFilter());
-                                            }
-                                        });
-                                        addButton(all_btn[2] = new ToolStripButton() {
-                                            {
-                                                setName("PARTIAL");
-                                                setIcon("/images/disk_multiple_orange.png");
-                                                setActionType(SelectionType.CHECKBOX);
-                                                setShowFocused(false);
-                                                setSelected(true);
-                                                setPrompt(Client.getSession().getMsg("ProfileViewer.tglbtnPartialWL.toolTipText"));
-                                                addClickHandler(e -> updateFilter());
-                                            }
-                                        });
-                                        addButton(all_btn[3] = new ToolStripButton() {
-                                            {
-                                                setName("COMPLETE");
-                                                setIcon("/images/disk_multiple_green.png");
-                                                setActionType(SelectionType.CHECKBOX);
-                                                setShowFocused(false);
-                                                setSelected(true);
-                                                setPrompt(Client.getSession().getMsg("ProfileViewer.tglbtnCompleteWL.toolTipText"));
-                                                addClickHandler(e -> updateFilter());
-                                            }
-                                        });
-                                    }
-                                });
-                                setShowResizeBar(true);
-                            }
+	class Anyware extends ListGrid //NOSONAR
+    {
+		private static final Map<String, String> STATUS_ICONS = Map.of(
+				"OK", "/images/icons/bullet_green.png",
+				"KO", "/images/icons/bullet_red.png",
+				STATUS_UNKNOWN, "/images/icons/bullet_black.png");
+		private static final Map<String, String> DUMPSTATUS_ICONS = Map.of(
+				"verified", "/images/icons/star.png",
+				"good", "/images/icons/tick.png",
+				"baddump", "/images/icons/delete.png",
+				"nodump", "/images/icons/error.png");
+		private static final Map<String, String> TYPE_ICONS = Map.of(
+				"ROM", "/images/rom_small.png",
+				"DISK", "/images/icons/drive.png",
+				"SAMPLE", "/images/icons/sound.png");
 
-                            private void updateFilter() {
-                                String filter = Stream.of(all_btn).filter(b -> b.isSelected()).map(b -> b.getName()).collect(Collectors.joining(","));
-                                if (filter == null || filter.isEmpty())
-                                    filter = "NONE";
-                                final Criteria criteria;
-                                if (anywareListList.getCriteria() != null) {
-                                    criteria = anywareListList.getCriteria();
-                                    criteria.addCriteria(new Criteria("status", filter));
-                                } else
-                                    criteria = new Criteria("status", filter);
-                                anywareListList.filterData(criteria);
-                            }
-                        });
-                        addMember(new VLayout() {
-                            private final ToolStripButton[] al_btn = new ToolStripButton[4];
+		private final DSAnyware ds;
 
-                            {
-                                addMember(anywareList = new AnywareList());
-                                addMember(new ToolStrip() {
-                                    {
-                                        addButton(al_btn[0] = new ToolStripButton() {
-                                            {
-                                                setName("UNKNOWN");
-                                                setIcon("/images/folder_closed_gray.png");
-                                                setActionType(SelectionType.CHECKBOX);
-                                                setShowFocused(false);
-                                                setSelected(true);
-                                                addClickHandler(e -> updateFilter());
-                                            }
-                                        });
-                                        addButton(al_btn[1] = new ToolStripButton() {
-                                            {
-                                                setName("MISSING");
-                                                setIcon("/images/folder_closed_red.png");
-                                                setActionType(SelectionType.CHECKBOX);
-                                                setShowFocused(false);
-                                                setSelected(true);
-                                                setPrompt(Client.getSession().getMsg("ProfileViewer.tglbtnMissingW.toolTipText"));
-                                                addClickHandler(e -> updateFilter());
-                                            }
-                                        });
-                                        addButton(al_btn[2] = new ToolStripButton() {
-                                            {
-                                                setName("PARTIAL");
-                                                setIcon("/images/folder_closed_orange.png");
-                                                setActionType(SelectionType.CHECKBOX);
-                                                setShowFocused(false);
-                                                setSelected(true);
-                                                setPrompt(Client.getSession().getMsg("ProfileViewer.tglbtnPartialW.toolTipText"));
-                                                addClickHandler(e -> updateFilter());
-                                            }
-                                        });
-                                        addButton(al_btn[3] = new ToolStripButton() {
-                                            {
-                                                setName("COMPLETE");
-                                                setIcon("/images/folder_closed_green.png");
-                                                setActionType(SelectionType.CHECKBOX);
-                                                setShowFocused(false);
-                                                setSelected(true);
-                                                setPrompt(Client.getSession().getMsg("ProfileViewer.tglbtnCompleteW.toolTipText"));
-                                                addClickHandler(e -> updateFilter());
-                                            }
-                                        });
-                                    }
-                                });
-                            }
+		public Anyware() {
+			super();
+			ds = DSAnyware.getInstance();
+			setDataProperties(buildServerResultSet());
+			setCanEdit(false);
+			setCanRemoveRecords(false);
+			setSelectionType(SelectionStyle.SINGLE);
+			setCanHover(true);
+			setHoverAutoFitWidth(true);
+			setHoverAutoFitMaxWidth("50%");
+			setAlternateRecordStyles(true);
+			setCanSort(false);
+			setContextMenu(buildAnywareMenu());
+			addDataArrivedHandler(event -> ds.setExtraData(Collections.emptyMap()));
+			var codeFormatter = (com.smartgwt.client.widgets.grid.CellFormatter) (value, recrd, rowNum, colNum) -> {
+				if (value != null)
+					return "<code>" + value + "</code>";
+				return null;
+			};
+			setDataSource(ds,
+					buildStatusField(STATUS, Client.getSession().getMsg("AnywareRenderer.Status"), STATUS_ICONS),
+					buildNameField(),
+					buildSizeField(),
+					buildCodeField("crc", 48, codeFormatter),
+					buildCodeField("md5", 100, codeFormatter),
+					buildCodeField("sha1", 160, codeFormatter),
+					buildMergeField(),
+					buildDumpStatusField());
+		}
 
-                            private void updateFilter() {
-                                String filter = Stream.of(al_btn).filter(b -> b.isSelected()).map(b -> b.getName()).collect(Collectors.joining(","));
-                                if (filter == null || filter.isEmpty())
-                                    filter = "NONE";
-                                final Criteria criteria;
-                                if (anywareList.getCriteria() != null) {
-                                    criteria = anywareList.getCriteria();
-                                    criteria.addCriteria(new Criteria("status", filter));
-                                } else
-                                    criteria = new Criteria("status", filter);
-                                anywareList.filterData(criteria);
-                            }
-                        });
-                        setShowResizeBar(true);
-                        setResizeBarTarget("next");
-                    }
-                });
-                addMember(new VLayout() {
-                    private final ToolStripButton[] a_btn = new ToolStripButton[3];
+		private ListGridField buildStatusField(String name, String title, Map<String, String> icons) {
+			var field = new ListGridField(name, title, 24);
+			field.setValueIcons(icons);
+			field.setShowValueIconOnly(true);
+			field.setAlign(Alignment.CENTER);
+			field.setCanEdit(false);
+			return field;
+		}
 
-                    {
-                        addMember(anyware = new Anyware());
-                        addMember(new ToolStrip() {
-                            {
-                                addButton(a_btn[0] = new ToolStripButton() {
-                                    {
-                                        setName("UNKNOWN");
-                                        setIcon("/images/icons/bullet_black.png");
-                                        setActionType(SelectionType.CHECKBOX);
-                                        setShowFocused(false);
-                                        setSelected(true);
-                                        setPrompt(Client.getSession().getMsg("ProfileViewer.tglbtnUnknown.toolTipText"));
-                                        addClickHandler(e -> updateFilter());
-                                    }
-                                });
-                                addButton(a_btn[1] = new ToolStripButton() {
-                                    {
-                                        setName("KO");
-                                        setIcon("/images/icons/bullet_red.png");
-                                        setActionType(SelectionType.CHECKBOX);
-                                        setShowFocused(false);
-                                        setSelected(true);
-                                        setPrompt(Client.getSession().getMsg("ProfileViewer.tglbtnBad.toolTipText"));
-                                        addClickHandler(e -> updateFilter());
-                                    }
-                                });
-                                addButton(a_btn[2] = new ToolStripButton() {
-                                    {
-                                        setName("OK");
-                                        setIcon("/images/icons/bullet_green.png");
-                                        setActionType(SelectionType.CHECKBOX);
-                                        setShowFocused(false);
-                                        setSelected(true);
-                                        setPrompt(Client.getSession().getMsg("ProfileViewer.tglbtnOK.toolTipText"));
-                                        addClickHandler(e -> updateFilter());
-                                    }
-                                });
-                            }
-                        });
-                    }
+		private ListGridField buildNameField() {
+			var field = new ListGridField("name", Client.getSession().getMsg("AnywareRenderer.Name"));
+			field.setMinWidth(128);
+			field.setWidth("*");
+			return field;
+		}
 
-                    private void updateFilter() {
-                        String filter = Stream.of(a_btn).filter(b -> b.isSelected()).map(b -> b.getName()).collect(Collectors.joining(","));
-                        if (filter == null || filter.isEmpty())
-                            filter = "NONE";
-                        final Criteria criteria;
-                        if (anyware.getCriteria() != null) {
-                            criteria = anyware.getCriteria();
-                            criteria.addCriteria(new Criteria("status", filter));
-                        } else
-                            criteria = new Criteria("status", filter);
-                        anyware.filterData(criteria);
-                    }
-                });
-            }
-        });
-        show();
-        anywareListList.reset();
-    }
+		private ListGridField buildSizeField() {
+			var field = new ListGridField("size", Client.getSession().getMsg("AnywareRenderer.Size"));
+			field.setMinWidth(48);
+			field.setAutoFitWidth(true);
+			return field;
+		}
 
-    @Override
-    protected void onDestroy() {
-        Client.getChildWindows().remove(this);
-        super.onDestroy();
-    }
+		private ListGridField buildCodeField(String name, int minWidth, com.smartgwt.client.widgets.grid.CellFormatter formatter) {
+			var field = new ListGridField(name);
+			field.setMinWidth(minWidth);
+			field.setAutoFitWidth(true);
+			field.setCellFormatter(formatter);
+			return field;
+		}
 
-    public static boolean canResetPV = true;
+		private ListGridField buildMergeField() {
+			var field = new ListGridField("merge", Client.getSession().getMsg("AnywareRenderer.Merge"));
+			field.setMinWidth(128);
+			field.setAutoFitWidth(true);
+			return field;
+		}
 
-    interface ResetCB {
-        void apply();
-    }
+		private ListGridField buildDumpStatusField() {
+			var field = new ListGridField("dumpstatus", Client.getSession().getMsg("AnywareRenderer.DumpStatus"), 24);
+			field.setValueIcons(DUMPSTATUS_ICONS);
+			field.setShowValueIconOnly(true);
+			field.setAlign(Alignment.CENTER);
+			field.setCanEdit(false);
+			return field;
+		}
 
-    public static void reset(ResetCB cb) {
-        canResetPV = false;
-        cb.apply();
-        canResetPV = true;
-        reset();
-    }
+		private Menu buildAnywareMenu() {
+			var menu = new Menu();
+			var dialog = new Dialog();
+			dialog.setWidth(350);
+			menu.setItems(
+					buildCopyMenuItem("Copy CRC", "crc", dialog),
+					buildCopyMenuItem("Copy SHA1", "sha1", dialog),
+					buildCopyMenuItem("Copy Name", "name", dialog),
+					buildSearchMenuItem());
+			return menu;
+		}
 
-    private static Timer resetTimer = null;
+		private MenuItem buildCopyMenuItem(String title, String attr, Dialog dialog) {
+			var item = new MenuItem(title);
+			item.addClickHandler(event -> {
+				var recrd = getSelectedRecord();
+				if (recrd != null)
+					SC.askforValue("Copy", "Select and Copy the text below", recrd.getAttribute(attr), v -> {
+					}, dialog);
+			});
+			item.setEnableIfCondition((target, menu, item1) -> getSelectedRecord() != null);
+			return item;
+		}
 
-    public static void reset() {
-        if (resetTimer == null) {
-            resetTimer = new Timer() {
-                @Override
-                public void run() {
-                    if (canResetPV && Client.getMainWindow().scannerPanel.profileViewer != null
-                            && Client.getChildWindows().contains(Client.getMainWindow().scannerPanel.profileViewer))
-                        Client.getMainWindow().scannerPanel.profileViewer.anywareListList.reset();
-                }
-            };
-        }
-        resetTimer.cancel();
-        resetTimer.schedule(1000);
-    }
+		private MenuItem buildSearchMenuItem() {
+			var item = new MenuItem("Search on the Web");
+			item.addClickHandler(event -> {
+				var recrd = getSelectedRecord();
+				if (recrd != null) {
+					var name = recrd.getAttribute("name");
+					var crc = recrd.getAttribute("crc");
+					var sha1 = recrd.getAttribute("sha1");
+					var hash = Optional.ofNullable(Optional.ofNullable(crc).orElse(sha1)).map(h -> '+' + h).orElse("");
+					com.google.gwt.user.client.Window.open(
+							"https://google.com/search?q=" + URL.encodeQueryString('"' + name + '"') + hash, "_blank", null);
+				}
+			});
+			item.setEnableIfCondition((target, menu, item1) -> getSelectedRecord() != null);
+			return item;
+		}
+
+		@Override
+		public String getValueIcon(ListGridField field, Object value, ListGridRecord recrd) {
+			if ("name".equals(field.getName()))
+				return TYPE_ICONS.get(recrd.getAttribute("type"));
+			return super.getValueIcon(field, value, recrd);
+		}
+
+		public void reset(Record recrd, DataSource ds) {
+			this.ds.setExtraData(Collections.singletonMap(RESET, "true"));
+			var criteria = new Criteria();
+			criteria.addCriteria("list", recrd.getAttribute("list"));
+			criteria.addCriteria("ware", recrd.getAttribute("name"));
+			if (Boolean.TRUE.equals(willFetchData(criteria)))
+				fetchRelatedData(recrd, ds);
+			else
+				refreshData();
+		}
+	}
+
+	public ProfileViewer() {
+		super();
+		setTitle(Client.getSession().getMsg("ProfileViewer.this.title"));
+		setWidth("80%");
+		setHeight("80%");
+		setAnimateMinimize(true);
+		setCanDragReposition(true);
+		setCanDragResize(true);
+		setShowHeaderIcon(true);
+		setShowMaximizeButton(true);
+		setHeaderIconDefaults(Map.of("width", 16, "height", 16, "src", "rom.png"));
+		addCloseClickHandler(event -> markForDestroy());
+		addItem(buildMainLayout());
+		show();
+		anywareListList.reset();
+	}
+
+	@Override
+	protected void onInit() {
+		Client.getChildWindows().add(this);
+		super.onInit();
+	}
+
+	private VLayout buildMainLayout() {
+		var main = new VLayout();
+		main.addMember(buildTopLayout());
+		main.addMember(buildBottomLayout());
+		return main;
+	}
+
+	private HLayout buildTopLayout() {
+		var top = new HLayout();
+		top.setHeight("60%");
+		top.addMember(buildAnywareListListPanel());
+		top.addMember(buildAnywareListPanel());
+		top.setShowResizeBar(true);
+		top.setResizeBarTarget("next");
+		return top;
+	}
+
+	private VLayout buildAnywareListListPanel() {
+		var panel = new VLayout();
+		var filterButtons = new ToolStripButton[4];
+		panel.setWidth("30%");
+		anywareListList = new AnywareListList();
+		panel.addMember(anywareListList);
+		var strip = new ToolStrip();
+		filterButtons[0] = buildFilterButton(STATUS_UNKNOWN, "/images/disk_multiple_gray.png",
+				"ProfileViewer.tglbtnUnknownWL.toolTipText");
+		filterButtons[1] = buildFilterButton(STATUS_MISSING, "/images/disk_multiple_red.png",
+				"ProfileViewer.tglbtnMissingWL.toolTipText");
+		filterButtons[2] = buildFilterButton(STATUS_PARTIAL, "/images/disk_multiple_orange.png",
+				"ProfileViewer.tglbtnPartialWL.toolTipText");
+		filterButtons[3] = buildFilterButton(STATUS_COMPLETE, "/images/disk_multiple_green.png",
+				"ProfileViewer.tglbtnCompleteWL.toolTipText");
+		strip.addButton(filterButtons[0]);
+		strip.addButton(filterButtons[1]);
+		strip.addButton(filterButtons[2]);
+		strip.addButton(filterButtons[3]);
+		panel.addMember(strip);
+		panel.setShowResizeBar(true);
+		for (var btn : filterButtons)
+			btn.addClickHandler(e -> updateListListFilter(filterButtons));
+		return panel;
+	}
+
+	private void updateListListFilter(ToolStripButton[] buttons) {
+		var filter = Stream.of(buttons).filter(ToolStripButton::isSelected).map(ToolStripButton::getName)
+				.collect(Collectors.joining(","));
+		if (filter.isEmpty())
+			filter = "NONE";
+		var criteria = anywareListList.getCriteria();
+		if (criteria != null)
+			criteria.addCriteria(new Criteria(STATUS, filter));
+		else
+			criteria = new Criteria(STATUS, filter);
+		anywareListList.filterData(criteria);
+	}
+
+	private VLayout buildAnywareListPanel() {
+		var panel = new VLayout();
+		var filterButtons = new ToolStripButton[4];
+		anywareList = new AnywareList();
+		panel.addMember(anywareList);
+		var strip = new ToolStrip();
+		filterButtons[0] = buildFilterButton(STATUS_UNKNOWN, "/images/folder_closed_gray.png", null);
+		filterButtons[1] = buildFilterButton(STATUS_MISSING, "/images/folder_closed_red.png",
+				"ProfileViewer.tglbtnMissingW.toolTipText");
+		filterButtons[2] = buildFilterButton(STATUS_PARTIAL, "/images/folder_closed_orange.png",
+				"ProfileViewer.tglbtnPartialW.toolTipText");
+		filterButtons[3] = buildFilterButton(STATUS_COMPLETE, "/images/folder_closed_green.png",
+				"ProfileViewer.tglbtnCompleteW.toolTipText");
+		strip.addButton(filterButtons[0]);
+		strip.addButton(filterButtons[1]);
+		strip.addButton(filterButtons[2]);
+		strip.addButton(filterButtons[3]);
+		panel.addMember(strip);
+		for (var btn : filterButtons)
+			btn.addClickHandler(e -> updateListFilter(filterButtons));
+		return panel;
+	}
+
+	private void updateListFilter(ToolStripButton[] buttons) {
+		var filter = Stream.of(buttons).filter(ToolStripButton::isSelected).map(ToolStripButton::getName)
+				.collect(Collectors.joining(","));
+		if (filter.isEmpty())
+			filter = "NONE";
+		var criteria = anywareList.getCriteria();
+		if (criteria != null)
+			criteria.addCriteria(new Criteria(STATUS, filter));
+		else
+			criteria = new Criteria(STATUS, filter);
+		anywareList.filterData(criteria);
+	}
+
+	private VLayout buildBottomLayout() {
+		var panel = new VLayout();
+		var filterButtons = new ToolStripButton[3];
+		anyware = new Anyware();
+		panel.addMember(anyware);
+		var strip = new ToolStrip();
+		filterButtons[0] = buildFilterButton(STATUS_UNKNOWN, "/images/icons/bullet_black.png",
+				"ProfileViewer.tglbtnUnknown.toolTipText");
+		filterButtons[1] = buildFilterButton("KO", "/images/icons/bullet_red.png",
+				"ProfileViewer.tglbtnBad.toolTipText");
+		filterButtons[2] = buildFilterButton("OK", "/images/icons/bullet_green.png",
+				"ProfileViewer.tglbtnOK.toolTipText");
+		strip.addButton(filterButtons[0]);
+		strip.addButton(filterButtons[1]);
+		strip.addButton(filterButtons[2]);
+		panel.addMember(strip);
+		for (var btn : filterButtons)
+			btn.addClickHandler(e -> updateAnywareFilter(filterButtons));
+		return panel;
+	}
+
+	private void updateAnywareFilter(ToolStripButton[] buttons) {
+		var filter = Stream.of(buttons).filter(ToolStripButton::isSelected).map(ToolStripButton::getName)
+				.collect(Collectors.joining(","));
+		if (filter.isEmpty())
+			filter = "NONE";
+		var criteria = anyware.getCriteria();
+		if (criteria != null)
+			criteria.addCriteria(new Criteria(STATUS, filter));
+		else
+			criteria = new Criteria(STATUS, filter);
+		anyware.filterData(criteria);
+	}
+
+	private ToolStripButton buildFilterButton(String name, String icon, String promptKey) {
+		var btn = new ToolStripButton();
+		btn.setName(name);
+		btn.setIcon(icon);
+		btn.setActionType(SelectionType.CHECKBOX);
+		btn.setShowFocused(false);
+		btn.setSelected(true);
+		if (promptKey != null)
+			btn.setPrompt(Client.getSession().getMsg(promptKey));
+		return btn;
+	}
+
+	@Override
+	protected void onDestroy() {
+		Client.getChildWindows().remove(this);
+		super.onDestroy();
+	}
+
+	public static boolean canResetPV = true;
+
+	public interface ResetCB {
+		void apply();
+	}
+
+	public static void reset(ResetCB cb) {
+		canResetPV = false;
+		cb.apply();
+		canResetPV = true;
+		reset();
+	}
+
+	private static Timer resetTimer = null;
+
+	public static void reset() {
+		if (resetTimer == null) {
+			resetTimer = new Timer() {
+				@Override
+				public void run() {
+					if (canResetPV && Client.getMainWindow().scannerPanel.profileViewer != null
+							&& Client.getChildWindows().contains(Client.getMainWindow().scannerPanel.profileViewer))
+						Client.getMainWindow().scannerPanel.profileViewer.anywareListList.reset();
+				}
+			};
+		}
+		resetTimer.cancel();
+		resetTimer.schedule(1000);
+	}
 
 }

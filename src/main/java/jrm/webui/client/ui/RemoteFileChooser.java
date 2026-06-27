@@ -9,9 +9,7 @@ import java.util.stream.Stream;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.i18n.client.NumberFormat;
-import com.smartgwt.client.data.DSCallback;
 import com.smartgwt.client.data.DSRequest;
-import com.smartgwt.client.data.DSResponse;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.ResultSet;
 import com.smartgwt.client.data.SortSpecifier;
@@ -204,20 +202,13 @@ public final class RemoteFileChooser extends Window {
                 if (getSelectedRecord() == null)
                     selectRecord(0);
             });
-            setDataSource(
-                    DSRemoteRootChooser.getInstance(options.context),
-                    new ListGridField("Type") {
-                        {
-                            setWidth(20);
-                            setMaxWidth(20);
-                            setCellFormatter((value, record, rowNum, colNum) -> "<img src='/images/icons/drive.png'/>");
-                        }
-                    },
-                    new ListGridField("Name") {
-                        {
-                            setWidth("*");
-                        }
-                    });
+            var typeField = new ListGridField("Type");
+            typeField.setWidth(20);
+            typeField.setMaxWidth(20);
+            typeField.setCellFormatter((value, record, rowNum, colNum) -> "<img src='/images/icons/drive.png'/>");
+            var nameField = new ListGridField("Name");
+            nameField.setWidth("*");
+            setDataSource(DSRemoteRootChooser.getInstance(options.context), typeField, nameField);
         }
     }
 
@@ -251,103 +242,58 @@ public final class RemoteFileChooser extends Window {
                     if (event.getOldValues() != null)
                         refreshData((dsResponse, data, dsRequest) -> selectSingleRecord(event.getNewValuesAsRecord()));
             });
-            setContextMenu(new Menu() {
-                {
-                    setItems(
-                            new MenuItem() {
-                                {
-                                    setTitle("Create dir");
-                                    addClickHandler(event -> {
-                                        UploadList.this.startEditingNew(new HashMap<String, Object>() {
-                                            {
-                                                put("Name", "New Folder");
-                                                put("isDir", true);
-                                                put("Size", -1);
-                                            }
-                                        });
-                                    });
-                                }
-                            },
-                            new MenuItem() {
-                                {
-                                    setTitle("Edit selection");
-                                    addClickHandler(event -> UploadList.this.startEditing(UploadList.this.getRecordIndex(UploadList.this.getSelectedRecord())));
-                                    setEnableIfCondition((target, menu, item) -> !options.isChoose && UploadList.this.getSelectedRecords().length == 1);
-                                }
-                            },
-                            new MenuItem() {
-                                {
-                                    setTitle("Delete selection");
-                                    addClickHandler(event -> UploadList.this.removeSelectedData());
-                                    setEnableIfCondition((target, menu, item) -> !options.isChoose && UploadList.this.getSelectedRecords().length > 0);
-                                }
-                            },
-                            new MenuItem() {
-                                {
-                                    setTitle("Download selection");
-                                    addClickHandler(event -> {
-                                        Record record = UploadList.this.getSelectedRecord();
-                                        DynamicForm form = new DynamicForm();
-                                        form.setAction("/download/");
-                                        HiddenItem item = new HiddenItem("path");
-                                        item.setDefaultValue(record.getAttribute("Path"));
-                                        form.setItems(item);
-                                        form.setTarget("_blank");
-                                        form.setMethod(FormMethod.POST);
-                                        form.setCanSubmit(true);
-                                        form.draw();
-                                        form.submitForm();
-                                        form.destroy();
-                                    });
-                                    setEnableIfCondition((target, menu, item) -> !options.isChoose && UploadList.this.getSelectedRecords().length == 1);
-                                }
-                            },
-                            new MenuItem() {
-                                {
-                                    setTitle("Archive");
-                                    setEnableIfCondition((target, menu, item) -> {
-                                        if (!options.isChoose && UploadList.this.getSelectedRecords().length == 1)
-                                            return new CaseInsensitiveString(UploadList.this.getSelectedRecord().getAttribute("Name")).endsWith(".zip");
-                                        return false;
-                                    });
-                                    this.setSubmenu(new Menu() {
-                                        {
-                                            setItems(new MenuItem() {
-                                                {
-                                                    setTitle("Extract here");
-                                                    addClickHandler(e -> {
-                                                        UploadList.this.getDataSource().performCustomOperation("extract_here", UploadList.this.getSelectedRecord(),
-                                                                new DSCallback() {
-                                                                    @Override
-                                                                    public void execute(DSResponse dsResponse, Object data, DSRequest dsRequest) {
-                                                                        UploadList.this.invalidateCache();
-                                                                    }
-                                                                });
-                                                    });
-                                                }
-                                            }, new MenuItem() {
-                                                {
-                                                    setDynamicTitleFunction((target, menu, item) -> {
-                                                        String name = UploadList.this.getSelectedRecord().getAttribute("Name");
-                                                        return "Extract to " + name.substring(0, name.length() - 4) + "/";
-                                                    });
-                                                    addClickHandler(e -> {
-                                                        UploadList.this.getDataSource().performCustomOperation("extract_subfolder", UploadList.this.getSelectedRecord(),
-                                                                new DSCallback() {
-                                                                    @Override
-                                                                    public void execute(DSResponse dsResponse, Object data, DSRequest dsRequest) {
-                                                                        UploadList.this.invalidateCache();
-                                                                    }
-                                                                });
-                                                    });
-                                                }
-                                            });
-                                        }
-                                    });
-                                }
-                            });
-                }
+            var ctxMenu = new Menu();
+            var createDirItem = new MenuItem();
+            createDirItem.setTitle("Create dir");
+            createDirItem.addClickHandler(event -> UploadList.this.startEditingNew(Map.of("Name", "New Folder", "isDir", true, "Size", -1)));
+            var editItem = new MenuItem();
+            editItem.setTitle("Edit selection");
+            editItem.addClickHandler(event -> UploadList.this.startEditing(UploadList.this.getRecordIndex(UploadList.this.getSelectedRecord())));
+            editItem.setEnableIfCondition((target, menu, item) -> !options.isChoose && UploadList.this.getSelectedRecords().length == 1);
+            var deleteItem = new MenuItem();
+            deleteItem.setTitle("Delete selection");
+            deleteItem.addClickHandler(event -> UploadList.this.removeSelectedData());
+            deleteItem.setEnableIfCondition((target, menu, item) -> !options.isChoose && UploadList.this.getSelectedRecords().length > 0);
+            var downloadItem = new MenuItem();
+            downloadItem.setTitle("Download selection");
+            downloadItem.addClickHandler(event -> {
+                var record = UploadList.this.getSelectedRecord();
+                var form = new DynamicForm();
+                form.setAction("/download/");
+                var hiddenItem = new HiddenItem("path");
+                hiddenItem.setDefaultValue(record.getAttribute("Path"));
+                form.setItems(hiddenItem);
+                form.setTarget("_blank");
+                form.setMethod(FormMethod.POST);
+                form.setCanSubmit(true);
+                form.draw();
+                form.submitForm();
+                form.destroy();
             });
+            downloadItem.setEnableIfCondition((target, menu, item) -> !options.isChoose && UploadList.this.getSelectedRecords().length == 1);
+            var archiveItem = new MenuItem();
+            archiveItem.setTitle("Archive");
+            archiveItem.setEnableIfCondition((target, menu, item) -> {
+                if (!options.isChoose && UploadList.this.getSelectedRecords().length == 1)
+                    return new CaseInsensitiveString(UploadList.this.getSelectedRecord().getAttribute("Name")).endsWith(".zip");
+                return false;
+            });
+            var archiveMenu = new Menu();
+            var extractHereItem = new MenuItem();
+            extractHereItem.setTitle("Extract here");
+            extractHereItem.addClickHandler(e -> UploadList.this.getDataSource().performCustomOperation("extract_here",
+                    UploadList.this.getSelectedRecord(), (dsResponse, data, dsRequest) -> UploadList.this.invalidateCache()));
+            var extractSubItem = new MenuItem();
+            extractSubItem.setDynamicTitleFunction((target, menu, item) -> {
+                var name = UploadList.this.getSelectedRecord().getAttribute("Name");
+                return "Extract to " + name.substring(0, name.length() - 4) + "/";
+            });
+            extractSubItem.addClickHandler(e -> UploadList.this.getDataSource().performCustomOperation("extract_subfolder",
+                    UploadList.this.getSelectedRecord(), (dsResponse, data, dsRequest) -> UploadList.this.invalidateCache()));
+            archiveMenu.setItems(extractHereItem, extractSubItem);
+            archiveItem.setSubmenu(archiveMenu);
+            ctxMenu.setItems(createDirItem, editItem, deleteItem, downloadItem, archiveItem);
+            setContextMenu(ctxMenu);
             addRecordClickHandler(event -> {
             });
             addRecordDoubleClickHandler(event -> {
@@ -367,42 +313,26 @@ public final class RemoteFileChooser extends Window {
             setDatetimeFormatter(DateDisplayFormat.TOSERIALIZEABLEDATE);
             setDataSource(ds);
             SortNormalizer normalizer = (record, fieldName) -> record.getAttribute("Name").equals("..") ? "\0" : record.getAttribute(fieldName);
-            setFields(
-                    new ListGridField("isDir") {
-                        {
-                            setWidth(20);
-                            setMaxWidth(20);
-                            setCellFormatter((value, record, rowNum, colNum) -> "<img src='/images/icons/" + ((boolean) value ? "folder.png" : "page.png") + "'/>");
-                        }
-                    },
-                    new ListGridField("Name") {
-                        {
-                            setWidth("*");
-                            setSortNormalizer(normalizer);
-                        }
-                    },
-                    new ListGridField("Size") {
-                        {
-                            setWidth(60);
-                            setCellFormatter((value, record, rowNum, colNum) -> {
-                                return ((int) value) < 0 ? "" : readableFileSize((int) value);
-                            });
-                            setSortNormalizer(normalizer);
-                        }
-                    },
-                    new ListGridField("Modified") {
-                        {
-                            setWidth(115);
-                            setSortNormalizer(normalizer);
-                        }
-                    });
+            var isDirField = new ListGridField("isDir");
+            isDirField.setWidth(20);
+            isDirField.setMaxWidth(20);
+            isDirField.setCellFormatter((value, record, rowNum, colNum) -> "<img src='/images/icons/" + ((boolean) value ? "folder.png" : "page.png") + "'/>");
+            var nameField = new ListGridField("Name");
+            nameField.setWidth("*");
+            nameField.setSortNormalizer(normalizer);
+            var sizeField = new ListGridField("Size");
+            sizeField.setWidth(60);
+            sizeField.setCellFormatter((value, record, rowNum, colNum) -> ((int) value) < 0 ? "" : readableFileSize((int) value));
+            sizeField.setSortNormalizer(normalizer);
+            var modifiedField = new ListGridField("Modified");
+            modifiedField.setWidth(115);
+            modifiedField.setSortNormalizer(normalizer);
+            setFields(isDirField, nameField, sizeField, modifiedField);
             setSelectionProperty("isSelected");
-            setDataProperties(new ResultSet() {
-                {
-                    setUseClientFiltering(false);
-                    setUseClientSorting(true);
-                }
-            });
+            var rs = new ResultSet();
+            rs.setUseClientFiltering(false);
+            rs.setUseClientSorting(true);
+            setDataProperties(rs);
         }
 
         public void enterDir(ListGridRecord record) {
@@ -684,47 +614,44 @@ public final class RemoteFileChooser extends Window {
         splitPane.setNavigationPaneWidth(100);
         addItem(splitPane);
 
-        addItem(new HLayout() {
-            {
-                setHeight(20);
-                setLayoutAlign(Alignment.RIGHT);
-                setPaddingAsLayoutMargin(true);
-                setPadding(3);
-                setMembersMargin(3);
-                setWidth100();
-                close = new IButton(options.isChoose ? "Cancel" : "Close", e -> RemoteFileChooser.this.markForDestroy());
-                close.setID("RemoteFileChooser_CloseBtn_" + context);
-                close.setAutoFit(true);
-                addMember(close);
-                pb_spacer = new LayoutSpacer("*", "20");
-                addMember(pb_spacer);
-                pb_layout = new HLayout();
-                pb_layout.setMembersMargin(3);
-                pb = new Progressbar();
-                pb.setLength("*");
-                pb.setBreadth(20);
-                pb.setLayoutAlign(VerticalAlignment.CENTER);
-                pb_text = new Label();
-                pb_text.setWidth100();
-                pb_text.setAlign(Alignment.CENTER);
-                pb.addChild(pb_text, "label", true);
-                pb_layout.addMember(pb);
-                IButton cancel = new IButton("Cancel", e -> cancelled = true);
-                cancel.setID("RemoteFileChooser_CancelBtn_" + context);
-                cancel.setAutoFit(true);
-                pb_layout.addMember(cancel);
-                pb_layout.hide();
-                addMember(pb_layout);
-                if (options.isChoose) {
-                    IButton choose = new IButton("Choose");
-                    choose.setID("RemoteFileChooser_ChooseBtn_" + context);
-                    choose.setAutoFit(true);
-                    choose.addClickHandler(clickChoose(context, cb, options));
-                    addMember(choose);
-                }
-            }
-
-        });
+        var bottomBar = new HLayout();
+        bottomBar.setHeight(20);
+        bottomBar.setLayoutAlign(Alignment.RIGHT);
+        bottomBar.setPaddingAsLayoutMargin(true);
+        bottomBar.setPadding(3);
+        bottomBar.setMembersMargin(3);
+        bottomBar.setWidth100();
+        close = new IButton(options.isChoose ? "Cancel" : "Close", e -> RemoteFileChooser.this.markForDestroy());
+        close.setID("RemoteFileChooser_CloseBtn_" + context);
+        close.setAutoFit(true);
+        bottomBar.addMember(close);
+        pb_spacer = new LayoutSpacer("*", "20");
+        bottomBar.addMember(pb_spacer);
+        pb_layout = new HLayout();
+        pb_layout.setMembersMargin(3);
+        pb = new Progressbar();
+        pb.setLength("*");
+        pb.setBreadth(20);
+        pb.setLayoutAlign(VerticalAlignment.CENTER);
+        pb_text = new Label();
+        pb_text.setWidth100();
+        pb_text.setAlign(Alignment.CENTER);
+        pb.addChild(pb_text, "label", true);
+        pb_layout.addMember(pb);
+        var cancel = new IButton("Cancel", e -> cancelled = true);
+        cancel.setID("RemoteFileChooser_CancelBtn_" + context);
+        cancel.setAutoFit(true);
+        pb_layout.addMember(cancel);
+        pb_layout.hide();
+        bottomBar.addMember(pb_layout);
+        if (options.isChoose) {
+            var choose = new IButton("Choose");
+            choose.setID("RemoteFileChooser_ChooseBtn_" + context);
+            choose.setAutoFit(true);
+            choose.addClickHandler(clickChoose(context, cb, options));
+            bottomBar.addMember(choose);
+        }
+        addItem(bottomBar);
         initUpload(!options.isChoose, list.getID());
         show();
     }

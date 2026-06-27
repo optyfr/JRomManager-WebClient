@@ -21,99 +21,145 @@ import jrm.webui.client.protocol.Q_Compressor;
 import jrm.webui.client.protocol.Q_Global;
 import jrm.webui.client.ui.RemoteFileChooser.PathInfo;
 
-public class BatchCompressorPanel extends VLayout {
-    ListGrid fr;
+public class BatchCompressorPanel extends VLayout //NOSONAR
+{
 
-    private final class Form extends DynamicForm {
-        private Form() {
-            setWidth100();
-            setHeight(20);
-            setNumCols(5);
-            setColWidths("*", 100, 75, 100, 100);
-            final var format = new SelectItem();
-            format.setValueMap("ZIP", "TZIP", "SEVENZIP");
-            format.setWidth(100);
-            format.setTitle(Client.getSession().getMsg("BatchCompressorPanel.Format")); //$NON-NLS-1$
-            format.setDefaultValue(Client.getSession().getSetting("compressor.format", "TZIP"));
-            format.addChangedHandler(e -> Client.sendMsg(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("compressor.format", (String) e.getValue()))));
-            final var force = new CheckboxItem("force");
-            force.setTitle(Client.getSession().getMsg("BatchCompressorPanel.Force")); //$NON-NLS-1$
-            force.setShowTitle(false);
-            force.setWidth("*");
-            force.setDefaultValue(Client.getSession().getSettingAsBoolean("compressor.force", false));
-            force.addChangedHandler(e -> Client.sendMsg(JsonUtils.stringify(Q_Global.SetProperty.instantiate().setProperty("compressor.force", (Boolean) e.getValue()))));
-            final var clear = new ButtonItem();
-            clear.setTitle(Client.getSession().getMsg("BatchCompressorPanel.Clear")); //$NON-NLS-1$
-            clear.setIcon("icons/bin.png");
-            clear.setAlign(Alignment.RIGHT);
-            clear.setStartRow(false);
-            clear.setEndRow(false);
-            clear.setWidth("*");
-            clear.addClickHandler(e -> fr.getDataSource().performCustomOperation("clear", null, (dsResponse, data, dsRequest) -> fr.invalidateCache()));
-            final var start = new ButtonItem();
-            start.setTitle(Client.getSession().getMsg("BatchCompressorPanel.Start")); //$NON-NLS-1$
-            start.setIcon("icons/bullet_go.png");
-            start.setAlign(Alignment.RIGHT);
-            start.setStartRow(false);
-            start.setWidth("*");
-            start.addClickHandler(e -> Client.sendMsg(JsonUtils.stringify(Q_Compressor.Start.instantiate())));
-            setItems(format, force, clear, start);
-        }
-    }
+	private static final String FILE = "file";
+	private static final String RESULT = "result";
+	private static final String ICON_BIN = "icons/bin.png";
+	private static final String ICON_BULLET_GO = "icons/bullet_go.png";
 
-    private static final class Grid extends ListGrid {
-        private Grid() {
-            setHeight100();
-            setCanEdit(false);
-            setCanHover(true);
-            setHoverAutoFitWidth(true);
-            setHoverAutoFitMaxWidth("50%");
-            setSelectionType(SelectionStyle.MULTIPLE);
-            setCanSort(false);
-            setAutoFitExpandField("result");
-            setAutoFitFieldsFillViewport(true);
-            setAutoFetchData(true);
-            final var menu = new Menu();
-            final var add = new MenuItem();
-            add.setTitle(Client.getSession().getMsg("BatchCompressorPanel.AddArchive")); //$NON-NLS-1$
-            add.addClickHandler(e -> new RemoteFileChooser("addArc", Client.getSession().getSetting("dir.addArc", null), pi -> {
-                RPCManager.startQueue();
-                for (PathInfo p : pi) {
-                    final var rec = new Record();
-                    rec.setAttribute("file", p.path);
-                    Grid.this.addData(rec);
-                }
-                RPCManager.sendQueue();
-            }));
-            menu.addItem(add);
-            final var delete = new MenuItem();
-            delete.setTitle(Client.getSession().getMsg("BatchCompressorPanel.DeleteSelection")); //$NON-NLS-1$
-            delete.setEnableIfCondition((target, mn, item) -> Grid.this.getSelectedRecords().length > 0);
-            delete.addClickHandler(e -> Grid.this.removeSelectedData());
-            menu.addItem(delete);
-            setContextMenu(menu);
-            setDataSource(DSBatchCompressorFR.getInstance());
-            setFields(
-                    new ListGridField("file", Client.getSession().getMsg("BatchCompressorPanel.Archives")), //$NON-NLS-2$
-                    new ListGridField("result", Client.getSession().getMsg("BatchCompressorPanel.Result")) //$NON-NLS-2$
-            );
-        }
-    }
+	ListGrid fr;
 
-    public BatchCompressorPanel() {
-        setHeight100();
-        fr = new Grid();
-        addMember(fr);
-        addMember(new Form());
-    }
+	public BatchCompressorPanel() {
+		setHeight100();
+		fr = buildGrid();
+		addMember(fr);
+		addMember(buildForm());
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
+	private DynamicForm buildForm() {
+		DynamicForm form = new DynamicForm();
+		form.setWidth100();
+		form.setHeight(20);
+		form.setNumCols(5);
+		form.setColWidths("*", 100, 75, 100, 100);
 
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
+		SelectItem format = buildFormatItem();
+		CheckboxItem force = buildForceItem();
+		ButtonItem clear = buildClearButton();
+		ButtonItem start = buildStartButton();
+		form.setItems(format, force, clear, start);
+		return form;
+	}
+
+	private SelectItem buildFormatItem() {
+		SelectItem format = new SelectItem();
+		format.setValueMap("ZIP", "TZIP", "SEVENZIP");
+		format.setWidth(100);
+		format.setTitle(Client.getSession().getMsg("BatchCompressorPanel.Format")); //$NON-NLS-1$
+		format.setDefaultValue(Client.getSession().getSetting("compressor.format", "TZIP"));
+		format.addChangedHandler(e -> Client.sendMsg(JsonUtils.stringify(
+				Q_Global.SetProperty.instantiate().setProperty("compressor.format", (String) e.getValue()))));
+		return format;
+	}
+
+	private CheckboxItem buildForceItem() {
+		CheckboxItem force = new CheckboxItem("force");
+		force.setTitle(Client.getSession().getMsg("BatchCompressorPanel.Force")); //$NON-NLS-1$
+		force.setShowTitle(false);
+		force.setWidth("*");
+		force.setDefaultValue(Client.getSession().getSettingAsBoolean("compressor.force", false));
+		force.addChangedHandler(e -> Client.sendMsg(JsonUtils.stringify(
+				Q_Global.SetProperty.instantiate().setProperty("compressor.force", (Boolean) e.getValue()))));
+		return force;
+	}
+
+	private ButtonItem buildClearButton() {
+		ButtonItem clear = new ButtonItem();
+		clear.setTitle(Client.getSession().getMsg("BatchCompressorPanel.Clear")); //$NON-NLS-1$
+		clear.setIcon(ICON_BIN);
+		clear.setAlign(Alignment.RIGHT);
+		clear.setStartRow(false);
+		clear.setEndRow(false);
+		clear.setWidth("*");
+		clear.addClickHandler(e -> fr.getDataSource().performCustomOperation("clear", null,
+				(dsResponse, data, dsRequest) -> fr.invalidateCache()));
+		return clear;
+	}
+
+	private ButtonItem buildStartButton() {
+		ButtonItem start = new ButtonItem();
+		start.setTitle(Client.getSession().getMsg("BatchCompressorPanel.Start")); //$NON-NLS-1$
+		start.setIcon(ICON_BULLET_GO);
+		start.setAlign(Alignment.RIGHT);
+		start.setStartRow(false);
+		start.setWidth("*");
+		start.addClickHandler(e -> Client.sendMsg(JsonUtils.stringify(Q_Compressor.Start.instantiate())));
+		return start;
+	}
+
+	private ListGrid buildGrid() {
+		ListGrid grid = new ListGrid();
+		grid.setHeight100();
+		grid.setCanEdit(false);
+		grid.setCanHover(true);
+		grid.setHoverAutoFitWidth(true);
+		grid.setHoverAutoFitMaxWidth("50%");
+		grid.setSelectionType(SelectionStyle.MULTIPLE);
+		grid.setCanSort(false);
+		grid.setAutoFitExpandField(RESULT);
+		grid.setAutoFitFieldsFillViewport(true);
+		grid.setAutoFetchData(true);
+		grid.setContextMenu(buildGridContextMenu());
+		grid.setDataSource(DSBatchCompressorFR.getInstance());
+		grid.setFields(
+				new ListGridField(FILE, Client.getSession().getMsg("BatchCompressorPanel.Archives")), //$NON-NLS-1$
+				new ListGridField(RESULT, Client.getSession().getMsg("BatchCompressorPanel.Result")) //$NON-NLS-1$
+		);
+		return grid;
+	}
+
+	private Menu buildGridContextMenu() {
+		Menu menu = new Menu();
+		menu.addItem(buildAddMenuItem());
+		menu.addItem(buildDeleteMenuItem());
+		return menu;
+	}
+
+	private MenuItem buildAddMenuItem() {
+		MenuItem add = new MenuItem();
+		add.setTitle(Client.getSession().getMsg("BatchCompressorPanel.AddArchive")); //$NON-NLS-1$
+		add.addClickHandler(e -> new RemoteFileChooser("addArc",
+				Client.getSession().getSetting("dir.addArc", null), pi -> {
+					RPCManager.startQueue();
+					for (PathInfo p : pi) {
+						Record rec = new Record();
+						rec.setAttribute(FILE, p.path);
+						fr.addData(rec);
+					}
+					RPCManager.sendQueue();
+				}));
+		return add;
+	}
+
+	private MenuItem buildDeleteMenuItem() {
+		MenuItem delete = new MenuItem();
+		delete.setTitle(Client.getSession().getMsg("BatchCompressorPanel.DeleteSelection")); //$NON-NLS-1$
+		delete.setEnableIfCondition((target, mn, item) -> fr.getSelectedRecords().length > 0);
+		delete.addClickHandler(e -> fr.removeSelectedData());
+		return delete;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+        if(obj instanceof BatchCompressorPanel)
+            return super.equals(obj);
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 }
