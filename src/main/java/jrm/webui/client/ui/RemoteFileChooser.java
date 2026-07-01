@@ -31,6 +31,7 @@ import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.SortNormalizer;
+import com.smartgwt.client.widgets.grid.events.RecordDoubleClickEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.LayoutSpacer;
@@ -47,96 +48,93 @@ import jrm.webui.client.utils.CaseInsensitiveString;
 import jsinterop.annotations.JsMethod;
 import jsinterop.annotations.JsPackage;
 
-public final class RemoteFileChooser extends Window {
+public final class RemoteFileChooser extends Window /* NOSONAR */ {
+    private static final String IS_DIR = "isDir";
     Label parentLab;
     Progressbar pb;
-    private Layout pb_layout;
-    private Label pb_text;
-    LayoutSpacer pb_spacer;
+    private Layout pbLayout;
+    private Label pbText;
+    LayoutSpacer pbSpacer;
     private IButton close;
 
     private boolean cancelled = false;
 
     static UploadList list;
 
-    private String parent, relparent;
+    private String parent;
+    private String  relparent;
     private String root;
 
-    static class Options {
-        enum SelMode {
+    public static class Options {
+        public enum SelMode {
             NONE, FILE, DIR, FILE_DIR;
         }
 
-        public final String context, initialPath;
+        public final String context;
+        public final String  initialPath;
         public final SelMode selMode;
-        public final boolean isMultiple, isChoose;
+        public final boolean isMultiple;
+        public final boolean  isChoose;
 
         public Options(String context, String initialPath) {
             this.context = context;
             this.initialPath = initialPath;
             switch (context) {
-                case "tfRomsDest":
-                case "tfDisksDest":
-                case "tfSWDest":
-                case "tfSWDisksDest":
-                case "tfSamplesDest":
-                case "tfBackupDest":
+                case "tfRomsDest", "tfDisksDest", "tfSWDest", "tfSWDisksDest", "tfSamplesDest", "tfBackupDest" -> {
                     selMode = SelMode.DIR;
                     isMultiple = false;
                     isChoose = true;
-                    break;
-                case "listSrcDir":
-                case "addDatSrc":
+                }
+                case "listSrcDir", "addDatSrc" -> {
                     selMode = SelMode.DIR;
                     isMultiple = true;
                     isChoose = true;
-                    break;
-                case "manageUploads":
+                }
+                case "manageUploads" -> {
                     selMode = SelMode.NONE;
                     isMultiple = true;
                     isChoose = false;
-                    break;
-                case "updDat":
-                case "updTrnt":
+                }
+                case "updDat", "updTrnt" -> {
                     selMode = SelMode.DIR;
                     isMultiple = true;
                     isChoose = true;
-                    break;
-                case "importDat":
+                }
+                case "importDat" -> {
                     selMode = SelMode.FILE;
                     isMultiple = true;
                     isChoose = true;
-                    break;
-                case "addArc":
+                }
+                case "addArc" -> {
                     selMode = SelMode.FILE;
                     isMultiple = true;
                     isChoose = true;
-                    break;
-                case "addDat":
+                }
+                case "addDat" -> {
                     selMode = SelMode.FILE_DIR;
                     isMultiple = true;
                     isChoose = true;
-                    break;
-                case "addTrnt":
+                }
+                case "addTrnt" -> {
                     selMode = SelMode.FILE;
                     isMultiple = true;
                     isChoose = true;
-                    break;
-                case "tfSrcDir":
+                }
+                case "tfSrcDir" -> {
                     selMode = SelMode.DIR;
                     isMultiple = false;
                     isChoose = true;
-                    break;
-                case "tfDstDat":
+                }
+                case "tfDstDat" -> {
                     selMode = SelMode.FILE;
                     isMultiple = false;
                     isChoose = true;
-                    break;
-                default:
+                }
+                default -> {
                     selMode = SelMode.FILE;
                     isMultiple = false;
                     isChoose = true;
-                    break;
+                }
             }
         }
     }
@@ -152,8 +150,8 @@ public final class RemoteFileChooser extends Window {
             this.name = name;
         }
 
-        public PathInfo(Record record) {
-            this(record.getAttribute("Path"), RemoteFileChooser.this.parent, record.getAttribute("Name"));
+        public PathInfo(Record recrd) {
+            this(recrd.getAttribute("Path"), RemoteFileChooser.this.parent, recrd.getAttribute("Name"));
         }
     }
 
@@ -161,7 +159,7 @@ public final class RemoteFileChooser extends Window {
         public void apply(PathInfo[] path);
     }
 
-    public class RootList extends ListGrid {
+    public final class RootList extends ListGrid /* NOSONAR */ {
         boolean initial = true;
 
         private RootList(Options options) {
@@ -192,10 +190,7 @@ public final class RemoteFileChooser extends Window {
                         initial = false;
                     }
                     list.ds.setExtraData(params);
-                    // if(list.getTotalRows()>0)
                     list.invalidateCache();
-                    // else
-                    // list.fetchData();
                 }
             });
             addDataArrivedHandler(event -> {
@@ -205,24 +200,26 @@ public final class RemoteFileChooser extends Window {
             var typeField = new ListGridField("Type");
             typeField.setWidth(20);
             typeField.setMaxWidth(20);
-            typeField.setCellFormatter((value, record, rowNum, colNum) -> "<img src='/images/icons/drive.png'/>");
+            typeField.setCellFormatter((value, recrd, rowNum, colNum) -> "<img src='/images/icons/drive.png'/>");
             var nameField = new ListGridField("Name");
             nameField.setWidth("*");
             setDataSource(DSRemoteRootChooser.getInstance(options.context), typeField, nameField);
         }
     }
 
-    public class UploadList extends ListGrid {
+    public class UploadList extends ListGrid /* NOSONAR */ {
         private int tot;
-        private float val[];
+        private float[] val;
         private final Options options;
         private final DSRemoteFileChooser ds;
+        private final CallBack cb;
 
         public UploadList(Options options, CallBack cb) {
             super();
             this.options = options;
+            this.cb = cb;
             ds = DSRemoteFileChooser.getInstance(options.context);
-            ds.setCB((data) -> {
+            ds.setCB(data -> {
                 root = XMLTools.selectString(data, "/response/root");
                 parent = XMLTools.selectString(data, "/response/parent");
                 relparent = XMLTools.selectString(data, "/response/relparent");
@@ -234,95 +231,30 @@ public final class RemoteFileChooser extends Window {
             setShowHover(true);
             setCanHover(true);
             setHoverWidth(200);
-            // setAutoFetchData(true);
             setSelectionType(options.isMultiple ? SelectionStyle.MULTIPLE : SelectionStyle.SINGLE);
             addEditFailedHandler(event -> startEditing(event.getRowNum(), event.getColNum()));
             addEditCompleteHandler(event -> {
-                if (event.getDsResponse().getStatus() == 0)
-                    if (event.getOldValues() != null)
+                if (event.getDsResponse().getStatus() == 0 && event.getOldValues() != null)
                         refreshData((dsResponse, data, dsRequest) -> selectSingleRecord(event.getNewValuesAsRecord()));
             });
-            var ctxMenu = new Menu();
-            var createDirItem = new MenuItem();
-            createDirItem.setTitle("Create dir");
-            createDirItem.addClickHandler(event -> UploadList.this.startEditingNew(Map.of("Name", "New Folder", "isDir", true, "Size", -1)));
-            var editItem = new MenuItem();
-            editItem.setTitle("Edit selection");
-            editItem.addClickHandler(event -> UploadList.this.startEditing(UploadList.this.getRecordIndex(UploadList.this.getSelectedRecord())));
-            editItem.setEnableIfCondition((target, menu, item) -> !options.isChoose && UploadList.this.getSelectedRecords().length == 1);
-            var deleteItem = new MenuItem();
-            deleteItem.setTitle("Delete selection");
-            deleteItem.addClickHandler(event -> UploadList.this.removeSelectedData());
-            deleteItem.setEnableIfCondition((target, menu, item) -> !options.isChoose && UploadList.this.getSelectedRecords().length > 0);
-            var downloadItem = new MenuItem();
-            downloadItem.setTitle("Download selection");
-            downloadItem.addClickHandler(event -> {
-                var record = UploadList.this.getSelectedRecord();
-                var form = new DynamicForm();
-                form.setAction("/download/");
-                var hiddenItem = new HiddenItem("path");
-                hiddenItem.setDefaultValue(record.getAttribute("Path"));
-                form.setItems(hiddenItem);
-                form.setTarget("_blank");
-                form.setMethod(FormMethod.POST);
-                form.setCanSubmit(true);
-                form.draw();
-                form.submitForm();
-                form.destroy();
-            });
-            downloadItem.setEnableIfCondition((target, menu, item) -> !options.isChoose && UploadList.this.getSelectedRecords().length == 1);
-            var archiveItem = new MenuItem();
-            archiveItem.setTitle("Archive");
-            archiveItem.setEnableIfCondition((target, menu, item) -> {
-                if (!options.isChoose && UploadList.this.getSelectedRecords().length == 1)
-                    return new CaseInsensitiveString(UploadList.this.getSelectedRecord().getAttribute("Name")).endsWith(".zip");
-                return false;
-            });
-            var archiveMenu = new Menu();
-            var extractHereItem = new MenuItem();
-            extractHereItem.setTitle("Extract here");
-            extractHereItem.addClickHandler(e -> UploadList.this.getDataSource().performCustomOperation("extract_here",
-                    UploadList.this.getSelectedRecord(), (dsResponse, data, dsRequest) -> UploadList.this.invalidateCache()));
-            var extractSubItem = new MenuItem();
-            extractSubItem.setDynamicTitleFunction((target, menu, item) -> {
-                var name = UploadList.this.getSelectedRecord().getAttribute("Name");
-                return "Extract to " + name.substring(0, name.length() - 4) + "/";
-            });
-            extractSubItem.addClickHandler(e -> UploadList.this.getDataSource().performCustomOperation("extract_subfolder",
-                    UploadList.this.getSelectedRecord(), (dsResponse, data, dsRequest) -> UploadList.this.invalidateCache()));
-            archiveMenu.setItems(extractHereItem, extractSubItem);
-            archiveItem.setSubmenu(archiveMenu);
-            ctxMenu.setItems(createDirItem, editItem, deleteItem, downloadItem, archiveItem);
-            setContextMenu(ctxMenu);
+            setContextMenu(createContextMenu());
             addRecordClickHandler(event -> {
             });
-            addRecordDoubleClickHandler(event -> {
-                ListGridRecord record = event.getRecord();
-                @SuppressWarnings("unused")
-                String path = record.getAttribute("Path");
-                String relpath = record.getAttribute("RelPath");
-                String name = record.getAttribute("Name");
-                if (record.getAttributeAsBoolean("isDir")) {
-                    enterDir(record);
-                } else if (options.isChoose) {
-                    processPaths(options.context, cb, new PathInfo[] { new PathInfo(relpath, parent, name) });
-                    RemoteFileChooser.this.markForDestroy();
-                }
-            });
-            setInitialSort(new SortSpecifier("isDir", SortDirection.DESCENDING), new SortSpecifier("Name", SortDirection.ASCENDING));
+            addRecordDoubleClickHandler(this::onRecordDoubleClick);
+            setInitialSort(new SortSpecifier(IS_DIR, SortDirection.DESCENDING), new SortSpecifier("Name", SortDirection.ASCENDING));
             setDatetimeFormatter(DateDisplayFormat.TOSERIALIZEABLEDATE);
             setDataSource(ds);
-            SortNormalizer normalizer = (record, fieldName) -> record.getAttribute("Name").equals("..") ? "\0" : record.getAttribute(fieldName);
-            var isDirField = new ListGridField("isDir");
+            SortNormalizer normalizer = (recrd, fieldName) -> recrd.getAttribute("Name").equals("..") ? "\0" : recrd.getAttribute(fieldName);
+            var isDirField = new ListGridField(IS_DIR);
             isDirField.setWidth(20);
             isDirField.setMaxWidth(20);
-            isDirField.setCellFormatter((value, record, rowNum, colNum) -> "<img src='/images/icons/" + ((boolean) value ? "folder.png" : "page.png") + "'/>");
+            isDirField.setCellFormatter((value, recrd, rowNum, colNum) -> "<img src='/images/icons/" + ((boolean) value ? "folder.png" : "page.png") + "'/>");
             var nameField = new ListGridField("Name");
             nameField.setWidth("*");
             nameField.setSortNormalizer(normalizer);
             var sizeField = new ListGridField("Size");
             sizeField.setWidth(60);
-            sizeField.setCellFormatter((value, record, rowNum, colNum) -> ((int) value) < 0 ? "" : readableFileSize((int) value));
+            sizeField.setCellFormatter((value, recrd, rowNum, colNum) -> ((int) value) < 0 ? "" : readableFileSize((int) value));
             sizeField.setSortNormalizer(normalizer);
             var modifiedField = new ListGridField("Modified");
             modifiedField.setWidth(115);
@@ -335,8 +267,8 @@ public final class RemoteFileChooser extends Window {
             setDataProperties(rs);
         }
 
-        public void enterDir(ListGridRecord record) {
-            String path = record.getAttribute("Path");
+        public void enterDir(ListGridRecord recrd) {
+            String path = recrd.getAttribute("Path");
             Map<String, String> params = new HashMap<>();
             params.put("context", options.context);
             params.put("parent", path);
@@ -369,15 +301,15 @@ public final class RemoteFileChooser extends Window {
                     cnt++;
             }
             pb.setPercentDone((int) (valtot * 100 / this.tot));
-            pb_text.setContents(cnt + "/" + tot);
+            pbText.setContents(cnt + "/" + tot);
             if (cnt == tot)
                 endProgress();
         }
 
         @JsMethod
         public void endProgress() {
-            pb_layout.hide();
-            pb_spacer.show();
+            pbLayout.hide();
+            pbSpacer.show();
             close.setDisabled(false);
             invalidateCache();
         }
@@ -390,18 +322,18 @@ public final class RemoteFileChooser extends Window {
             for (int i = 0; i < this.tot; i++)
                 this.val[i] = 0;
             pb.setPercentDone(0);
-            pb_text.setContents(0 + "/" + tot);
-            pb_spacer.hide();
+            pbText.setContents(0 + "/" + tot);
+            pbSpacer.hide();
             close.setDisabled(true);
-            pb_layout.show();
+            pbLayout.show();
         }
 
-        private List<JavaScriptObject> activeQueue = new ArrayList<>();
-        private final int activeMax = 5;
+        private final List<JavaScriptObject> activeQueue = new ArrayList<>();
+        private static final int ACTIVE_MAX = 5;
 
         @JsMethod
         public int getActiveMax() {
-            return activeMax;
+            return ACTIVE_MAX;
         }
 
         @JsMethod
@@ -450,9 +382,9 @@ public final class RemoteFileChooser extends Window {
 						self.purgeActive(self.isCancelled());
 						if(!self.isCancelled())
 						{
-							var todo = Math.min(afiles.length, self.getActiveMax() - self.getActiveLength());
-							for(var i = 0; i < todo; i++)
-								self.addActive(self.upload_file(idx++, afiles.shift()));
+							var left = Math.min(afiles.length, self.getActiveMax() - self.getActiveLength());
+							for(var i = 0; i < left; i++)
+								self.addActive(self.uploadFile(idx++, afiles.shift()));
 						}
 						else
 							afiles = [];
@@ -470,7 +402,7 @@ public final class RemoteFileChooser extends Window {
 		}-*/;
 
         @JsMethod
-        public native JavaScriptObject upload_file(int i, JavaScriptObject file) /*-{
+        public native JavaScriptObject uploadFile(int i, JavaScriptObject file) /*-{
 			var self = this;
 			var data = {
 				xhr:new XMLHttpRequest(),
@@ -493,12 +425,12 @@ public final class RemoteFileChooser extends Window {
 				if(evt.lengthComputable)
 				{
 					data.status = evt.loaded==evt.total?2:1;
-					self.upload_result(data,evt.loaded);
+					self.uploadResult(data,evt.loaded);
 				}
 				else
 				{
 					data.status = 1;
-					self.upload_result(data,0);
+					self.uploadResult(data,0);
 				}
 			}, false);
 
@@ -508,7 +440,7 @@ public final class RemoteFileChooser extends Window {
 				var infos = eval('('+evt.target.responseText+')');
 				data.status = infos.status;
 				data.extstatus = infos.extstatus;
-				self.upload_result(data,data.fsize);
+				self.uploadResult(data,data.fsize);
 				if(data.status==0)
 				{
 					data.xhr.open("put", "/upload/?", true);
@@ -516,7 +448,7 @@ public final class RemoteFileChooser extends Window {
 					data.xhr.setRequestHeader("X-File-Parent", encodeURIComponent(self.getParentPath()));
 					data.xhr.setRequestHeader("X-File-Size", file.size?file.size:file.fileSize);
 					data.xhr.setRequestHeader("X-File-Type", file.type);
-					self.upload_result(data);
+					self.uploadResult(data);
 					data.xhr.send(file);
 				}
 			}, false);
@@ -525,14 +457,14 @@ public final class RemoteFileChooser extends Window {
 			{
 				data.status = 4;
 				data.extstatus = "An error occurred while transferring the file.";
-				self.upload_result(data);
+				self.uploadResult(data);
 			}, false);  
 			
 			data.xhr.addEventListener("abort", function(evt)
 			{  
 				data.status = 5;
 				data.extstatus = "The transfer has been canceled by the user.";
-				self.upload_result(data);
+				self.uploadResult(data);
 			}, false);  
 			
 			data.xhr.open("post", "/upload/?init=1", true);
@@ -540,13 +472,13 @@ public final class RemoteFileChooser extends Window {
 			data.xhr.setRequestHeader("X-File-Parent", encodeURIComponent(self.getParentPath()));
 			data.xhr.setRequestHeader("X-File-Size", file.size);
 			data.xhr.setRequestHeader("X-File-Type", file.type);
-			self.upload_result(data);
+			self.uploadResult(data);
 			data.xhr.send();
 			return data;
 		}-*/;
 
         @JsMethod
-        public native void upload_result(JavaScriptObject data, int loaded) /*-{
+        public native void uploadResult(JavaScriptObject data, int loaded) /*-{
 			if(loaded==undefined) loaded=0;
 			data.percent = loaded / data.fsize;
 			data.current_time = new Date();
@@ -574,6 +506,75 @@ public final class RemoteFileChooser extends Window {
 					break;
 			}
 		}-*/;
+
+        private Menu createContextMenu() {
+            var ctxMenu = new Menu();
+            var createDirItem = new MenuItem();
+            createDirItem.setTitle("Create dir");
+            createDirItem.addClickHandler(event -> UploadList.this.startEditingNew(Map.of("Name", "New Folder", IS_DIR, true, "Size", -1)));
+            var editItem = new MenuItem();
+            editItem.setTitle("Edit selection");
+            editItem.addClickHandler(event -> UploadList.this.startEditing(UploadList.this.getRecordIndex(UploadList.this.getSelectedRecord())));
+            editItem.setEnableIfCondition((target, menu, item) -> !options.isChoose && UploadList.this.getSelectedRecords().length == 1);
+            var deleteItem = new MenuItem();
+            deleteItem.setTitle("Delete selection");
+            deleteItem.addClickHandler(event -> UploadList.this.removeSelectedData());
+            deleteItem.setEnableIfCondition((target, menu, item) -> !options.isChoose && UploadList.this.getSelectedRecords().length > 0);
+            var downloadItem = new MenuItem();
+            downloadItem.setTitle("Download selection");
+            downloadItem.addClickHandler(event -> {
+                var recrd = UploadList.this.getSelectedRecord();
+                var form = new DynamicForm();
+                form.setAction("/download/");
+                var hiddenItem = new HiddenItem("path");
+                hiddenItem.setDefaultValue(recrd.getAttribute("Path"));
+                form.setItems(hiddenItem);
+                form.setTarget("_blank");
+                form.setMethod(FormMethod.POST);
+                form.setCanSubmit(true);
+                form.draw();
+                form.submitForm();
+                form.destroy();
+            });
+            downloadItem.setEnableIfCondition((target, menu, item) -> !options.isChoose && UploadList.this.getSelectedRecords().length == 1);
+            var archiveItem = new MenuItem();
+            archiveItem.setTitle("Archive");
+            archiveItem.setEnableIfCondition((target, menu, item) -> isArchiveFile());
+            var archiveMenu = new Menu();
+            var extractHereItem = new MenuItem();
+            extractHereItem.setTitle("Extract here");
+            extractHereItem.addClickHandler(e -> UploadList.this.getDataSource().performCustomOperation("extract_here",
+                    UploadList.this.getSelectedRecord(), (dsResponse, data, dsRequest) -> UploadList.this.invalidateCache()));
+            var extractSubItem = new MenuItem();
+            extractSubItem.setDynamicTitleFunction((target, menu, item) -> {
+                var name = UploadList.this.getSelectedRecord().getAttribute("Name");
+                return "Extract to " + name.substring(0, name.length() - 4) + "/";
+            });
+            extractSubItem.addClickHandler(e -> UploadList.this.getDataSource().performCustomOperation("extract_subfolder",
+                    UploadList.this.getSelectedRecord(), (dsResponse, data, dsRequest) -> UploadList.this.invalidateCache()));
+            archiveMenu.setItems(extractHereItem, extractSubItem);
+            archiveItem.setSubmenu(archiveMenu);
+            ctxMenu.setItems(createDirItem, editItem, deleteItem, downloadItem, archiveItem);
+            return ctxMenu;
+        }
+
+        private boolean isArchiveFile() {
+            if (!options.isChoose && UploadList.this.getSelectedRecords().length == 1)
+                return new CaseInsensitiveString(UploadList.this.getSelectedRecord().getAttribute("Name")).endsWith(".zip");
+            return false;
+        }
+
+        private void onRecordDoubleClick(RecordDoubleClickEvent event) {
+            ListGridRecord recrd = event.getRecord();
+            String relpath = recrd.getAttribute("RelPath");
+            String name = recrd.getAttribute("Name");
+            if (Boolean.TRUE.equals(recrd.getAttributeAsBoolean(IS_DIR))) {
+                enterDir(recrd);
+            } else if (options.isChoose) {
+                processPaths(options.context, cb, new PathInfo[] { new PathInfo(relpath, parent, name) });
+                RemoteFileChooser.this.markForDestroy();
+            }
+        }
     }
 
     public RemoteFileChooser(String context, String initialPath, CallBack cb) {
@@ -597,7 +598,7 @@ public final class RemoteFileChooser extends Window {
         setCanDragReposition(true);
         setDismissOnEscape(false);
         addCloseClickHandler(event -> {
-            if (!close.isDisabled())
+            if (Boolean.FALSE.equals(close.isDisabled()))
                 RemoteFileChooser.this.markForDestroy();
         });
 
@@ -625,25 +626,25 @@ public final class RemoteFileChooser extends Window {
         close.setID("RemoteFileChooser_CloseBtn_" + context);
         close.setAutoFit(true);
         bottomBar.addMember(close);
-        pb_spacer = new LayoutSpacer("*", "20");
-        bottomBar.addMember(pb_spacer);
-        pb_layout = new HLayout();
-        pb_layout.setMembersMargin(3);
+        pbSpacer = new LayoutSpacer("*", "20");
+        bottomBar.addMember(pbSpacer);
+        pbLayout = new HLayout();
+        pbLayout.setMembersMargin(3);
         pb = new Progressbar();
         pb.setLength("*");
         pb.setBreadth(20);
         pb.setLayoutAlign(VerticalAlignment.CENTER);
-        pb_text = new Label();
-        pb_text.setWidth100();
-        pb_text.setAlign(Alignment.CENTER);
-        pb.addChild(pb_text, "label", true);
-        pb_layout.addMember(pb);
+        pbText = new Label();
+        pbText.setWidth100();
+        pbText.setAlign(Alignment.CENTER);
+        pb.addChild(pbText, "label", true);
+        pbLayout.addMember(pb);
         var cancel = new IButton("Cancel", e -> cancelled = true);
         cancel.setID("RemoteFileChooser_CancelBtn_" + context);
         cancel.setAutoFit(true);
-        pb_layout.addMember(cancel);
-        pb_layout.hide();
-        bottomBar.addMember(pb_layout);
+        pbLayout.addMember(cancel);
+        pbLayout.hide();
+        bottomBar.addMember(pbLayout);
         if (options.isChoose) {
             var choose = new IButton("Choose");
             choose.setID("RemoteFileChooser_ChooseBtn_" + context);
@@ -662,11 +663,11 @@ public final class RemoteFileChooser extends Window {
             if (records.length > 0) {
                 if (options.selMode == SelMode.FILE) {
                     if (records.length == 1) {
-                        if (Boolean.TRUE.equals(records[0].getAttributeAsBoolean("isDir"))) {
+                        if (Boolean.TRUE.equals(records[0].getAttributeAsBoolean(IS_DIR))) {
                             list.enterDir(records[0]);
                             return;
                         }
-                    } else if (Stream.of(records).filter(r -> r.getAttributeAsBoolean("isDir")).count() > 0)
+                    } else if (Stream.of(records).filter(r -> r.getAttributeAsBoolean(IS_DIR)).count() > 0)
                         return;
                 }
                 PathInfo[] pathInfos = Stream.of(records).map(PathInfo::new).toList().toArray(new PathInfo[0]);
@@ -840,14 +841,12 @@ public final class RemoteFileChooser extends Window {
             Q_Global.SetProperty.instantiate().setProperty("dir." + context, parent).send();
         else if (paths != null && paths.length > 0 && paths[0].parent != null)
             Q_Global.SetProperty.instantiate().setProperty("dir." + context, paths[0].parent).send();
-        switch (context) {
-            case "addArc":
-                addArc(cb, paths);
-                break;
-            default:
+        switch (context) /* NOSONAR */ {
+            case "addArc" -> addArc(cb, paths);
+            default -> {
                 if (cb != null)
                     cb.apply(paths);
-                break;
+            }
         }
     }
 

@@ -198,8 +198,8 @@ public class ProfilePanel extends VLayout //NOSONAR
 		ListGridField field = new ListGridField(TITLE);
 		field.setHoverCustomizer(new HoverCustomizer() {
 			@Override
-			public String hoverHTML(Object value, ListGridRecord record, int rowNum, int colNum) {
-				return record.getAttribute(TITLE);
+			public String hoverHTML(Object value, ListGridRecord recrd, int rowNum, int colNum) {
+				return recrd.getAttribute(TITLE);
 			}
 		});
 		return field;

@@ -118,7 +118,8 @@ public class MainWindow extends Window //NOSONAR
             ArrayList<String> arrlststr = new ArrayList<>();
             for (int i = 0; i < jsarrstr.length(); i++)
                 arrlststr.add(jsarrstr.get(i));
-            String[] arrstr = arrlststr.toArray(new String[0]);
+            @SuppressWarnings("CollectionsToArray")
+            String[] arrstr = arrlststr.toArray(new String[0]); /* NOSONAR */
             scannerPanel.scannerFiltersPanel.filterForm.getItem("cbYearMin").setValueMap(arrstr); //$NON-NLS-1$
             scannerPanel.scannerFiltersPanel.filterForm.getItem("cbYearMin").setDefaultValue(arrstr[0]); //$NON-NLS-1$
             scannerPanel.scannerFiltersPanel.filterForm.getItem("cbYearMax").setValueMap(arrstr); //$NON-NLS-1$
