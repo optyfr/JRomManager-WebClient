@@ -6,9 +6,18 @@ import com.smartgwt.client.widgets.Window;
 
 import jrm.webui.client.Client;
 
-public final class ReportViewer extends Window implements ReportStatus {
+/**
+ * Full report viewer window for scanner results.
+ *
+ * @since 2.5
+ */
+public final class ReportViewer extends Window implements ReportStatus /* NOSONAR */ {
+    /** The report tree displayed in this window. */
     private ReportTree tree;
 
+    /**
+     * Constructs the full report viewer window and shows the default report tree.
+     */
     public ReportViewer() {
         super();
         Client.getChildWindows().add(this);
@@ -35,14 +44,24 @@ public final class ReportViewer extends Window implements ReportStatus {
         show();
     }
 
+    /**
+     * Applies a report filter state to the underlying tree.
+     *
+     * @param name the filter name
+     * @param value the filter value
+     */
     void applyFilter(String name, Boolean value) {
         tree.applyFilter(name, value);
     }
 
+    /** Reloads the report tree by invalidating its cache. */
     void reload() {
         tree.invalidateCache();
     }
 
+    /**
+     * Removes this window from the {@link Client} child-window list on destruction.
+     */
     @Override
     protected void onDestroy() {
         Client.getChildWindows().remove(this);

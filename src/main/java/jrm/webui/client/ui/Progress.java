@@ -22,45 +22,69 @@ import jrm.webui.client.Client;
 import jrm.webui.client.protocol.A_Progress;
 import jrm.webui.client.protocol.Q_Progress;
 
+/**
+ * Modal SmartGWT window that reports progress of a long-running server operation.
+ * <p>
+ * Displays a variable number of thread info labels (with optional sub-info lines)
+ * plus up to three progress bars, each with its own time-left label, and a cancel
+ * button. The window content is driven by {@link A_Progress.SetFullProgress}
+ * payloads received from the server.
+ *
+ * @since 2.5
+ */
 public class Progress extends Window /* NOSONAR */ {
+    /** HTML markup for the indeterminate "loading" spinner shown inside a progress bar. */
     private static final String LOADING_IMG = "<center><img height='16' width='16' src='/images/loading.gif'></center>";
 
+    /** SmartGWT child-name used to overlay a label onto a {@link Progressbar}. */
     private static final String LABEL = "label";
 
+    /** Placeholder text shown in a time-left label when no timing information is available. */
     private static final String TIME_TIME = "<code>--:--:--/--:--:--</code>";
 
+    /** Vertical layout holding the per-thread info and sub-info labels. */
     private VLayout panel;
 
-    /** The lbl info. */
+    /** Per-thread info labels, one row per server-side worker thread. */
     private Label[] lblInfo;
 
-    /** The lbl sub info. */
+    /** Per-thread (or shared) sub-info labels displayed below the info labels. */
     private Label[] lblSubInfo;
 
-    /** The progress bar. */
+    /** Primary progress bar (overall scan/audit operation). */
     private final Progressbar progressBar;
+
+    /** Label painted on top of {@link #progressBar} showing its current message. */
     private final Label progressBarLabel;
 
-    /** The lbl timeleft. */
+    /** Time-left label associated with {@link #progressBar}. */
     private final Label lblTimeleft;
 
-    /** The btn cancel. */
+    /** Cancel button allowing the user to abort the running server operation. */
     private final IButton btnCancel;
 
-    /** The progress bar 2. */
+    /** Secondary progress bar (sub-operation, e.g. a fix or compression pass). */
     private final Progressbar progressBar2;
+
+    /** Label painted on top of {@link #progressBar2} showing its current message. */
     private final Label progressBarLabel2;
 
-    /** The lbl time left 2. */
+    /** Time-left label associated with {@link #progressBar2}. */
     private final Label lblTimeLeft2;
 
-    /** The progress bar 3. */
+    /** Tertiary progress bar (additional sub-operation). */
     private final Progressbar progressBar3;
+
+    /** Label painted on top of {@link #progressBar3} showing its current message. */
     private final Label progressBarLabel3;
 
-    /** The lbl time left 3. */
+    /** Time-left label associated with {@link #progressBar3}. */
     private final Label lblTimeLeft3;
 
+    /**
+     * Creates the progress window, registers it with the client child windows,
+     * builds the layout, centers it on the page, and shows it.
+     */
     public Progress() {
         super();
         Client.getChildWindows().add(this);
@@ -144,12 +168,26 @@ public class Progress extends Window /* NOSONAR */ {
         packHeight();
     }
 
+    /** Background color for odd-numbered info rows (darker shade). */
     private static final String COLOR_NORMAL = "rgb(70% 70% 70%)";
+    /** Background color for even-numbered info rows (lighter shade). */
     private static final String COLOR_LIGHT = "rgb(80% 80% 80%)";
+    /** Background color for the shared sub-info row (lightest shade). */
     private static final String COLOR_LIGHTER = "rgb(90% 90% 90%)";
+    /** Opening {@code <code>} HTML tag, used to wrap time-left values. */
     private static final String CODE_OPEN = "<code>";
+    /** Closing {@code </code>} HTML tag, used to wrap time-left values. */
     private static final String CODE_CLOSE = "</code>";
 
+    /**
+     * (Re)builds the info label area for the given number of threads.
+     *
+     * @param threadCnt
+     *            the number of thread info lines to display
+     * @param multipleSubInfos
+     *            {@code true} to show one sub-info line per thread, {@code false}
+     *            to show a single shared sub-info line, or {@code null} to show none
+     */
     public void setInfos(int threadCnt, Boolean multipleSubInfos) {
         panel.removeMembers(panel.getMembers());
 
@@ -177,6 +215,15 @@ public class Progress extends Window /* NOSONAR */ {
             packHeight();
     }
 
+    /**
+     * Grows the info label area to the given thread count, preserving existing
+     * labels and appending new ones as needed.
+     *
+     * @param threadCnt
+     *            the new total number of thread info lines
+     * @param multipleSubInfos
+     *            {@code true} to also extend the per-thread sub-info lines
+     */
     public void extendInfos(int threadCnt, Boolean multipleSubInfos) {
         if (lblInfo == null || lblInfo.length == threadCnt)
             return;
@@ -204,6 +251,11 @@ public class Progress extends Window /* NOSONAR */ {
             packHeight();
     }
 
+    /**
+     * Builds the scrollable vertical panel that hosts the info and sub-info labels.
+     *
+     * @return a new configured {@link VLayout}
+     */
     private VLayout buildPanel() {
         VLayout p = new VLayout();
         p.setMembersMargin(2);
@@ -213,6 +265,12 @@ public class Progress extends Window /* NOSONAR */ {
         return p;
     }
 
+    /**
+     * Builds the main vertical layout assembling the info panel, the three
+     * progress-bar rows and the cancel button.
+     *
+     * @return the assembled main layout
+     */
     private VLayout buildMainLayout() {
         VLayout main = new VLayout();
         main.setWidth100();
@@ -229,6 +287,14 @@ public class Progress extends Window /* NOSONAR */ {
         return main;
     }
 
+    /**
+     * Builds a single horizontal row containing a progress bar and its
+     * associated time-left label.
+     *
+     * @param pb        the progress bar widget for this row
+     * @param timeLabel the time-left label for this row
+     * @return the assembled row layout
+     */
     private Layout buildProgressBarRow(Progressbar pb, Label timeLabel) {
         HLayout row = new HLayout();
         row.setWidth100();
@@ -237,10 +303,22 @@ public class Progress extends Window /* NOSONAR */ {
         return row;
     }
 
+    /**
+     * Tells whether an index is odd.
+     *
+     * @param i the index to test
+     * @return {@code true} if {@code i} is odd, {@code false} otherwise
+     */
     private boolean isOdd(int i) {
         return (i % 2) != 0;
     }
 
+    /**
+     * Builds a styled info/sub-info label with the given background color.
+     *
+     * @param color the CSS background color to apply
+     * @return a new configured {@link Label}
+     */
     private Label buildLabel(String color) {
         final var label = new Label();
         label.setWidth100();
@@ -254,6 +332,9 @@ public class Progress extends Window /* NOSONAR */ {
         return label;
     }
 
+    /**
+     * Clears the contents of all info and sub-info labels.
+     */
     public void clearInfos() {
         for (Label label : lblInfo)
             label.setContents("&nbsp;");
@@ -261,6 +342,12 @@ public class Progress extends Window /* NOSONAR */ {
             label.setContents("&nbsp;");
     }
 
+    /**
+     * Updates the whole window from a full-progress payload received from the server.
+     *
+     * @param pd
+     *            the progress data to apply
+     */
     public void setFullProgress(A_Progress.SetFullProgress.ProgressData pd) {
         for (int i = 0; i < lblInfo.length; i++)
             lblInfo[i].setContents(Optional.ofNullable(pd.getInfos().get(i)).orElse(""));
@@ -271,6 +358,22 @@ public class Progress extends Window /* NOSONAR */ {
         updateProgressBar(progressBar3, progressBarLabel3, lblTimeLeft3, pd.getPB3(), true);
     }
 
+    /**
+     * Applies a single progress-bar update from its payload, toggling visibility,
+     * indeterminate state, percent-done, label and time-left text as needed.
+     *
+     * @param pb
+     *            the progress bar widget to update
+     * @param pbLabel
+     *            the label painted on top of the progress bar
+     * @param timeLabel
+     *            the time-left label associated with the bar
+     * @param pbData
+     *            the progress payload for this bar
+     * @param usePercCheck
+     *            {@code true} to gate the update on {@code perc >= 0},
+     *            {@code false} to gate it on {@code val > 0}
+     */
     private void updateProgressBar(Progressbar pb, Label pbLabel, Label timeLabel,
             A_Progress.SetFullProgress.ProgressData.Progress pbData, boolean usePercCheck) {
         if (pb.isVisible() != pbData.isVisible()) {
@@ -295,27 +398,47 @@ public class Progress extends Window /* NOSONAR */ {
             timeLabel.setContents(TIME_TIME);
     }
 
+    /**
+     * Sends a cancel request to the server and disables the cancel button.
+     */
     public void cancel() {
         btnCancel.setDisabled(true);
         btnCancel.setTitle("Canceling"); //$NON-NLS-1$
         Client.sendMsg(JsonUtils.stringify(Q_Progress.Cancel.instantiate()));
     }
 
+    /**
+     * Reserved hook to recompute the window height after content changes.
+     * <p>
+     * Currently a no-op because SmartGWT handles the layout automatically.
+     */
     private void packHeight() {
         // Reserved for future use - currently not needed as SmartGWT handles layout automatically
     }
 
+    /**
+     * Removes this window from the client child-window registry when destroyed.
+     */
     @Override
     protected void onDestroy() {
         Client.getChildWindows().remove(this);
         super.onDestroy();
     }
 
+    /**
+     * Closes the progress window by marking it for destruction.
+     */
     @Override
     public void close() {
         markForDestroy();
     }
 
+    /**
+     * Toggles whether the cancel button is enabled.
+     *
+     * @param canCancel
+     *            {@code true} to enable the cancel button, {@code false} to disable it
+     */
     public void canCancel(boolean canCancel) {
         btnCancel.setDisabled(!canCancel);
     }

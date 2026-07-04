@@ -13,8 +13,28 @@ import com.smartgwt.client.widgets.layout.SectionStackSection;
 
 import jrm.webui.client.Client;
 
-final class SettingsCompressorPanel extends SectionStack {
-    class SettingsCompressorZipPanel extends SettingsForm {
+/**
+ * Panel for configuring compression settings (Zip and 7-Zip).
+ * <p>
+ * Displays two collapsible sections, one per compressor, each hosting a
+ * dedicated {@link SettingsForm} with the relevant options.
+ *
+ * @since 2.5
+ */
+final class SettingsCompressorPanel extends SectionStack /* NOSONAR */ {
+    /** Compression level key shared by the Zip and 7-Zip forms. */
+    private static final String LEVEL_NORMAL = "NORMAL"; //$NON-NLS-1$
+
+    /**
+     * Settings form for Zip compression options.
+     *
+     * @since 2.5
+     */
+    class SettingsCompressorZipPanel extends SettingsForm /* NOSONAR */ {
+        /**
+         * Builds the Zip compression form: temporary-files threshold and
+         * compression level selectors, both persisted as global settings.
+         */
         public SettingsCompressorZipPanel() {
             setWidth("75%");
             setLayoutAlign(Alignment.CENTER);
@@ -44,7 +64,7 @@ final class SettingsCompressorPanel extends SectionStack {
             zipLevels.put("STORE", Client.getSession().getMsg("ZipOptions.STORE")); //$NON-NLS-1$
             zipLevels.put("FASTEST", Client.getSession().getMsg("ZipOptions.FASTEST")); //$NON-NLS-1$
             zipLevels.put("FAST", Client.getSession().getMsg("ZipOptions.FAST")); //$NON-NLS-1$
-            zipLevels.put("NORMAL", Client.getSession().getMsg("ZipOptions.NORMAL")); //$NON-NLS-1$
+            zipLevels.put(LEVEL_NORMAL, Client.getSession().getMsg("ZipOptions.NORMAL")); //$NON-NLS-1$
             zipLevels.put("MAXIMUM", Client.getSession().getMsg("ZipOptions.MAXIMUM")); //$NON-NLS-1$
             zipLevels.put("ULTRA", Client.getSession().getMsg("ZipOptions.ULTRA")); //$NON-NLS-1$
             zipLevel.setValueMap(zipLevels);
@@ -56,7 +76,16 @@ final class SettingsCompressorPanel extends SectionStack {
 
     }
 
-    class SettingsCompressor7zEPanel extends SettingsForm {
+    /**
+     * Settings form for 7-Zip compression options.
+     *
+     * @since 2.5
+     */
+    class SettingsCompressor7zEPanel extends SettingsForm /* NOSONAR */ {
+        /**
+         * Builds the 7-Zip compression form: compression level, thread count
+         * and solid-archive selectors, all persisted as global settings.
+         */
         public SettingsCompressor7zEPanel() {
             setWidth("75%");
             setLayoutAlign(Alignment.CENTER);
@@ -69,13 +98,13 @@ final class SettingsCompressorPanel extends SectionStack {
             levels.put("STORE", Client.getSession().getMsg("SevenZipOptions.STORE")); //$NON-NLS-1$
             levels.put("FASTEST", Client.getSession().getMsg("SevenZipOptions.FASTEST")); //$NON-NLS-1$
             levels.put("FAST", Client.getSession().getMsg("SevenZipOptions.FAST")); //$NON-NLS-1$
-            levels.put("NORMAL", Client.getSession().getMsg("SevenZipOptions.NORMAL")); //$NON-NLS-1$
+            levels.put(LEVEL_NORMAL, Client.getSession().getMsg("SevenZipOptions.NORMAL")); //$NON-NLS-1$
             levels.put("MAXIMUM", Client.getSession().getMsg("SevenZipOptions.MAXIMUM")); //$NON-NLS-1$
             levels.put("ULTRA", Client.getSession().getMsg("SevenZipOptions.ULTRA")); //$NON-NLS-1$
             level.setValueMap(levels);
             level.setWidth("*");
             level.addChangedHandler(event -> setGPropertyItemValue(getName(), fname2name.get(getName()), (String) level.getValue()));
-            level.setDefaultValue(Client.getSession().getSetting(fname2name.get(getName()), "NORMAL"));
+            level.setDefaultValue(Client.getSession().getSetting(fname2name.get(getName()), LEVEL_NORMAL));
             final var threads = new IntegerItem("txt7ZThreads", Client.getSession().getMsg("MainFrame.lbl7zThreads.text"));
             threads.addChangedHandler(event -> setGPropertyItemValue(getName(), fname2name.get(getName()), threads.getValueAsInteger()));
             threads.setDefaultValue(Client.getSession().getSettingAsInteger(fname2name.get(getName()), -1));
@@ -90,6 +119,10 @@ final class SettingsCompressorPanel extends SectionStack {
         }
     }
 
+    /**
+     * Builds the compressor panel with one expanded section for Zip and one
+     * for 7-Zip.
+     */
     public SettingsCompressorPanel() {
         setVisibilityMode(VisibilityMode.MULTIPLE);
         setMargin(5);

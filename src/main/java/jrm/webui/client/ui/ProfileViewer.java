@@ -33,19 +33,45 @@ import jrm.webui.client.datasources.DSAnyware;
 import jrm.webui.client.datasources.DSAnywareList;
 import jrm.webui.client.datasources.DSAnywareListList;
 
+/**
+ * Window displaying the contents of a profile as three synchronized list grids:
+ * the list of ware lists (e.g. machine lists), the wares within the selected
+ * list (e.g. machines), and the entries (ROMs/disks/samples) within the
+ * selected ware.
+ * <p>
+ * Each grid is paired with a toolbar of status filter toggle buttons. The
+ * viewer registers itself with the {@link Client} child-window list and can be
+ * reset (refreshed) programmatically through the static {@link #reset()} API.
+ *
+ * @since 2.5
+ */
 public class ProfileViewer extends Window //NOSONAR
 {
+	/** Status value indicating a fully complete set. */
 	private static final String STATUS_COMPLETE = "COMPLETE";
+	/** Status value indicating a fully missing set. */
 	private static final String STATUS_MISSING = "MISSING";
+	/** Status value indicating a partially complete set. */
 	private static final String STATUS_PARTIAL = "PARTIAL";
+	/** Status value indicating an unknown set state. */
 	private static final String STATUS_UNKNOWN = "UNKNOWN";
+	/** Record attribute holding the status of a ware or entry. */
 	private static final String STATUS = "status";
+	/** Extra-data key used to signal a datasource reset. */
 	private static final String RESET = "reset";
 
+	/** The grid displaying the list of ware lists. */
 	AnywareListList anywareListList;
+	/** The grid displaying the wares within the selected ware list. */
 	AnywareList anywareList;
+	/** The grid displaying the entries within the selected ware. */
 	Anyware anyware;
 
+	/**
+	 * Builds a server-side result set that disables client-side filtering and sorting.
+	 *
+	 * @return the configured result set
+	 */
 	private static ResultSet buildServerResultSet() {
 		var rs = new ResultSet();
 		rs.setUseClientFiltering(false);
@@ -53,15 +79,27 @@ public class ProfileViewer extends Window //NOSONAR
 		return rs;
 	}
 
+	/**
+	 * List grid displaying the available ware lists (e.g. machine lists) of the current profile.
+	 * <p>
+	 * Selecting a list resets the {@link AnywareList} grid to display its contents.
+	 *
+	 * @since 2.5
+	 */
 	class AnywareListList extends ListGrid //NOSONAR
     {
+		/** Status-to-icon mapping for ware list rows. */
 		private static final Map<String, String> STATUS_ICONS = Map.of(
 				STATUS_COMPLETE, "/images/disk_multiple_green.png",
 				STATUS_MISSING, "/images/disk_multiple_red.png",
 				STATUS_PARTIAL, "/images/disk_multiple_orange.png",
 				STATUS_UNKNOWN, "/images/disk_multiple_gray.png");
+		/** The datasource backing this grid. */
 		private final DSAnywareListList ds;
 
+		/**
+		 * Constructs the ware-list grid, binding its datasource and selection/data handlers.
+		 */
 		public AnywareListList() {
 			super();
 			ds = DSAnywareListList.getInstance();
@@ -88,6 +126,9 @@ public class ProfileViewer extends Window //NOSONAR
 					buildField("have", 80, "25%", Alignment.CENTER));
 		}
 
+		/**
+		 * Returns the status icon for the name field, falling back to the default behavior otherwise.
+		 */
 		@Override
 		public String getValueIcon(ListGridField field, Object value, ListGridRecord recrd) {
 			if ("name".equals(field.getName()))
@@ -95,6 +136,9 @@ public class ProfileViewer extends Window //NOSONAR
 			return super.getValueIcon(field, value, recrd);
 		}
 
+		/**
+		 * Resets the grid by signaling a reset to the datasource and refreshing or fetching its data.
+		 */
 		public void reset() {
 			ds.setExtraData(Collections.singletonMap(RESET, "true"));
 			if (Boolean.TRUE.equals(willFetchData(null)))
@@ -104,6 +148,15 @@ public class ProfileViewer extends Window //NOSONAR
 		}
 	}
 
+	/**
+	 * Builds a list grid field with the given minimum width, width, and alignment.
+	 *
+	 * @param name the field name
+	 * @param minWidth the minimum width in pixels
+	 * @param width the width, or {@code null} to leave it unset
+	 * @param align the alignment, or {@code null} to leave it unset
+	 * @return the configured list grid field
+	 */
 	private static ListGridField buildField(String name, int minWidth, String width, Alignment align) {
 		var field = new ListGridField(name);
 		field.setMinWidth(minWidth);
@@ -114,6 +167,18 @@ public class ProfileViewer extends Window //NOSONAR
 		return field;
 	}
 
+	/**
+	 * Builds a titled list grid field with the given minimum width, width, alignment, edit, and filter capabilities.
+	 *
+	 * @param name the field name
+	 * @param title the field title
+	 * @param minWidth the minimum width in pixels
+	 * @param width the width, or {@code null} to leave it unset
+	 * @param align the alignment, or {@code null} to leave it unset
+	 * @param canEdit whether the field is editable
+	 * @param canFilter whether the field can be filtered
+	 * @return the configured list grid field
+	 */
 	private static ListGridField buildField(String name, String title, int minWidth, String width,
 			Alignment align, boolean canEdit, boolean canFilter) {
 		var field = new ListGridField(name, title);
@@ -127,25 +192,45 @@ public class ProfileViewer extends Window //NOSONAR
 		return field;
 	}
 
+	/**
+	 * List grid displaying the wares (machines or software) within the selected ware list.
+	 * <p>
+	 * Selecting a ware resets the {@link Anyware} grid to display its entries.
+	 * Double-clicking a {@code cloneof} or {@code romof} cell navigates to the
+	 * referenced ware.
+	 *
+	 * @since 2.5
+	 */
 	class AnywareList extends ListGrid //NOSONAR
     {
+		/** Record attribute holding the name of a ware. */
 		private static final String NAME = "name";
+		/** Status-to-icon mapping for ware rows. */
 		private static final Map<String, String> STATUS_ICONS = Map.of(
 				STATUS_COMPLETE, "/images/folder_closed_green.png",
 				STATUS_MISSING, "/images/folder_closed_red.png",
 				STATUS_PARTIAL, "/images/folder_closed_orange.png",
 				STATUS_UNKNOWN, "/images/folder_closed_gray.png");
+		/** Record attribute holding the clone-of reference of a ware. */
 		private static final String CLONEOF = "cloneof";
+		/** Record attribute holding the rom-of reference of a ware. */
 		private static final String ROMOF = "romof";
+		/** Type-to-icon mapping for ware rows. */
 		private static final Map<String, String> TYPE_ICONS = Map.of(
 				"BIOS", "/images/icons/application_osx_terminal.png",
 				"DEVICE", "/images/icons/computer.png",
 				"MECHANICAL", "/images/icons/wrench.png",
 				"STANDARD", "/images/icons/joystick.png");
+		/** Whether the current list is a machine list (controls visibility of machine-specific fields). */
 		private boolean ismachinelist = false;
+		/** Index of a record to select once data arrives, or {@code null} if none. */
 		private Integer toSelect = null;
+		/** The datasource backing this grid. */
 		private final DSAnywareList ds;
 
+		/**
+		 * Constructs the ware grid, binding its datasource, selection/click handlers, context menu, and fields.
+		 */
 		public AnywareList() //NOSONAR
 		{
 			ds = DSAnywareList.getInstance();
@@ -207,6 +292,11 @@ public class ProfileViewer extends Window //NOSONAR
 			getField("have").setCanSort(false);
 		}
 
+		/**
+		 * Builds the context menu with collect-keywords and select-none/all/invert actions.
+		 *
+		 * @return the configured menu
+		 */
 		private Menu buildAnywareListMenu() {
 			var menu = new Menu();
 			var collectKeywords = new MenuItem(Client.getSession().getMsg("ProfileViewer.mntmCollectKeywords.text"));
@@ -223,6 +313,14 @@ public class ProfileViewer extends Window //NOSONAR
 			return menu;
 		}
 
+		/**
+		 * Builds a status field displaying only a value icon.
+		 *
+		 * @param name the field name
+		 * @param title the field title
+		 * @param icons the status-to-icon mapping
+		 * @return the configured status field
+		 */
 		private ListGridField buildStatusField(String name, String title, Map<String, String> icons) {
 			var field = new ListGridField(name, title, 24);
 			field.setValueIcons(icons);
@@ -233,6 +331,11 @@ public class ProfileViewer extends Window //NOSONAR
 			return field;
 		}
 
+		/**
+		 * Builds the rom-of field, visible only for machine lists.
+		 *
+		 * @return the configured rom-of field
+		 */
 		private ListGridField buildRomOfField() {
 			var field = new ListGridField(ROMOF, Client.getSession().getMsg("MachineListRenderer.RomOf"));
 			field.setMinWidth(70);
@@ -242,6 +345,11 @@ public class ProfileViewer extends Window //NOSONAR
 			return field;
 		}
 
+		/**
+		 * Builds the sample-of field, visible only for machine lists.
+		 *
+		 * @return the configured sample-of field
+		 */
 		private ListGridField buildSampleOfField() {
 			var field = new ListGridField("sampleof", Client.getSession().getMsg("MachineListRenderer.SampleOf"));
 			field.setMinWidth(70);
@@ -251,6 +359,11 @@ public class ProfileViewer extends Window //NOSONAR
 			return field;
 		}
 
+		/**
+		 * Builds the toggleable "selected" field used to mark wares for inclusion.
+		 *
+		 * @return the configured selected field
+		 */
 		private ListGridField buildSelectedField() {
 			var field = new ListGridField("selected", Client.getSession().getMsg("MachineListRenderer.Selected"), 20);
 			field.setAlign(Alignment.CENTER);
@@ -259,6 +372,9 @@ public class ProfileViewer extends Window //NOSONAR
 			return field;
 		}
 
+		/**
+		 * Returns the icon for a ware cell based on the field name and record attributes.
+		 */
 		@Override
 		public String getValueIcon(ListGridField field, Object value, ListGridRecord recrd) {
 			return switch (field.getName()) {
@@ -270,6 +386,12 @@ public class ProfileViewer extends Window //NOSONAR
 			};
 		}
 
+		/**
+		 * Resets the grid to display the wares of the given ware-list record, signaling a reset to the datasource.
+		 *
+		 * @param recrd the selected ware-list record
+		 * @param ds the datasource of the ware-list grid
+		 */
 		public void reset(Record recrd, DataSource ds) {
 			this.ds.setExtraData(Collections.singletonMap(RESET, "true"));
 			ismachinelist = "*".equals(recrd.getAttribute(NAME));
@@ -282,24 +404,39 @@ public class ProfileViewer extends Window //NOSONAR
 		}
 	}
 
+	/**
+	 * List grid displaying the entries (ROMs/disks/samples) within the selected ware.
+	 * <p>
+	 * Provides a context menu to copy entry attributes (CRC, SHA-1, name) and to
+	 * search the web for the selected entry.
+	 *
+	 * @since 2.5
+	 */
 	class Anyware extends ListGrid //NOSONAR
     {
+		/** Status-to-icon mapping for entry rows. */
 		private static final Map<String, String> STATUS_ICONS = Map.of(
 				"OK", "/images/icons/bullet_green.png",
 				"KO", "/images/icons/bullet_red.png",
 				STATUS_UNKNOWN, "/images/icons/bullet_black.png");
+		/** Dump-status-to-icon mapping for entry rows. */
 		private static final Map<String, String> DUMPSTATUS_ICONS = Map.of(
 				"verified", "/images/icons/star.png",
 				"good", "/images/icons/tick.png",
 				"baddump", "/images/icons/delete.png",
 				"nodump", "/images/icons/error.png");
+		/** Type-to-icon mapping for entry rows. */
 		private static final Map<String, String> TYPE_ICONS = Map.of(
 				"ROM", "/images/rom_small.png",
 				"DISK", "/images/icons/drive.png",
 				"SAMPLE", "/images/icons/sound.png");
 
+		/** The datasource backing this grid. */
 		private final DSAnyware ds;
 
+		/**
+		 * Constructs the entry grid, binding its datasource, context menu, and fields.
+		 */
 		public Anyware() {
 			super();
 			ds = DSAnyware.getInstance();
@@ -330,6 +467,14 @@ public class ProfileViewer extends Window //NOSONAR
 					buildDumpStatusField());
 		}
 
+		/**
+		 * Builds a status field displaying only a value icon.
+		 *
+		 * @param name the field name
+		 * @param title the field title
+		 * @param icons the status-to-icon mapping
+		 * @return the configured status field
+		 */
 		private ListGridField buildStatusField(String name, String title, Map<String, String> icons) {
 			var field = new ListGridField(name, title, 24);
 			field.setValueIcons(icons);
@@ -339,6 +484,11 @@ public class ProfileViewer extends Window //NOSONAR
 			return field;
 		}
 
+		/**
+		 * Builds the name field, taking the remaining horizontal space.
+		 *
+		 * @return the configured name field
+		 */
 		private ListGridField buildNameField() {
 			var field = new ListGridField("name", Client.getSession().getMsg("AnywareRenderer.Name"));
 			field.setMinWidth(128);
@@ -346,6 +496,11 @@ public class ProfileViewer extends Window //NOSONAR
 			return field;
 		}
 
+		/**
+		 * Builds the size field, auto-fitting its width to the content.
+		 *
+		 * @return the configured size field
+		 */
 		private ListGridField buildSizeField() {
 			var field = new ListGridField("size", Client.getSession().getMsg("AnywareRenderer.Size"));
 			field.setMinWidth(48);
@@ -353,6 +508,14 @@ public class ProfileViewer extends Window //NOSONAR
 			return field;
 		}
 
+		/**
+		 * Builds a hash code field (crc/md5/sha1) rendered in a monospace {@code <code>} element.
+		 *
+		 * @param name the field name
+		 * @param minWidth the minimum width in pixels
+		 * @param formatter the cell formatter wrapping the value in a {@code <code>} element
+		 * @return the configured code field
+		 */
 		private ListGridField buildCodeField(String name, int minWidth, com.smartgwt.client.widgets.grid.CellFormatter formatter) {
 			var field = new ListGridField(name);
 			field.setMinWidth(minWidth);
@@ -361,6 +524,11 @@ public class ProfileViewer extends Window //NOSONAR
 			return field;
 		}
 
+		/**
+		 * Builds the merge field, auto-fitting its width to the content.
+		 *
+		 * @return the configured merge field
+		 */
 		private ListGridField buildMergeField() {
 			var field = new ListGridField("merge", Client.getSession().getMsg("AnywareRenderer.Merge"));
 			field.setMinWidth(128);
@@ -368,6 +536,11 @@ public class ProfileViewer extends Window //NOSONAR
 			return field;
 		}
 
+		/**
+		 * Builds the dump-status field displaying only a value icon.
+		 *
+		 * @return the configured dump-status field
+		 */
 		private ListGridField buildDumpStatusField() {
 			var field = new ListGridField("dumpstatus", Client.getSession().getMsg("AnywareRenderer.DumpStatus"), 24);
 			field.setValueIcons(DUMPSTATUS_ICONS);
@@ -377,6 +550,11 @@ public class ProfileViewer extends Window //NOSONAR
 			return field;
 		}
 
+		/**
+		 * Builds the context menu with copy-CRC/SHA-1/name and web-search actions.
+		 *
+		 * @return the configured menu
+		 */
 		private Menu buildAnywareMenu() {
 			var menu = new Menu();
 			var dialog = new Dialog();
@@ -389,6 +567,14 @@ public class ProfileViewer extends Window //NOSONAR
 			return menu;
 		}
 
+		/**
+		 * Builds a menu item that copies the given record attribute to the clipboard through a dialog.
+		 *
+		 * @param title the menu item title
+		 * @param attr the record attribute to copy
+		 * @param dialog the dialog used to prompt the user for the copy
+		 * @return the configured menu item
+		 */
 		private MenuItem buildCopyMenuItem(String title, String attr, Dialog dialog) {
 			var item = new MenuItem(title);
 			item.addClickHandler(event -> {
@@ -401,6 +587,11 @@ public class ProfileViewer extends Window //NOSONAR
 			return item;
 		}
 
+		/**
+		 * Builds a menu item that searches the web for the selected entry's name and hash.
+		 *
+		 * @return the configured menu item
+		 */
 		private MenuItem buildSearchMenuItem() {
 			var item = new MenuItem("Search on the Web");
 			item.addClickHandler(event -> {
@@ -418,6 +609,9 @@ public class ProfileViewer extends Window //NOSONAR
 			return item;
 		}
 
+		/**
+		 * Returns the type icon for the name field, falling back to the default behavior otherwise.
+		 */
 		@Override
 		public String getValueIcon(ListGridField field, Object value, ListGridRecord recrd) {
 			if ("name".equals(field.getName()))
@@ -425,6 +619,12 @@ public class ProfileViewer extends Window //NOSONAR
 			return super.getValueIcon(field, value, recrd);
 		}
 
+		/**
+		 * Resets the grid to display the entries of the given ware record, signaling a reset to the datasource.
+		 *
+		 * @param recrd the selected ware record
+		 * @param ds the datasource of the ware grid
+		 */
 		public void reset(Record recrd, DataSource ds) {
 			this.ds.setExtraData(Collections.singletonMap(RESET, "true"));
 			var criteria = new Criteria();
@@ -437,6 +637,9 @@ public class ProfileViewer extends Window //NOSONAR
 		}
 	}
 
+	/**
+	 * Constructs the profile viewer window, builds its layout, shows it, and resets the ware-list grid.
+	 */
 	public ProfileViewer() {
 		super();
 		setTitle(Client.getSession().getMsg("ProfileViewer.this.title"));
@@ -454,12 +657,20 @@ public class ProfileViewer extends Window //NOSONAR
 		anywareListList.reset();
 	}
 
+	/**
+	 * Registers this window with the {@link Client} child-window list before initialization.
+	 */
 	@Override
 	protected void onInit() {
 		Client.getChildWindows().add(this);
 		super.onInit();
 	}
 
+	/**
+	 * Builds the main vertical layout containing the top (lists) and bottom (entries) panels.
+	 *
+	 * @return the configured main layout
+	 */
 	private VLayout buildMainLayout() {
 		var main = new VLayout();
 		main.addMember(buildTopLayout());
@@ -467,6 +678,11 @@ public class ProfileViewer extends Window //NOSONAR
 		return main;
 	}
 
+	/**
+	 * Builds the top horizontal layout containing the ware-list and ware panels with a resize bar.
+	 *
+	 * @return the configured top layout
+	 */
 	private HLayout buildTopLayout() {
 		var top = new HLayout();
 		top.setHeight("60%");
@@ -477,6 +693,11 @@ public class ProfileViewer extends Window //NOSONAR
 		return top;
 	}
 
+	/**
+	 * Builds the ware-list panel: the grid and its status filter toolbar.
+	 *
+	 * @return the configured panel
+	 */
 	private VLayout buildAnywareListListPanel() {
 		var panel = new VLayout();
 		var filterButtons = new ToolStripButton[4];
@@ -503,6 +724,11 @@ public class ProfileViewer extends Window //NOSONAR
 		return panel;
 	}
 
+	/**
+	 * Updates the ware-list grid filter from the selected status toggle buttons.
+	 *
+	 * @param buttons the status filter toggle buttons
+	 */
 	private void updateListListFilter(ToolStripButton[] buttons) {
 		var filter = Stream.of(buttons).filter(ToolStripButton::isSelected).map(ToolStripButton::getName)
 				.collect(Collectors.joining(","));
@@ -516,6 +742,11 @@ public class ProfileViewer extends Window //NOSONAR
 		anywareListList.filterData(criteria);
 	}
 
+	/**
+	 * Builds the ware panel: the grid and its status filter toolbar.
+	 *
+	 * @return the configured panel
+	 */
 	private VLayout buildAnywareListPanel() {
 		var panel = new VLayout();
 		var filterButtons = new ToolStripButton[4];
@@ -539,6 +770,11 @@ public class ProfileViewer extends Window //NOSONAR
 		return panel;
 	}
 
+	/**
+	 * Updates the ware grid filter from the selected status toggle buttons.
+	 *
+	 * @param buttons the status filter toggle buttons
+	 */
 	private void updateListFilter(ToolStripButton[] buttons) {
 		var filter = Stream.of(buttons).filter(ToolStripButton::isSelected).map(ToolStripButton::getName)
 				.collect(Collectors.joining(","));
@@ -552,6 +788,11 @@ public class ProfileViewer extends Window //NOSONAR
 		anywareList.filterData(criteria);
 	}
 
+	/**
+	 * Builds the bottom panel: the entry grid and its status filter toolbar.
+	 *
+	 * @return the configured bottom layout
+	 */
 	private VLayout buildBottomLayout() {
 		var panel = new VLayout();
 		var filterButtons = new ToolStripButton[3];
@@ -573,6 +814,11 @@ public class ProfileViewer extends Window //NOSONAR
 		return panel;
 	}
 
+	/**
+	 * Updates the entry grid filter from the selected status toggle buttons.
+	 *
+	 * @param buttons the status filter toggle buttons
+	 */
 	private void updateAnywareFilter(ToolStripButton[] buttons) {
 		var filter = Stream.of(buttons).filter(ToolStripButton::isSelected).map(ToolStripButton::getName)
 				.collect(Collectors.joining(","));
@@ -586,6 +832,14 @@ public class ProfileViewer extends Window //NOSONAR
 		anyware.filterData(criteria);
 	}
 
+	/**
+	 * Builds a checkbox-style toggle filter button with the given name, icon, and optional tooltip.
+	 *
+	 * @param name the button name (used as the filter value)
+	 * @param icon the button icon path
+	 * @param promptKey the i18n message key for the tooltip, or {@code null} for no tooltip
+	 * @return the configured toggle button
+	 */
 	private ToolStripButton buildFilterButton(String name, String icon, String promptKey) {
 		var btn = new ToolStripButton();
 		btn.setName(name);
@@ -598,18 +852,35 @@ public class ProfileViewer extends Window //NOSONAR
 		return btn;
 	}
 
+	/**
+	 * Removes this window from the {@link Client} child-window list on destruction.
+	 */
 	@Override
 	protected void onDestroy() {
 		Client.getChildWindows().remove(this);
 		super.onDestroy();
 	}
 
+	/**
+	 * Flag guarding the static {@link #reset()} from running while a reset callback is in progress.
+	 */
 	public static boolean canResetPV = true;
 
+	/**
+	 * Callback executed within the guarded scope of {@link #reset(ResetCB)}.
+	 *
+	 * @since 2.5
+	 */
 	public interface ResetCB {
+		/** Applies the reset action. */
 		void apply();
 	}
 
+	/**
+	 * Runs the given callback within a reset guard, then schedules a deferred reset of the ware-list grid.
+	 *
+	 * @param cb the callback to apply before resetting
+	 */
 	public static void reset(ResetCB cb) {
 		canResetPV = false;
 		cb.apply();
@@ -617,8 +888,14 @@ public class ProfileViewer extends Window //NOSONAR
 		reset();
 	}
 
+	/** Deferred timer used to coalesce reset requests. */
 	private static Timer resetTimer = null;
 
+	/**
+	 * Schedules a deferred reset of the ware-list grid of the currently visible profile viewer, if any.
+	 * <p>
+	 * Repeated calls coalesce into a single reset one second after the last call.
+	 */
 	public static void reset() {
 		if (resetTimer == null) {
 			resetTimer = new Timer() {

@@ -2,7 +2,6 @@ package jrm.webui.client.ui;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.gwt.core.client.JsonUtils;
@@ -25,6 +24,11 @@ import jrm.webui.client.Client;
 import jrm.webui.client.protocol.Q_Profile;
 import jrm.webui.client.utils.EnhJSO;
 
+/**
+ * Panel containing systems, sources, and filter form controls.
+ *
+ * @since 2.5
+ */
 public final class ScannerFiltersPanel extends HLayout // NOSONAR
 {
     private static final String PROPERTY = "property";
@@ -98,7 +102,7 @@ public final class ScannerFiltersPanel extends HLayout // NOSONAR
         private void invertSelection() {
             ListGridRecord[] toUnselect = getSelectedRecords();
             List<ListGridRecord> toUnselectList = Arrays.asList(toUnselect);
-            ListGridRecord[] toSelect = Stream.of(getRecords()).filter(r -> !toUnselectList.contains(r)).collect(Collectors.toList()).toArray(new ListGridRecord[0]);
+            ListGridRecord[] toSelect = Stream.of(getRecords()).filter(r -> !toUnselectList.contains(r)).toList().toArray(new ListGridRecord[0]);
             deselectRecords(toUnselect);
             selectRecords(toSelect);
         }
@@ -165,7 +169,7 @@ public final class ScannerFiltersPanel extends HLayout // NOSONAR
         private MenuItem buildSelectByTypeMenuItem(String titleMsg, String type, boolean select) {
             MenuItem item = new MenuItem(Client.getSession().getMsg(titleMsg));
             item.addClickHandler(event -> ProfileViewer.reset(() -> {
-                ListGridRecord[] records = Stream.of(getRecords()).filter(r -> type.equals(r.getAttribute(TYPE))).collect(Collectors.toList()).toArray(new ListGridRecord[0]);
+                ListGridRecord[] records = Stream.of(getRecords()).filter(r -> type.equals(r.getAttribute(TYPE))).toList().toArray(new ListGridRecord[0]);
                 if (select)
                     selectRecords(records);
                 else

@@ -38,22 +38,49 @@ import jrm.webui.client.protocol.A_ReportLite;
 import jrm.webui.client.protocol.A_TrntChk;
 import jrm.webui.client.utils.EnhJSO;
 
+/**
+ * Main application window of the JRomManager web client.
+ * <p>
+ * Hosts the central {@link TabSet} with one tab per feature area (profiles,
+ * scanner, Dir2Dat, batch tools, settings) and dispatches server-side events
+ * received through the protocol {@code A_*} classes to the matching child panel
+ * via the overloaded {@code update(...)} methods.
+ *
+ * @since 2.5
+ */
 public class MainWindow extends Window //NOSONAR
 {
+    /** Name of the scanner tab, also used as its tab identifier. */
     private static final String SCANNER = "scanner";
 
+    /** The central tab set hosting the feature tabs. */
     TabSet mainPane;
+    /** The profiles management panel. */
     ProfilePanel profilePanel;
+    /** The scanner panel. */
     ScannerPanel scannerPanel;
+    /** The batch DirUpd8r panel. */
     BatchDirUpd8rPanel batchDirUpd8rPanel;
+    /** The batch torrent checker panel. */
     BatchTrrntChkPanel batchTrrntChkPanel;
+    /** The batch compressor panel. */
     BatchCompressorPanel batchCompressorPanel;
+    /** The Dir2Dat panel. */
     Dir2DatPanel dir2datPanel;
+    /** The general settings panel. */
     SettingsGenPanel settingsGenPanel;
+    /** The compressor settings panel. */
     SettingsCompressorPanel settingsCompressorPanel;
+    /** The debug settings panel. */
     SettingsDebugPanel settingsDebugPanel;
+    /** The current progress dialog, or {@code null} if none is open. */
     private Progress progress = null;
 
+    /**
+     * Constructs the main window: configures default list grid properties, the
+     * window chrome and close (logout) handler, then builds and adds all feature
+     * tabs to the central tab set.
+     */
     public MainWindow() {
         super();
         final var deflist = new ListGrid();
@@ -102,6 +129,14 @@ public class MainWindow extends Window //NOSONAR
         show();
     }
 
+    /**
+     * Reacts to a profile loaded event: updates the profile info label, toggles the
+     * scan/fix buttons, enables or disables the scanner tab, and refreshes the
+     * scanner settings and filters from the loaded profile.
+     *
+     * @param params
+     *            the profile loaded event parameters
+     */
     public void update(A_Profile.Loaded params) {
         scannerPanel.lblProfileinfo.setContents(params.getSuccess() ? params.getName() : null);
         scannerPanel.btnScan.setDisabled(!params.getSuccess());
@@ -133,53 +168,122 @@ public class MainWindow extends Window //NOSONAR
         profilePanel.refreshListGrid();
     }
 
+    /**
+     * Reacts to a progress start event by opening a new progress dialog.
+     *
+     * @param params
+     *            the progress event parameters (unused)
+     */
     public void update(A_Progress params) //NOSONAR
     {
         progress = new Progress();
     }
 
+    /**
+     * Reacts to a progress close event by closing the progress dialog and, when
+     * errors were reported, displaying them in a warning popup.
+     *
+     * @param params
+     *            the progress close event parameters
+     */
     public void update(A_Progress.Close params) {
         progress.close();
         if (params.hasErrors())
             SC.warn(params.getErrors().stream().map(str -> "<pre>" + str + "</pre>").collect(Collectors.joining()));
     }
 
+    /**
+     * Reacts to a progress set-infos event by initializing the progress dialog
+     * with the thread count and sub-info descriptors.
+     *
+     * @param params
+     *            the progress set-infos event parameters
+     */
     public void update(A_Progress.SetInfos params) {
         progress.setInfos(params.getThreadCnt(), params.getMultipleSubInfos());
     }
 
+    /**
+     * Reacts to a progress extend-infos event by extending the progress dialog
+     * with additional thread and sub-info descriptors.
+     *
+     * @param params
+     *            the progress extend-infos event parameters
+     */
     public void update(A_Progress.ExtendInfos params) {
         progress.extendInfos(params.getThreadCnt(), params.getMultipleSubInfos());
     }
 
+    /**
+     * Reacts to a progress can-cancel event by toggling the cancel button of the
+     * progress dialog.
+     *
+     * @param params
+     *            the progress can-cancel event parameters
+     */
     public void update(A_Progress.CanCancel params) {
         progress.canCancel(params.canCancel());
     }
 
+    /**
+     * Reacts to a progress clear-infos event by clearing the progress dialog info.
+     *
+     * @param params
+     *            the progress clear-infos event parameters (unused)
+     */
     public void update(A_Progress.ClearInfos params) //NOSONAR
     {
         progress.clearInfos();
     }
 
+    /**
+     * Reacts to a progress set-full-progress event by updating the progress dialog
+     * with the full progress parameters.
+     *
+     * @param params
+     *            the progress set-full-progress event parameters
+     */
     public void update(A_Progress.SetFullProgress params) //NOSONAR
     {
         progress.setFullProgress(params.getParams());
     }
 
+    /**
+     * Reacts to a category/version file loaded event by updating the advanced
+     * filters panel path field and disabling events on the category tree.
+     *
+     * @param params
+     *            the category/version loaded event parameters
+     */
     public void update(A_CatVer.Loaded params) //NOSONAR
     {
-        scannerPanel.scannerAdvFiltersPanel.catver_path.setValue(params.getPath());
-        scannerPanel.scannerAdvFiltersPanel.catver_tree.enableEvents = false;
-        scannerPanel.scannerAdvFiltersPanel.catver_tree.invalidateCache();
+        scannerPanel.scannerAdvFiltersPanel.catverPath.setValue(params.getPath());
+        scannerPanel.scannerAdvFiltersPanel.catverTree.enableEvents = false;
+        scannerPanel.scannerAdvFiltersPanel.catverTree.invalidateCache();
     }
 
+    /**
+     * Reacts to an NPlayers file loaded event by updating the advanced filters
+     * panel path field and disabling events on the NPlayers list.
+     *
+     * @param params
+     *            the NPlayers loaded event parameters
+     */
     public void update(A_NPlayers.Loaded params) //NOSONAR
     {
-        scannerPanel.scannerAdvFiltersPanel.nplayers_path.setValue(params.getPath());
-        scannerPanel.scannerAdvFiltersPanel.nplayers_list.enableEvents = false;
-        scannerPanel.scannerAdvFiltersPanel.nplayers_list.invalidateCache();
+        scannerPanel.scannerAdvFiltersPanel.nplayersPath.setValue(params.getPath());
+        scannerPanel.scannerAdvFiltersPanel.nplayersList.enableEvents = false;
+        scannerPanel.scannerAdvFiltersPanel.nplayersList.invalidateCache();
     }
 
+    /**
+     * Reacts to a profile scanned event by toggling the fix button based on the
+     * number of pending actions, showing or refreshing the report viewer, and
+     * refreshing any open profile viewer.
+     *
+     * @param params
+     *            the profile scanned event parameters
+     */
     public void update(A_Profile.Scanned params) //NOSONAR
     {
         if (params.getSuccess()) {
@@ -201,6 +305,13 @@ public class MainWindow extends Window //NOSONAR
         }
     }
 
+    /**
+     * Reacts to a profile fixed event by toggling the fix button based on the
+     * number of remaining actions and refreshing any open profile viewer.
+     *
+     * @param params
+     *            the profile fixed event parameters
+     */
     public void update(A_Profile.Fixed params) {
         if (params.getSuccess()) {
             scannerPanel.btnFix.setDisabled(params.getActions() == null || params.getActions() == 0);
@@ -212,16 +323,37 @@ public class MainWindow extends Window //NOSONAR
         }
     }
 
+    /**
+     * Reacts to a report filter applied event by forwarding each filter parameter
+     * to the scanner report viewer and reloading it.
+     *
+     * @param params
+     *            the report apply-filter event parameters
+     */
     public void update(A_Report.ApplyFilter params) {
         params.forEachParams((k, v) -> scannerPanel.reportViewer.applyFilter(k, v));
         scannerPanel.reportViewer.reload();
     }
 
+    /**
+     * Reacts to a lite report filter applied event by forwarding each filter
+     * parameter to the batch DirUpd8r report and reloading it.
+     *
+     * @param params
+     *            the lite report apply-filter event parameters
+     */
     public void update(A_ReportLite.ApplyFilter params) {
         params.forEachParams((k, v) -> batchDirUpd8rPanel.report.applyFilter(k, v));
         batchDirUpd8rPanel.report.reload();
     }
 
+    /**
+     * Reacts to a Dat2Dir clear-results event by clearing the result column of all
+     * batch DirUpd8r SDR rows.
+     *
+     * @param params
+     *            the clear-results event parameters (unused)
+     */
     public void update(A_Dat2Dir.ClearResults params) //NOSONAR
     {
         RecordList list = batchDirUpd8rPanel.sdr.getResultSet().getAllCachedRows();
@@ -229,12 +361,26 @@ public class MainWindow extends Window //NOSONAR
             batchDirUpd8rPanel.sdr.setEditValue(i, 3, ""); //$NON-NLS-1$
     }
 
+    /**
+     * Reacts to a Dat2Dir update-result event by setting the result of the given
+     * batch DirUpd8r SDR row.
+     *
+     * @param params
+     *            the update-result event parameters
+     */
     public void update(A_Dat2Dir.UpdateResult params) {
         final int row = params.getRow();
         final String result = params.getResult();
         batchDirUpd8rPanel.sdr.setEditValue(row, 3, result);
     }
 
+    /**
+     * Reacts to a Dat2Dir end event by disabling the scanner tab, cancelling any
+     * pending edit, and refreshing and re-expanding the SDR rows.
+     *
+     * @param params
+     *            the Dat2Dir end event parameters (unused)
+     */
     public void update(A_Dat2Dir.End params) //NOSONAR
     {
         mainPane.disableTab(SCANNER);
@@ -246,10 +392,24 @@ public class MainWindow extends Window //NOSONAR
         });
     }
 
+    /**
+     * Reacts to a Dat2Dir show-settings event by opening the custom scanner
+     * settings window for the given source DATs.
+     *
+     * @param params
+     *            the show-settings event parameters
+     */
     public void update(A_Dat2Dir.ShowSettings params) {
         batchDirUpd8rPanel.showSettings(params.getSettings(), params.getSrcs());
     }
 
+    /**
+     * Reacts to a TrntChk clear-results event by clearing the result column of all
+     * batch torrent checker SDR rows.
+     *
+     * @param params
+     *            the clear-results event parameters (unused)
+     */
     public void update(A_TrntChk.ClearResults params) //NOSONAR
     {
         RecordList list = batchTrrntChkPanel.sdr.getResultSet().getAllCachedRows();
@@ -257,12 +417,26 @@ public class MainWindow extends Window //NOSONAR
             batchTrrntChkPanel.sdr.setEditValue(i, 3, ""); //$NON-NLS-1$
     }
 
+    /**
+     * Reacts to a TrntChk update-result event by setting the result of the given
+     * batch torrent checker SDR row.
+     *
+     * @param params
+     *            the update-result event parameters
+     */
     public void update(A_TrntChk.UpdateResult params) {
         final int row = params.getRow();
         final String result = params.getResult();
         batchTrrntChkPanel.sdr.setEditValue(row, 3, result);
     }
 
+    /**
+     * Reacts to a TrntChk end event by cancelling any pending edit and refreshing
+     * and re-expanding the batch torrent checker SDR rows.
+     *
+     * @param params
+     *            the TrntChk end event parameters (unused)
+     */
     public void update(A_TrntChk.End params) //NOSONAR
     {
         batchTrrntChkPanel.sdr.cancelEditing();
@@ -273,34 +447,76 @@ public class MainWindow extends Window //NOSONAR
         });
     }
 
+    /**
+     * Reacts to a compressor clear-results event by clearing the result column of
+     * all batch compressor grid rows.
+     *
+     * @param params
+     *            the clear-results event parameters (unused)
+     */
     public void update(A_Compressor.ClearResults params) //NOSONAR
     {
         for (int i = 0; i < batchCompressorPanel.fr.getTotalRows(); i++)
             batchCompressorPanel.fr.setEditValue(i, 1, ""); //$NON-NLS-1$
     }
 
+    /**
+     * Reacts to a compressor update-result event by setting the result of the
+     * given batch compressor grid row.
+     *
+     * @param params
+     *            the update-result event parameters
+     */
     public void update(A_Compressor.UpdateResult params) {
         final int row = params.getRow();
         final String result = params.getResult();
         batchCompressorPanel.fr.setEditValue(row, 1, result);
     }
 
+    /**
+     * Reacts to a compressor update-file event by setting the file path of the
+     * given batch compressor grid row.
+     *
+     * @param params
+     *            the update-file event parameters
+     */
     public void update(A_Compressor.UpdateFile params) {
         final int row = params.getRow();
         final String file = params.getFile();
         batchCompressorPanel.fr.setEditValue(row, 0, file);
     }
 
+    /**
+     * Reacts to a compressor end event by discarding all pending edits and
+     * refreshing the batch compressor grid data.
+     *
+     * @param params
+     *            the compressor end event parameters (unused)
+     */
     public void update(A_Compressor.End params) //NOSONAR
     {
         batchCompressorPanel.fr.discardAllEdits();
         batchCompressorPanel.fr.refreshData();
     }
 
+    /**
+     * Reacts to a global set-memory event by updating the memory text field of the
+     * debug settings panel.
+     *
+     * @param params
+     *            the set-memory event parameters
+     */
     public void update(A_Global.SetMemory params) {
         settingsDebugPanel.getItem("txtDbgMemory").setValue(params.getMsg()); //$NON-NLS-1$
     }
 
+    /**
+     * Reacts to a profile imported event by adding a new row to the profiles list
+     * grid and selecting it.
+     *
+     * @param params
+     *            the profile imported event parameters
+     */
     public void update(A_Profile.Imported params) {
         Record rec = new Record();
         rec.setAttribute("Src", params.getPath()); //$NON-NLS-1$
@@ -310,7 +526,9 @@ public class MainWindow extends Window //NOSONAR
     }
 
     /**
-     * @return
+     * Builds and returns the Settings tab containing general, compressor, debug, and admin sections.
+     *
+     * @return the Settings tab
      */
     private Tab getSettingsTab() {
         final var tab = new Tab();
@@ -349,7 +567,9 @@ public class MainWindow extends Window //NOSONAR
     }
 
     /**
-     * @return
+     * Builds and returns the Batch Tools tab containing Dat2Dir, TrrntChk, and Compressor panels.
+     *
+     * @return the Batch Tools tab
      */
     private Tab getBatchTab() {
         Tab tab = new Tab();
@@ -359,6 +579,12 @@ public class MainWindow extends Window //NOSONAR
         return tab;
     }
 
+    /**
+     * Builds the inner tab set of the Batch Tools tab, hosting the Dat2Dir,
+     * torrent checker and compressor sub-tabs.
+     *
+     * @return the configured tab set
+     */
     private TabSet buildBatchTabSet() {
         TabSet tabSet = new TabSet();
         tabSet.setPaneMargin(0);
@@ -369,6 +595,11 @@ public class MainWindow extends Window //NOSONAR
         return tabSet;
     }
 
+    /**
+     * Builds the batch Dat2Dir sub-tab and its embedded {@link BatchDirUpd8rPanel}.
+     *
+     * @return the configured tab
+     */
     private Tab buildBatchDat2DirTab() {
         Tab tab = new Tab();
         tab.setTitle(Client.getSession().getMsg("MainFrame.panelBatchToolsDat2Dir.title")); //$NON-NLS-1$
@@ -378,6 +609,12 @@ public class MainWindow extends Window //NOSONAR
         return tab;
     }
 
+    /**
+     * Builds the batch torrent checker sub-tab and its embedded
+     * {@link BatchTrrntChkPanel}.
+     *
+     * @return the configured tab
+     */
     private Tab buildBatchTrrntChkTab() {
         Tab tab = new Tab();
         tab.setTitle(Client.getSession().getMsg("MainFrame.panelBatchToolsDir2Torrent.title")); //$NON-NLS-1$
@@ -387,6 +624,12 @@ public class MainWindow extends Window //NOSONAR
         return tab;
     }
 
+    /**
+     * Builds the batch compressor sub-tab and its embedded
+     * {@link BatchCompressorPanel}.
+     *
+     * @return the configured tab
+     */
     private Tab buildBatchCompressorTab() {
         Tab tab = new Tab();
         tab.setTitle(Client.getSession().getMsg("BatchPanel.Compressor")); //$NON-NLS-1$
@@ -397,7 +640,9 @@ public class MainWindow extends Window //NOSONAR
     }
 
     /**
-     * @return
+     * Builds and returns the Dir2Dat tab for directory-to-DAT conversion.
+     *
+     * @return the Dir2Dat tab
      */
     private Tab getDir2DatTab() {
         Tab tab = new Tab();
@@ -409,7 +654,9 @@ public class MainWindow extends Window //NOSONAR
     }
 
     /**
-     * @return
+     * Builds and returns the Scanner tab, initially disabled until a profile is loaded.
+     *
+     * @return the Scanner tab
      */
     private Tab getScannerTab() {
         Tab tab = new Tab();
@@ -423,7 +670,9 @@ public class MainWindow extends Window //NOSONAR
     }
 
     /**
-     * @return
+     * Builds and returns the Profiles tab for profile management.
+     *
+     * @return the Profiles tab
      */
     private Tab getProfileTab() {
         Tab tab = new Tab();

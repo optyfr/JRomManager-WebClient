@@ -48,34 +48,87 @@ import jrm.webui.client.utils.CaseInsensitiveString;
 import jsinterop.annotations.JsMethod;
 import jsinterop.annotations.JsPackage;
 
+/**
+ * Remote file chooser dialog for navigating server-side file systems.
+ * <p>
+ * Presents a split pane with a root/drive list on the left and the file list
+ * of the currently selected directory on the right. Depending on the
+ * {@link Options context} it can be used to choose files and/or directories,
+ * or to manage (create, rename, delete, upload, download, archive) remote
+ * entries. Selections are reported back through a {@link CallBack}.
+ *
+ * @since 2.5
+ */
 public final class RemoteFileChooser extends Window /* NOSONAR */ {
+    /** Attribute name used to flag directory records. */
     private static final String IS_DIR = "isDir";
+    /** Label showing the relative path of the currently listed directory. */
     Label parentLab;
+    /** Upload progress bar shown while files are being transferred. */
     Progressbar pb;
+    /** Layout wrapping the upload progress bar and its cancel button. */
     private Layout pbLayout;
+    /** Text label painted on top of {@link #pb} (e.g. {@code "5/10"}). */
     private Label pbText;
+    /** Spacer shown in place of the progress bar when no upload is running. */
     LayoutSpacer pbSpacer;
+    /** Close/Cancel button of the chooser. */
     private IButton close;
 
+    /** Whether the current upload batch has been cancelled by the user. */
     private boolean cancelled = false;
 
+    /** The current upload list instance (shared static for JS access). */
     static UploadList list;
 
+    /** Absolute path of the currently listed directory. */
     private String parent;
-    private String  relparent;
+    /** Relative path of the currently listed directory, used for selections. */
+    private String relparent;
+    /** Currently selected root/drive path. */
     private String root;
 
+    /**
+     * Configuration options for the remote file chooser.
+     *
+     * @since 2.5
+     */
     public static class Options {
+        /**
+         * Selection mode for the file chooser.
+         *
+         * @since 2.5
+         */
         public enum SelMode {
-            NONE, FILE, DIR, FILE_DIR;
+            /** No selection allowed. */
+            NONE,
+            /** Single file selection. */
+            FILE,
+            /** Single directory selection. */
+            DIR,
+            /** Multiple file/directory selection. */
+            FILE_DIR;
         }
 
+        /** Identifier of the calling context; drives the selection rules. */
         public final String context;
+        /** Optional initial path to expand, or {@code null} for the root. */
         public final String  initialPath;
+        /** Selection mode derived from the {@link #context}. */
         public final SelMode selMode;
+        /** Whether multi-row selection is enabled for this context. */
         public final boolean isMultiple;
+        /** Whether the chooser operates in "choose" (vs. "manage") mode. */
         public final boolean  isChoose;
 
+        /**
+         * Builds the options for the given context, deriving the selection
+         * mode, multi-selection flag and choose/manage flag from a fixed rule
+         * table keyed on {@code context}.
+         *
+         * @param context     the calling context identifier
+         * @param initialPath the optional initial path to expand
+         */
         public Options(String context, String initialPath) {
             this.context = context;
             this.initialPath = initialPath;
@@ -139,29 +192,68 @@ public final class RemoteFileChooser extends Window /* NOSONAR */ {
         }
     }
 
+    /**
+     * Holds path information for selected files/directories.
+     *
+     * @since 2.5
+     */
     public class PathInfo {
         String path;
         String parent;
         String name;
 
+        /**
+         * Constructs a new PathInfo with explicit path components.
+         *
+         * @param path the full path
+         * @param parent the parent path
+         * @param name the file/directory name
+         */
         public PathInfo(String path, String parent, String name) {
             this.path = path;
             this.parent = parent;
             this.name = name;
         }
 
+        /**
+         * Constructs a new PathInfo from a ListGridRecord.
+         *
+         * @param recrd the record containing path information
+         */
         public PathInfo(Record recrd) {
             this(recrd.getAttribute("Path"), RemoteFileChooser.this.parent, recrd.getAttribute("Name"));
         }
     }
 
+    /**
+     * Callback interface for file selection events.
+     *
+     * @since 2.5
+     */
     public interface CallBack {
+        /**
+         * Invoked once the user has confirmed a selection.
+         *
+         * @param path the selected paths, never {@code null}
+         */
         public void apply(PathInfo[] path);
     }
 
+    /**
+     * Left-hand navigation grid listing the available server-side roots/drives.
+     *
+     * @since 2.5
+     */
     public final class RootList extends ListGrid /* NOSONAR */ {
+        /** Whether the initial path has not yet been applied to a selection. */
         boolean initial = true;
 
+        /**
+         * Builds the root list grid for the given options, wiring up the
+         * selection and data-arrived handlers that drive the detail list.
+         *
+         * @param options the chooser options
+         */
         private RootList(Options options) {
             setID("RemoteFileChooser_RootList_" + options.context);
             setCanSort(false);
@@ -207,13 +299,32 @@ public final class RemoteFileChooser extends Window /* NOSONAR */ {
         }
     }
 
+    /**
+     * Right-hand detail grid listing the entries of the currently selected
+     * directory, with support for editing, deleting, uploading, downloading
+     * and archiving entries depending on the chooser options.
+     *
+     * @since 2.5
+     */
     public class UploadList extends ListGrid /* NOSONAR */ {
+        /** Total number of files in the current upload batch. */
         private int tot;
+        /** Per-file upload progress (0..1) for the current batch. */
         private float[] val;
+        /** The chooser options this list was built with. */
         private final Options options;
+        /** The datasource backing this list. */
         private final DSRemoteFileChooser ds;
+        /** The callback to invoke when a selection is confirmed. */
         private final CallBack cb;
 
+        /**
+         * Builds the upload list grid for the given options, configuring its
+         * datasource, fields, sort order, editing handlers and context menu.
+         *
+         * @param options the chooser options
+         * @param cb      the callback to invoke on confirmed selection
+         */
         public UploadList(Options options, CallBack cb) {
             super();
             this.options = options;
@@ -267,6 +378,11 @@ public final class RemoteFileChooser extends Window /* NOSONAR */ {
             setDataProperties(rs);
         }
 
+        /**
+         * Navigates the list into the directory represented by the given record.
+         *
+         * @param recrd the directory record to enter
+         */
         public void enterDir(ListGridRecord recrd) {
             String path = recrd.getAttribute("Path");
             Map<String, String> params = new HashMap<>();
@@ -277,6 +393,12 @@ public final class RemoteFileChooser extends Window /* NOSONAR */ {
             invalidateCache();
         }
 
+        /**
+         * Formats a byte size into a human-readable string (e.g. {@code "1.5 MB"}).
+         *
+         * @param size the size in bytes
+         * @return a human-readable size string, or {@code "0"} for non-positive input
+         */
         public String readableFileSize(long size) {
             if (size <= 0)
                 return "0";
@@ -285,11 +407,23 @@ public final class RemoteFileChooser extends Window /* NOSONAR */ {
             return NumberFormat.getFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
         }
 
+        /**
+         * Returns the relative path of the currently listed directory.
+         *
+         * @return the current parent-relative path
+         */
         @JsMethod
         public String getParentPath() {
             return parentLab.getContents();
         }
 
+        /**
+         * Reports upload progress for a single file and refreshes the aggregate
+         * progress bar; completes the batch when all files are done.
+         *
+         * @param idx the file index within the current batch
+         * @param val the per-file progress (0..1)
+         */
         @JsMethod
         public void setProgress(int idx, float val) {
             this.val[idx] = val;
@@ -306,6 +440,10 @@ public final class RemoteFileChooser extends Window /* NOSONAR */ {
                 endProgress();
         }
 
+        /**
+         * Ends the current upload batch: hides the progress bar, restores the
+         * close button and refreshes the listing.
+         */
         @JsMethod
         public void endProgress() {
             pbLayout.hide();
@@ -314,6 +452,12 @@ public final class RemoteFileChooser extends Window /* NOSONAR */ {
             invalidateCache();
         }
 
+        /**
+         * Starts a new upload batch of {@code tot} files, resetting state and
+         * showing the progress bar.
+         *
+         * @param tot the number of files in the batch
+         */
         @JsMethod
         public void initProgress(int tot) {
             cancelled = false;
@@ -328,24 +472,47 @@ public final class RemoteFileChooser extends Window /* NOSONAR */ {
             pbLayout.show();
         }
 
+        /** Queue of in-flight upload requests. */
         private final List<JavaScriptObject> activeQueue = new ArrayList<>();
+        /** Maximum number of concurrent uploads. */
         private static final int ACTIVE_MAX = 5;
 
+        /**
+         * Returns the maximum number of concurrent uploads allowed.
+         *
+         * @return the concurrent upload limit
+         */
         @JsMethod
         public int getActiveMax() {
             return ACTIVE_MAX;
         }
 
+        /**
+         * Returns the number of currently in-flight uploads.
+         *
+         * @return the active upload count
+         */
         @JsMethod
         public int getActiveLength() {
             return activeQueue.size();
         }
 
+        /**
+         * Adds an in-flight upload descriptor to the active queue.
+         *
+         * @param data the upload descriptor to enqueue
+         */
         @JsMethod
         public void addActive(JavaScriptObject data) {
             activeQueue.add(data);
         }
 
+        /**
+         * Removes completed uploads from the active queue, optionally aborting
+         * the ones still in progress.
+         *
+         * @param abort {@code true} to abort uploads still in progress
+         */
         @JsMethod
         public void purgeActive(boolean abort) {
             Iterator<JavaScriptObject> it = activeQueue.iterator();
@@ -356,17 +523,39 @@ public final class RemoteFileChooser extends Window /* NOSONAR */ {
             }
         }
 
+        /**
+         * Native helper that optionally aborts the given upload request and
+         * reports whether it is still considered active.
+         *
+         * @param data  the upload descriptor
+         * @param abort {@code true} to abort the underlying XHR
+         * @return {@code true} if the upload is still in progress
+         */
         @JsMethod
         public native boolean stillActive(JavaScriptObject data, boolean abort) /*-{
 			if(abort) data.xhr.abort();
 			return data.status < 3;
 		}-*/;
 
+        /**
+         * Tells whether the current upload batch has been cancelled by the user.
+         *
+         * @return {@code true} if the batch was cancelled
+         */
         @JsMethod
         public boolean isCancelled() {
             return cancelled;
         }
 
+        /**
+         * Native entry point invoked when the user selects files for upload.
+         * <p>
+         * Schedules a timer that progressively starts uploads (up to
+         * {@link #ACTIVE_MAX} concurrently) and updates the progress bar
+         * until all files have been transferred or the batch is cancelled.
+         *
+         * @param files the selected files (File API objects)
+         */
         @JsMethod
         public native void handleFileSelect(JavaScriptObject files) /*-{
 			if(typeof files !== "undefined")
@@ -401,6 +590,14 @@ public final class RemoteFileChooser extends Window /* NOSONAR */ {
 				$wnd.isc.warn("No support for the File API in this web browser");
 		}-*/;
 
+        /**
+         * Native helper that starts the upload of a single file, wiring up the
+         * progress, load, error and abort listeners on the underlying XHR.
+         *
+         * @param i    the file index within the current batch
+         * @param file the File API object to upload
+         * @return the upload descriptor tracking this transfer
+         */
         @JsMethod
         public native JavaScriptObject uploadFile(int i, JavaScriptObject file) /*-{
 			var self = this;
@@ -477,6 +674,13 @@ public final class RemoteFileChooser extends Window /* NOSONAR */ {
 			return data;
 		}-*/;
 
+        /**
+         * Native helper invoked to report the result/progress of an upload,
+         * updating the per-file and aggregate progress accordingly.
+         *
+         * @param data   the upload descriptor
+         * @param loaded the number of bytes transferred so far
+         */
         @JsMethod
         public native void uploadResult(JavaScriptObject data, int loaded) /*-{
 			if(loaded==undefined) loaded=0;
@@ -507,6 +711,12 @@ public final class RemoteFileChooser extends Window /* NOSONAR */ {
 			}
 		}-*/;
 
+        /**
+         * Builds the context menu for the upload list (create dir, edit,
+         * delete, download, archive).
+         *
+         * @return the configured context menu
+         */
         private Menu createContextMenu() {
             var ctxMenu = new Menu();
             var createDirItem = new MenuItem();
@@ -558,12 +768,24 @@ public final class RemoteFileChooser extends Window /* NOSONAR */ {
             return ctxMenu;
         }
 
+        /**
+         * Tells whether the single selected record is a {@code .zip} archive
+         * that can be extracted.
+         *
+         * @return {@code true} if the selection is a single extractable zip
+         */
         private boolean isArchiveFile() {
             if (!options.isChoose && UploadList.this.getSelectedRecords().length == 1)
                 return new CaseInsensitiveString(UploadList.this.getSelectedRecord().getAttribute("Name")).endsWith(".zip");
             return false;
         }
 
+        /**
+         * Handles double-click on a record: enters a directory, or confirms
+         * the selection when a file is double-clicked in choose mode.
+         *
+         * @param event the double-click event
+         */
         private void onRecordDoubleClick(RecordDoubleClickEvent event) {
             ListGridRecord recrd = event.getRecord();
             String relpath = recrd.getAttribute("RelPath");
@@ -577,6 +799,14 @@ public final class RemoteFileChooser extends Window /* NOSONAR */ {
         }
     }
 
+    /**
+     * Constructs and shows the remote file chooser for the given context.
+     *
+     * @param context     the calling context identifier, used to derive the
+     *                    selection rules and window title
+     * @param initialPath the optional initial path to expand, or {@code null}
+     * @param cb          the callback invoked when a selection is confirmed
+     */
     public RemoteFileChooser(String context, String initialPath, CallBack cb) {
         super();
         Client.getChildWindows().remove(this);
@@ -609,7 +839,7 @@ public final class RemoteFileChooser extends Window /* NOSONAR */ {
         final var splitPane = new SplitPane();
         splitPane.setHeight("*");
         splitPane.setNavigationPane(new RootList(options));
-        list = new UploadList(options, cb);
+        list = new UploadList(options, cb); /* NOSONAR */
         splitPane.setDetailPane(list);
         splitPane.setDetailToolButtons(parentLab);
         splitPane.setNavigationPaneWidth(100);
@@ -657,18 +887,22 @@ public final class RemoteFileChooser extends Window /* NOSONAR */ {
         show();
     }
 
+    /**
+     * Builds the click handler for the "Choose" button: validates the current
+     * selection, optionally enters a directory, then dispatches the selected
+     * paths through {@link #processPaths}.
+     *
+     * @param context the calling context identifier
+     * @param cb      the callback to invoke on confirmed selection
+     * @param options the chooser options
+     * @return the click handler
+     */
     private ClickHandler clickChoose(String context, CallBack cb, final Options options) {
         return e -> {
             ListGridRecord[] records = list.getSelectedRecords();
             if (records.length > 0) {
-                if (options.selMode == SelMode.FILE) {
-                    if (records.length == 1) {
-                        if (Boolean.TRUE.equals(records[0].getAttributeAsBoolean(IS_DIR))) {
-                            list.enterDir(records[0]);
-                            return;
-                        }
-                    } else if (Stream.of(records).filter(r -> r.getAttributeAsBoolean(IS_DIR)).count() > 0)
-                        return;
+                if (options.selMode == SelMode.FILE && enterDirIfRequired(records)) {
+                    return;
                 }
                 PathInfo[] pathInfos = Stream.of(records).map(PathInfo::new).toList().toArray(new PathInfo[0]);
                 processPaths(context, cb, pathInfos);
@@ -680,6 +914,34 @@ public final class RemoteFileChooser extends Window /* NOSONAR */ {
         };
     }
 
+    /**
+     * If the selection consists of a single directory, enters it and signals
+     * that the click should not confirm a selection.
+     *
+     * @param records the currently selected records
+     * @return {@code true} if a directory was entered (or the selection is
+     *         mixed) and the choose action should be aborted
+     */
+    private boolean enterDirIfRequired(ListGridRecord[] records) {
+        if (records.length == 1) {
+            if (Boolean.TRUE.equals(records[0].getAttributeAsBoolean(IS_DIR))) {
+                list.enterDir(records[0]);
+                return true;
+            }
+        } else if (Stream.of(records).anyMatch(r -> Boolean.TRUE.equals(r.getAttributeAsBoolean(IS_DIR)))) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Native helper that recursively walks a {@code DataTransferItemList} of
+     * dropped entries (files and directories) and resolves to a flat array of
+     * File objects annotated with their full relative path.
+     *
+     * @param dataTransferItems the drag-and-drop items
+     * @return a JavaScript promise resolving to the collected files
+     */
     @JsMethod(namespace = JsPackage.GLOBAL)
     public static native JavaScriptObject getFilesWebkitDataTransferItems(JavaScriptObject dataTransferItems) /*-{
 		function traverseFileTreePromise(item, path)
@@ -728,6 +990,13 @@ public final class RemoteFileChooser extends Window /* NOSONAR */ {
 		});
 	}-*/;
 
+    /**
+     * Native helper that installs or removes the global drag-and-drop handlers
+     * used to upload files into the chooser.
+     *
+     * @param init {@code true} to install the handlers, {@code false} to remove them
+     * @param id   the event-proxy id of the target drop area
+     */
     private static native void initUpload(boolean init, String id) /*-{
 		if($wnd.File && $wnd.FileReader)
 		{
@@ -825,17 +1094,34 @@ public final class RemoteFileChooser extends Window /* NOSONAR */ {
 		}
 	}-*/;
 
+    /**
+     * Returns the currently active upload list (exposed to native JS code).
+     *
+     * @return the active upload list, or {@code null} if none was created
+     */
     @JsMethod(namespace = JsPackage.GLOBAL)
     public static UploadList getUploadList() {
         return list;
     }
 
+    /**
+     * Removes this window from the client child-window registry when destroyed.
+     */
     @Override
     protected void onDestroy() {
         Client.getChildWindows().remove(this);
         super.onDestroy();
     }
 
+    /**
+     * Persists the selected parent directory for the given context and
+     * dispatches the paths to the appropriate handler (e.g. archive expansion
+     * for {@code addArc}, otherwise the supplied callback).
+     *
+     * @param context the calling context identifier
+     * @param cb      the callback to invoke, or {@code null}
+     * @param paths   the selected paths
+     */
     private void processPaths(String context, CallBack cb, PathInfo[] paths) {
         if (parent != null)
             Q_Global.SetProperty.instantiate().setProperty("dir." + context, parent).send();
@@ -850,6 +1136,13 @@ public final class RemoteFileChooser extends Window /* NOSONAR */ {
         }
     }
 
+    /**
+     * Expands the selected archives on the server and reports the resulting
+     * entries back through the callback.
+     *
+     * @param cb    the callback to invoke with the expanded entries
+     * @param paths the selected archive paths
+     */
     private void addArc(CallBack cb, PathInfo[] paths) {
         final var request = new DSRequest();
         request.setData(Map.of("paths", Stream.of(paths).map(p -> p.path).toArray()));

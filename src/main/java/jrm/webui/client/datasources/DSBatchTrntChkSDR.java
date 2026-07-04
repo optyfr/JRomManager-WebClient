@@ -8,9 +8,20 @@ import com.smartgwt.client.types.DSDataFormat;
 import com.smartgwt.client.types.DSOperationType;
 import com.smartgwt.client.types.DSProtocol;
 
+/**
+ * SmartGWT data source for the batch Torrent Check source-destination-result list.
+ * <p>
+ * Manages the list of source/destination pairs to be checked by the Torrent Check
+ * batch operation, including selection state and result status.
+ *
+ * @since 2.5
+ */
 public final class DSBatchTrntChkSDR extends RestDataSource {
     private static final String BASENAME = "BatchTrntChkSDR";
 
+    /**
+     * Constructs a new batch Torrent Check SDR data source.
+     */
     private DSBatchTrntChkSDR() {
         setID(BASENAME);
         setDataURL("/datasources/" + BASENAME);
@@ -38,6 +49,11 @@ public final class DSBatchTrntChkSDR extends RestDataSource {
                 new DataSourceBooleanField("selected"));
     }
 
+    /**
+     * Returns the singleton instance, creating it if necessary.
+     *
+     * @return the shared {@code DSBatchTrntChkSDR} instance
+     */
     public static DSBatchTrntChkSDR getInstance() {
         if (null == get(BASENAME))
             return new DSBatchTrntChkSDR();

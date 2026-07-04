@@ -9,9 +9,20 @@ import com.smartgwt.client.widgets.layout.LayoutSpacer;
 
 import jrm.webui.client.Client;
 
-public final class ReportLite extends Window implements ReportStatus {
+/**
+ * Lightweight report viewer window for batch operations.
+ *
+ * @since 2.5
+ */
+public final class ReportLite extends Window implements ReportStatus /* NOSONAR */ {
+    /** The report tree displayed in this window. */
     private ReportTree tree;
 
+    /**
+     * Constructs the lightweight report viewer window for the given report source.
+     *
+     * @param src the report source identifier
+     */
     public ReportLite(String src) {
         super();
         Client.getChildWindows().add(this);
@@ -44,14 +55,24 @@ public final class ReportLite extends Window implements ReportStatus {
         show();
     }
 
+    /**
+     * Applies a report filter state to the underlying tree.
+     *
+     * @param name the filter name
+     * @param value the filter value
+     */
     void applyFilter(String name, Boolean value) {
         tree.applyFilter(name, value);
     }
 
+    /** Reloads the report tree by invalidating its cache. */
     void reload() {
         tree.invalidateCache();
     }
 
+    /**
+     * Removes this window from the {@link Client} child-window list on destruction.
+     */
     @Override
     protected void onDestroy() {
         Client.getChildWindows().remove(this);

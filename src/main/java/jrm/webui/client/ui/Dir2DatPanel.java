@@ -14,16 +14,34 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import jrm.webui.client.Client;
 import jrm.webui.client.protocol.Q_Dir2Dat;
 
+/**
+ * SmartGWT panel for the Dir2Dat (directory to DAT) UI.
+ * <p>
+ * Lays out three bordered settings forms side by side and stacked: the options
+ * form (scan flags), the headers form (DAT metadata), and the IO form (source
+ * directory, destination DAT, format and generate action).
+ *
+ * @since 2.5
+ */
 public class Dir2DatPanel extends VLayout //NOSONAR
 {
+	/** CSS border style applied to each settings form. */
 	private static final String BORDER_STYLE = "1px solid WindowFrame";
+	/** Name of the source directory text item. */
 	private static final String TXT_SRC_DIR = "txtSrcDir";
+	/** Name of the destination DAT text item. */
 	private static final String TXT_DST_DAT = "txtDstDat";
 
+	/** The form holding the Dir2Dat scan options. */
 	SettingsForm options;
+	/** The form holding the DAT header metadata fields. */
 	SettingsForm headers;
+	/** The form holding the source directory, destination DAT, format and generate action. */
 	SettingsForm io;
 
+	/**
+	 * Constructs the Dir2Dat panel, building the options, headers and IO forms.
+	 */
 	public Dir2DatPanel() {
 		setLayoutMargin(5);
 		options = buildOptionsForm();
@@ -34,6 +52,12 @@ public class Dir2DatPanel extends VLayout //NOSONAR
 		setMembers(topLayout, io);
 	}
 
+	/**
+	 * Builds the options form hosting the Dir2Dat scan flags (scan subfolders,
+	 * deep scan, add MD5/SHA1, junk folders, etc.).
+	 *
+	 * @return the configured settings form
+	 */
 	private SettingsForm buildOptionsForm() {
 		SettingsForm form = new SettingsForm();
 		form.setMargin(5);
@@ -56,6 +80,13 @@ public class Dir2DatPanel extends VLayout //NOSONAR
 		return form;
 	}
 
+	/**
+	 * Builds the "scan subfolders" checkbox, persisted as a global property.
+	 *
+	 * @param form
+	 *            the owning settings form
+	 * @return the configured checkbox item
+	 */
 	private CheckboxItem buildScanSubfoldersCheckbox(SettingsForm form) {
 		CheckboxItem item = new CheckboxItem("chckbxScanSubfolders");
 		item.setTitle(Client.getSession().getMsg("MainFrame.chckbxScanSubfolders.text"));
@@ -64,6 +95,13 @@ public class Dir2DatPanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the "deep scan" checkbox, persisted as a global property.
+	 *
+	 * @param form
+	 *            the owning settings form
+	 * @return the configured checkbox item
+	 */
 	private CheckboxItem buildDeepScanCheckbox(SettingsForm form) {
 		CheckboxItem item = new CheckboxItem("chckbxDeepScan");
 		item.setTitle(Client.getSession().getMsg("MainFrame.chckbxDeepScanFor.text"));
@@ -72,6 +110,13 @@ public class Dir2DatPanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the "add MD5" checkbox, persisted as a global property.
+	 *
+	 * @param form
+	 *            the owning settings form
+	 * @return the configured checkbox item
+	 */
 	private CheckboxItem buildAddMD5Checkbox(SettingsForm form) {
 		CheckboxItem item = new CheckboxItem("chckbxAddMD5");
 		item.setTitle(Client.getSession().getMsg("MainFrame.chckbxAddMd.text"));
@@ -80,6 +125,13 @@ public class Dir2DatPanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the "add SHA1" checkbox, persisted as a global property.
+	 *
+	 * @param form
+	 *            the owning settings form
+	 * @return the configured checkbox item
+	 */
 	private CheckboxItem buildAddSHA1Checkbox(SettingsForm form) {
 		CheckboxItem item = new CheckboxItem("chckbxAddSHA1");
 		item.setTitle(Client.getSession().getMsg("MainFrame.chckbxAddShamd.text"));
@@ -88,6 +140,13 @@ public class Dir2DatPanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the "junk folders" checkbox, persisted as a global property.
+	 *
+	 * @param form
+	 *            the owning settings form
+	 * @return the configured checkbox item
+	 */
 	private CheckboxItem buildJunkFoldersCheckbox(SettingsForm form) {
 		CheckboxItem item = new CheckboxItem("chckbxJunkFolders");
 		item.setTitle(Client.getSession().getMsg("MainFrame.chckbxJunkSubfolders.text"));
@@ -96,6 +155,13 @@ public class Dir2DatPanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the "do not scan archives" checkbox, persisted as a global property.
+	 *
+	 * @param form
+	 *            the owning settings form
+	 * @return the configured checkbox item
+	 */
 	private CheckboxItem buildDoNotScanArchivesCheckbox(SettingsForm form) {
 		CheckboxItem item = new CheckboxItem("chckbxDoNotScanArchives");
 		item.setTitle(Client.getSession().getMsg("MainFrame.chckbxDoNotScan.text"));
@@ -104,6 +170,13 @@ public class Dir2DatPanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the "match current profile" checkbox, persisted as a global property.
+	 *
+	 * @param form
+	 *            the owning settings form
+	 * @return the configured checkbox item
+	 */
 	private CheckboxItem buildMatchProfileCheckbox(SettingsForm form) {
 		CheckboxItem item = new CheckboxItem("chckbxMatchProfile");
 		item.setTitle(Client.getSession().getMsg("MainFrame.chckbxMatchCurrentProfile.text"));
@@ -112,6 +185,13 @@ public class Dir2DatPanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the "include empty dirs" checkbox, persisted as a global property.
+	 *
+	 * @param form
+	 *            the owning settings form
+	 * @return the configured checkbox item
+	 */
 	private CheckboxItem buildIncludeEmptyDirsCheckbox(SettingsForm form) {
 		CheckboxItem item = new CheckboxItem("chckbxIncludeEmptyDirs");
 		item.setTitle(Client.getSession().getMsg("MainFrame.chckbxIncludeEmptyDirs.text"));
@@ -120,6 +200,12 @@ public class Dir2DatPanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the headers form hosting the DAT metadata fields (name, description,
+	 * version, author, comment, category, date, email, homepage, URL).
+	 *
+	 * @return the configured settings form
+	 */
 	private SettingsForm buildHeadersForm() {
 		SettingsForm form = new SettingsForm();
 		form.setMargin(5);
@@ -144,6 +230,15 @@ public class Dir2DatPanel extends VLayout //NOSONAR
 		return form;
 	}
 
+	/**
+	 * Builds a labeled text field bound to the given message key.
+	 *
+	 * @param name
+	 *            the field name
+	 * @param msgKey
+	 *            the message key used to resolve the field title
+	 * @return the configured text item
+	 */
 	private TextItem buildTextField(String name, String msgKey) {
 		TextItem item = new TextItem(name);
 		item.setTitle(Client.getSession().getMsg(msgKey));
@@ -169,6 +264,12 @@ public class Dir2DatPanel extends VLayout //NOSONAR
 		return form;
 	}
 
+	/**
+	 * Builds the read-only source directory text field, initialized from the
+	 * stored setting.
+	 *
+	 * @return the configured text item
+	 */
 	private TextItem buildSrcDirField() {
 		TextItem item = new TextItem(TXT_SRC_DIR);
 		item.setTitle(Client.getSession().getMsg("MainFrame.lblSrcDir_1.text"));
@@ -179,6 +280,12 @@ public class Dir2DatPanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the source directory browse button, which opens a remote file chooser
+	 * and stores the selected path in the source directory field and setting.
+	 *
+	 * @return the configured button item
+	 */
 	private ButtonItem buildSrcDirBrowseButton() {
 		ButtonItem item = new ButtonItem();
 		item.setStartRow(false);
@@ -193,6 +300,12 @@ public class Dir2DatPanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the "Generate" button which sends a Dir2Dat start request to the
+	 * server with the current options, headers and IO values.
+	 *
+	 * @return the configured button item
+	 */
 	private ButtonItem buildGenerateButton() {
 		ButtonItem item = new ButtonItem();
 		item.setStartRow(false);
@@ -206,6 +319,12 @@ public class Dir2DatPanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the read-only destination DAT text field, initialized from the
+	 * stored setting.
+	 *
+	 * @return the configured text item
+	 */
 	private TextItem buildDstDatField() {
 		TextItem item = new TextItem(TXT_DST_DAT);
 		item.setTitle(Client.getSession().getMsg("MainFrame.lblDstDat.text"));
@@ -216,6 +335,12 @@ public class Dir2DatPanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the destination DAT browse button, which opens a remote file chooser
+	 * and stores the selected path in the destination DAT field and setting.
+	 *
+	 * @return the configured button item
+	 */
 	private ButtonItem buildDstDatBrowseButton() {
 		ButtonItem item = new ButtonItem();
 		item.setStartRow(false);
@@ -229,6 +354,12 @@ public class Dir2DatPanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the DAT format radio group (MAME / DATAFILE / SOFTWARELIST),
+	 * persisted as a global property.
+	 *
+	 * @return the configured radio group item
+	 */
 	private RadioGroupItem buildFormatRadioGroup() {
 		RadioGroupItem item = new RadioGroupItem("rgFormat");
 		item.setTitle(Client.getSession().getMsg("MainFrame.lblFormat.text"));
@@ -245,12 +376,25 @@ public class Dir2DatPanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds a static header item used as a section title within a settings form.
+	 *
+	 * @param title
+	 *            the header title
+	 * @return the configured header item
+	 */
 	private static HeaderItem buildHeaderItem(String title) {
 		HeaderItem item = new HeaderItem();
 		item.setDefaultValue(title);
 		return item;
 	}
 
+	/**
+	 * Builds an invisible spacer item used to add vertical breathing room within a
+	 * settings form.
+	 *
+	 * @return the configured canvas item
+	 */
 	private static CanvasItem buildSpacerItem() {
 		CanvasItem item = new CanvasItem();
 		item.setHeight("*");

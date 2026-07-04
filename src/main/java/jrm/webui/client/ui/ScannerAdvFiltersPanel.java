@@ -2,7 +2,6 @@ package jrm.webui.client.ui;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.gwt.core.client.JsonUtils;
@@ -40,16 +39,43 @@ import jrm.webui.client.protocol.Q_CatVer;
 import jrm.webui.client.protocol.Q_NPlayers;
 import jrm.webui.client.protocol.Q_Profile;
 
-public final class ScannerAdvFiltersPanel extends HLayout {
-    TextItem catver_path;
-    CatVerTree catver_tree;
-    TextItem nplayers_path;
-    NPlayersList nplayers_list;
+/**
+ * Advanced filters panel with category/version and player count filters.
+ *
+ * @since 2.5
+ */
+public final class ScannerAdvFiltersPanel extends HLayout /* NOSONAR */ {
+    /** Record attribute indicating whether a node is selected. */
+    private static final String IS_SELECTED = "isSelected";
+    /** Record attribute indicating whether a node is a folder. */
+    private static final String IS_FOLDER = "isFolder";
+    /** Text item holding the path to the CatVer file. */
+    TextItem catverPath;
+    /** Tree grid displaying the category/version hierarchy. */
+    CatVerTree catverTree;
+    /** Text item holding the path to the NPlayers file. */
+    TextItem nplayersPath;
+    /** List grid displaying the player-count entries. */
+    NPlayersList nplayersList;
 
-    class NPlayersList extends ListGrid {
+    /**
+     * List grid displaying the player-count entries, with selection synchronized to the profile properties.
+     *
+     * @since 2.5
+     */
+    class NPlayersList extends ListGrid /* NOSONAR */ {
+        /** When {@code false} selection changes are not propagated to the server (used while loading data). */
         boolean enableEvents = false;
 
+        /**
+         * REST datasource for the NPlayers list grid.
+         *
+         * @since 2.5
+         */
         class DataSource extends RestDataSource {
+            /**
+             * Constructs the datasource, configuring its ID, URL, format, operation bindings, and fields.
+             */
             DataSource() {
                 setID("NPlayers");
                 setDataURL("/datasources/" + getID());
@@ -63,7 +89,7 @@ public final class ScannerAdvFiltersPanel extends HLayout {
                 dsf.setPrimaryKey(true);
                 dsf.setHidden(true);
                 addField(dsf);
-                dsf = new DataSourceBooleanField("isSelected");
+                dsf = new DataSourceBooleanField(IS_SELECTED);
                 dsf.setHidden(true);
                 addField(dsf);
                 dsf = new DataSourceIntegerField("Cnt");
@@ -72,12 +98,15 @@ public final class ScannerAdvFiltersPanel extends HLayout {
             }
         }
 
+        /**
+         * Constructs the NPlayers list grid, configuring selection, handlers, datasource, and context menu.
+         */
         NPlayersList() {
             setSelectionAppearance(SelectionAppearance.CHECKBOX);
             setShowAllRecords(true);
             setShowSelectedStyle(false);
             setAutoFetchData(true);
-            setSelectionProperty("isSelected");
+            setSelectionProperty(IS_SELECTED);
             setAlternateRecordStyles(false);
             setCanEdit(false);
             setCanRemoveRecords(false);
@@ -91,23 +120,23 @@ public final class ScannerAdvFiltersPanel extends HLayout {
             addDataArrivedHandler(event -> enableEvents = true);
             setDataSource(new DataSource());
             ListGridField field = new ListGridField("Name");
-            field.setCellFormatter((value, record, rowNum, colNum) -> value + " (" + record.getAttribute("Cnt") + ")");
+            field.setCellFormatter((value, recrd, rowNum, colNum) -> value + " (" + recrd.getAttribute("Cnt") + ")");
             setFields(field);
             Menu menu = new Menu();
             MenuItem item = new MenuItem(Client.getSession().getMsg("MainFrame.SelectAll"));
-            item.addClickHandler(event -> nplayers_list.selectAllRecords());
+            item.addClickHandler(event -> nplayersList.selectAllRecords());
             menu.addItem(item);
             item = new MenuItem(Client.getSession().getMsg("MainFrame.SelectNone"));
-            item.addClickHandler(event -> nplayers_list.deselectAllRecords());
+            item.addClickHandler(event -> nplayersList.deselectAllRecords());
             menu.addItem(item);
             item = new MenuItem(Client.getSession().getMsg("MainFrame.InvertSelection"));
             item.addClickHandler(event -> {
-                ListGridRecord[] to_unselect = nplayers_list.getSelectedRecords();
-                List<ListGridRecord> to_unselect_list = Arrays.asList(to_unselect);
-                ListGridRecord[] to_select = Stream.of(nplayers_list.getRecords()).filter(r -> !to_unselect_list.contains(r)).collect(Collectors.toList())
+                ListGridRecord[] toUnselect = nplayersList.getSelectedRecords();
+                List<ListGridRecord> toUnselectList = Arrays.asList(toUnselect);
+                ListGridRecord[] toSelect = Stream.of(nplayersList.getRecords()).filter(r -> !toUnselectList.contains(r)).toList()
                         .toArray(new ListGridRecord[0]);
-                nplayers_list.deselectRecords(to_unselect);
-                nplayers_list.selectRecords(to_select);
+                nplayersList.deselectRecords(toUnselect);
+                nplayersList.selectRecords(toSelect);
             });
             menu.addItem(item);
             item = new MenuItem();
@@ -120,10 +149,24 @@ public final class ScannerAdvFiltersPanel extends HLayout {
         }
     }
 
-    class CatVerTree extends TreeGrid {
+    /**
+     * Tree grid displaying the category/version hierarchy, with cascade selection synchronized to the profile properties.
+     *
+     * @since 2.5
+     */
+    class CatVerTree extends TreeGrid /* NOSONAR */ {
+        /** When {@code false} selection changes are not propagated to the server (used while loading data). */
         boolean enableEvents = false;
 
+        /**
+         * REST datasource for the CatVer tree grid.
+         *
+         * @since 2.5
+         */
         class DataSource extends RestDataSource {
+            /**
+             * Constructs the datasource, configuring its ID, URL, format, operation bindings, and fields.
+             */
             DataSource() {
                 setID("CatVer");
                 setDataURL("/datasources/" + getID());
@@ -144,10 +187,10 @@ public final class ScannerAdvFiltersPanel extends HLayout {
                 dsf = new DataSourceBooleanField("isOpen");
                 dsf.setHidden(true);
                 addField(dsf);
-                dsf = new DataSourceBooleanField("isSelected");
+                dsf = new DataSourceBooleanField(IS_SELECTED);
                 dsf.setHidden(true);
                 addField(dsf);
-                dsf = new DataSourceBooleanField("isFolder");
+                dsf = new DataSourceBooleanField(IS_FOLDER);
                 dsf.setHidden(true);
                 addField(dsf);
                 dsf = new DataSourceIntegerField("Cnt");
@@ -156,6 +199,32 @@ public final class ScannerAdvFiltersPanel extends HLayout {
             }
         }
 
+        /**
+         * Formats a category/version cell, appending the count of selected descendant leaves for folder nodes.
+         *
+         * @param value the cell value
+         * @param recrd the list grid record
+         * @return the formatted cell text
+         */
+        private String formatCatVerCell(Object value, ListGridRecord recrd) {
+            TreeNode node = Tree.nodeForRecord(recrd);
+            if (Boolean.TRUE.equals(node.getAttributeAsBoolean(IS_FOLDER))) {
+                TreeNode[] children = getData().getDescendantLeaves(node);
+                if (children != null) {
+                    int count = 0;
+                    for (TreeNode child : children) {
+                        if (Boolean.TRUE.equals(isSelected(child)))
+                            count += Integer.parseInt(child.getAttribute("Cnt"));
+                    }
+                    return value + " (" + count + ")";
+                }
+            }
+            return value + " (" + recrd.getAttribute("Cnt") + ")";
+        }
+
+        /**
+         * Constructs the CatVer tree grid, configuring selection, handlers, datasource, and context menu.
+         */
         CatVerTree() {
             setShowAllRecords(true);
             setSelectionAppearance(SelectionAppearance.CHECKBOX);
@@ -167,7 +236,6 @@ public final class ScannerAdvFiltersPanel extends HLayout {
             setCanEdit(false);
             setCanRemoveRecords(false);
             setAutoFetchData(true);
-            // setCellHeight(16);
             Tree tree = new Tree();
             tree.setModelType(TreeModelType.PARENT);
             tree.setRootValue(1);
@@ -175,9 +243,9 @@ public final class ScannerAdvFiltersPanel extends HLayout {
             tree.setIdField("ID");
             tree.setParentIdField("ParentID");
             tree.setOpenProperty("isOpen");
-            tree.setIsFolderProperty("isFolder");
+            tree.setIsFolderProperty(IS_FOLDER);
             setDataProperties(tree);
-            setSelectionProperty("isSelected");
+            setSelectionProperty(IS_SELECTED);
             setTreeFieldTitle(Client.getSession().getMsg("MainFrame.Categories"));
             setNodeIcon(null);
             setFolderIcon(null);
@@ -195,21 +263,7 @@ public final class ScannerAdvFiltersPanel extends HLayout {
             });
             setDataSource(new DataSource());
             TreeGridField field = new TreeGridField("Name");
-            field.setCellFormatter((value, record, rowNum, colNum) -> {
-                TreeNode node = Tree.nodeForRecord(record);
-                if (node.getAttributeAsBoolean("isFolder")) {
-                    TreeNode[] children = getData().getDescendantLeaves(node);
-                    if (children != null) {
-                        int count = 0;
-                        for (TreeNode child : children) {
-                            if (isSelected(child))
-                                count += Integer.parseInt(child.getAttribute("Cnt"));
-                        }
-                        return value + " (" + count + ")";
-                    }
-                }
-                return value + " (" + record.getAttribute("Cnt") + ")";
-            });
+            field.setCellFormatter((value, recrd, rowNum, colNum) -> formatCatVerCell(value, recrd));
             setFields(field);
             Menu menu = new Menu();
             MenuItem mnitem = new MenuItem();
@@ -217,11 +271,11 @@ public final class ScannerAdvFiltersPanel extends HLayout {
             Menu smenu = new Menu();
             MenuItem smnitem = new MenuItem();
             smnitem.setTitle(Client.getSession().getMsg("MainFrame.All"));
-            smnitem.addClickHandler(event -> catver_tree.selectAllRecords());
+            smnitem.addClickHandler(event -> catverTree.selectAllRecords());
             smenu.addItem(smnitem);
             smnitem = new MenuItem();
             smnitem.setTitle(Client.getSession().getMsg("MainFrame.Mature"));
-            smnitem.addClickHandler(event -> catver_tree.selectRecords(catver_tree.getData().findAll(new AdvancedCriteria("Name", OperatorId.ENDS_WITH, "* Mature *"))));
+            smnitem.addClickHandler(event -> catverTree.selectRecords(catverTree.getData().findAll(new AdvancedCriteria("Name", OperatorId.ENDS_WITH, "* Mature *"))));
             smenu.addItem(smnitem);
             mnitem.setSubmenu(smenu);
             menu.addItem(mnitem);
@@ -230,11 +284,11 @@ public final class ScannerAdvFiltersPanel extends HLayout {
             smenu = new Menu();
             smnitem = new MenuItem();
             smnitem.setTitle(Client.getSession().getMsg("MainFrame.All"));
-            smnitem.addClickHandler(event -> catver_tree.deselectAllRecords());
+            smnitem.addClickHandler(event -> catverTree.deselectAllRecords());
             smenu.addItem(smnitem);
             smnitem = new MenuItem();
             smnitem.setTitle(Client.getSession().getMsg("MainFrame.Mature"));
-            smnitem.addClickHandler(event -> catver_tree.deselectRecords(catver_tree.getData().findAll(new AdvancedCriteria("Name", OperatorId.ENDS_WITH, "* Mature *"))));
+            smnitem.addClickHandler(event -> catverTree.deselectRecords(catverTree.getData().findAll(new AdvancedCriteria("Name", OperatorId.ENDS_WITH, "* Mature *"))));
             smenu.addItem(smnitem);
             mnitem.setSubmenu(smenu);
             menu.addItem(mnitem);
@@ -248,48 +302,53 @@ public final class ScannerAdvFiltersPanel extends HLayout {
         }
     }
 
+    /**
+     * Constructs the advanced filters panel, building the NPlayers and CatVer layouts side by side.
+     */
     public ScannerAdvFiltersPanel() {
         super();
-        VLayout nplayers_layout = new VLayout();
-        nplayers_layout.setShowResizeBar(true);
-        DynamicForm nplayers_form = new DynamicForm();
-        nplayers_form.setCellPadding(0);
-        nplayers_form.setNumCols(2);
-        nplayers_form.setColWidths("*", 26);
-        nplayers_path = new TextItem();
-        nplayers_path.setShowTitle(false);
-        nplayers_path.setWidth("*");
-        nplayers_path.setCanEdit(false);
-        ButtonItem nplayers_frbt = new ButtonItem();
-        nplayers_frbt.setStartRow(false);
-        nplayers_frbt.setIcon("icons/disk.png");
-        nplayers_frbt.setTitle(null);
-        nplayers_frbt.setValueIconRightPadding(0);
-        nplayers_frbt.setEndRow(false);
-        nplayers_frbt.addClickHandler(
+        VLayout nplayersLayout = new VLayout();
+        nplayersLayout.setShowResizeBar(true);
+        DynamicForm nplayersForm = new DynamicForm();
+        nplayersForm.setCellPadding(0);
+        nplayersForm.setNumCols(2);
+        nplayersForm.setColWidths("*", 26);
+        nplayersPath = new TextItem();
+        nplayersPath.setShowTitle(false);
+        nplayersPath.setWidth("*");
+        nplayersPath.setCanEdit(false);
+        ButtonItem nplayersFrbt = new ButtonItem();
+        nplayersFrbt.setStartRow(false);
+        nplayersFrbt.setIcon("icons/disk.png");
+        nplayersFrbt.setTitle(null);
+        nplayersFrbt.setValueIconRightPadding(0);
+        nplayersFrbt.setEndRow(false);
+        nplayersFrbt.addClickHandler(
                 event -> new RemoteFileChooser("NPlayers", null, path -> Client.sendMsg(JsonUtils.stringify(Q_NPlayers.Load.instantiate().setPath(path[0].path)))));
-        nplayers_form.setItems(nplayers_path, nplayers_frbt);
-        nplayers_layout.setMembers(nplayers_form, nplayers_list = new NPlayersList());
-        VLayout catver_layout = new VLayout();
-        DynamicForm catver_form = new DynamicForm();
-        catver_form.setWidth100();
-        catver_form.setCellPadding(0);
-        catver_form.setNumCols(2);
-        catver_form.setColWidths("*", 26);
-        catver_path = new TextItem();
-        catver_path.setShowTitle(false);
-        catver_path.setWidth("*");
-        catver_path.setCanEdit(false);
-        ButtonItem catver_frbt = new ButtonItem();
-        catver_frbt.setStartRow(false);
-        catver_frbt.setIcon("icons/disk.png");
-        catver_frbt.setTitle(null);
-        catver_frbt.setValueIconRightPadding(0);
-        catver_frbt.setEndRow(false);
-        catver_frbt.addClickHandler(event -> new RemoteFileChooser("CatVer", null, path -> Client.sendMsg(JsonUtils.stringify(Q_CatVer.Load.instantiate().setPath(path[0].path)))));
-        catver_form.setItems(catver_path, catver_frbt);
-        catver_layout.setMembers(catver_form, catver_tree = new CatVerTree());
-        setMembers(nplayers_layout, catver_layout);
+        nplayersForm.setItems(nplayersPath, nplayersFrbt);
+        nplayersList = new NPlayersList();
+        nplayersLayout.setMembers(nplayersForm, nplayersList);
+        VLayout catverLayout = new VLayout();
+        DynamicForm catverForm = new DynamicForm();
+        catverForm.setWidth100();
+        catverForm.setCellPadding(0);
+        catverForm.setNumCols(2);
+        catverForm.setColWidths("*", 26);
+        catverPath = new TextItem();
+        catverPath.setShowTitle(false);
+        catverPath.setWidth("*");
+        catverPath.setCanEdit(false);
+        ButtonItem catverFrbt = new ButtonItem();
+        catverFrbt.setStartRow(false);
+        catverFrbt.setIcon("icons/disk.png");
+        catverFrbt.setTitle(null);
+        catverFrbt.setValueIconRightPadding(0);
+        catverFrbt.setEndRow(false);
+        catverFrbt.addClickHandler(event -> new RemoteFileChooser("CatVer", null, path -> Client.sendMsg(JsonUtils.stringify(Q_CatVer.Load.instantiate().setPath(path[0].path)))));
+        catverForm.setItems(catverPath, catverFrbt);
+        catverTree = new CatVerTree();
+        catverLayout.setMembers(catverForm, catverTree);
+        setMembers(nplayersLayout, catverLayout);
     }
 
 }

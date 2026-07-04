@@ -34,32 +34,67 @@ import jrm.webui.client.Client;
 import jrm.webui.client.protocol.Q_Profile;
 import jrm.webui.client.ui.RemoteFileChooser.PathInfo;
 
+/**
+ * Profile management panel showing a tree of profile folders on the left and the
+ * list of profiles contained in the selected folder on the right.
+ * <p>
+ * Provides context menus and toolbar buttons to import DAT files, import from
+ * MAME, create/delete/rename profiles, drop caches, and create/delete profile
+ * folders.
+ *
+ * @since 2.5
+ */
 public class ProfilePanel extends VLayout //NOSONAR
 {
+	/** Record attribute holding the parent folder path of a profile. */
 	private static final String PARENT = "Parent";
+	/** Record attribute holding the parent identifier of a tree node. */
 	private static final String PARENT_ID = "ParentID";
+	/** Record attribute/field holding the display title of a tree node. */
 	private static final String TITLE = "title";
+	/** Record attribute holding the filesystem path of a tree node. */
 	private static final String PATH = "Path";
+	/** Record attribute holding the unique identifier of a tree node. */
 	private static final String ID = "ID";
+	/** URL prefix for datasource REST endpoints. */
 	private static final String POST_XML_SUFFIX = "/datasources/";
+	/** Icon for the "create folder" menu item. */
 	private static final String ICON_FOLDER_ADD = "icons/folder_add.png";
+	/** Icon for the "delete folder" menu item. */
 	private static final String ICON_FOLDER_DELETE = "icons/folder_delete.png";
+	/** Icon for the "manage uploads" button. */
 	private static final String ICON_PAGE_ADD = "icons/page_add.png";
+	/** Icon for the "import DAT" action. */
 	private static final String ICON_SCRIPT_GO = "icons/script_go.png";
+	/** Icon for the "delete profile" menu item. */
 	private static final String ICON_SCRIPT_DELETE = "icons/script_delete.png";
+	/** Icon for the "rename profile" menu item. */
 	private static final String ICON_SCRIPT_EDIT = "icons/script_edit.png";
+	/** Icon for the "drop cache" menu item. */
 	private static final String ICON_BIN = "icons/bin.png";
+	/** Icon for the "import from MAME" button. */
 	private static final String ICON_APP_GO = "icons/application_go.png";
 
+	/** The list grid displaying profiles contained in the selected tree folder. */
 	ListGrid listgrid;
+	/** The tree grid displaying the profile folder hierarchy. */
 	TreeGrid treegrid;
+	/** The currently selected parent path, updated from the list datasource response. */
 	String parentPath;
 
+	/**
+	 * Constructs the profile panel and adds the split pane containing the tree and list grids.
+	 */
 	public ProfilePanel() {
 		super();
 		addMembers(buildSplitPane());
 	}
 
+	/**
+	 * Builds the split pane with the profile folder tree as navigation pane and the profile list as detail pane.
+	 *
+	 * @return the configured split pane
+	 */
 	private SplitPane buildSplitPane() {
 		SplitPane splitPane = new SplitPane();
 		listgrid = buildListGrid();
@@ -76,6 +111,11 @@ public class ProfilePanel extends VLayout //NOSONAR
 		return splitPane;
 	}
 
+	/**
+	 * Builds the profile list grid with its hover behavior, double-click handler, context menu, and datasource.
+	 *
+	 * @return the configured list grid
+	 */
 	private ListGrid buildListGrid() {
 		ListGrid grid = new ListGrid();
 		grid.setShowFilterEditor(false);
@@ -89,6 +129,11 @@ public class ProfilePanel extends VLayout //NOSONAR
 		return grid;
 	}
 
+	/**
+	 * Loads the profile corresponding to the double-clicked list record.
+	 *
+	 * @param event the record double-click event
+	 */
 	private void loadProfile(RecordDoubleClickEvent event) {
 		Record rec = event.getRecord();
 		Q_Profile.Load.instantiate()
@@ -96,6 +141,13 @@ public class ProfilePanel extends VLayout //NOSONAR
 				.send();
 	}
 
+	/**
+	 * Builds the REST datasource backing the profile list grid, defining its fields and operation bindings.
+	 * <p>
+	 * The datasource extracts the parent path from each fetch response and stores it in {@link #parentPath}.
+	 *
+	 * @return the configured REST datasource
+	 */
 	private RestDataSource buildListDataSource() {
 		RestDataSource ds = new RestDataSource() {
 			@Override
@@ -134,6 +186,11 @@ public class ProfilePanel extends VLayout //NOSONAR
 		return ds;
 	}
 
+	/**
+	 * Builds the profile folder tree grid with its hover behavior, context menu, data-arrival and record-click handlers, and datasource.
+	 *
+	 * @return the configured tree grid
+	 */
 	private TreeGrid buildTreeGrid() {
 		TreeGrid tree = new TreeGrid();
 		tree.setShowRoot(true);
@@ -154,6 +211,11 @@ public class ProfilePanel extends VLayout //NOSONAR
 		return tree;
 	}
 
+	/**
+	 * Selects the first tree node when data arrives and refreshes the list grid accordingly.
+	 *
+	 * @param event the data-arrived event (unused)
+	 */
 	private void onTreeDataArrived(@SuppressWarnings("unused") DataArrivedEvent event) //NOSONAR
 	{
 		treegrid.selectSingleRecord(0);
@@ -165,11 +227,21 @@ public class ProfilePanel extends VLayout //NOSONAR
 		}
 	}
 
+	/**
+	 * Updates the list grid criteria to show profiles contained in the clicked tree node's path.
+	 *
+	 * @param event the record-click event
+	 */
 	private void onTreeRecordClick(com.smartgwt.client.widgets.grid.events.RecordClickEvent event) {
 		listgrid.setCriteria(createPathCriteria(event.getRecord().getAttribute(PATH)));
 		listgrid.invalidateCache();
 	}
 
+	/**
+	 * Builds the REST datasource backing the profile folder tree grid, defining its fields and operation bindings.
+	 *
+	 * @return the configured REST datasource
+	 */
 	private RestDataSource buildTreeDataSource() {
 		RestDataSource ds = new RestDataSource();
 		ds.setID("profilesTree");
@@ -194,6 +266,11 @@ public class ProfilePanel extends VLayout //NOSONAR
 		return ds;
 	}
 
+	/**
+	 * Builds the title field for the tree grid, with a hover customizer displaying the node title.
+	 *
+	 * @return the configured list grid field
+	 */
 	private ListGridField buildTitleField() {
 		ListGridField field = new ListGridField(TITLE);
 		field.setHoverCustomizer(new HoverCustomizer() {
@@ -205,6 +282,12 @@ public class ProfilePanel extends VLayout //NOSONAR
 		return field;
 	}
 
+	/**
+	 * Creates a {@link Criteria} filtering the list grid by the given parent path.
+	 *
+	 * @param path the parent folder path, or {@code null} for no criteria
+	 * @return the criteria, or {@code null} if {@code path} is {@code null}
+	 */
 	private static Criteria createPathCriteria(String path) {
 		if (path == null) {
 			return null;
@@ -214,6 +297,14 @@ public class ProfilePanel extends VLayout //NOSONAR
 		return criteria;
 	}
 
+	/**
+	 * Creates a record describing a source file to import into a parent profile folder.
+	 *
+	 * @param src the source identifier (e.g. {@code "importDat"})
+	 * @param parentValue the parent folder path
+	 * @param file the file name
+	 * @return the configured record
+	 */
 	private static Record createSrcParentFileRecord(String src, String parentValue, String file) {
 		Record rec = new Record();
 		rec.setAttribute("Src", src);
@@ -222,6 +313,12 @@ public class ProfilePanel extends VLayout //NOSONAR
 		return rec;
 	}
 
+	/**
+	 * Creates an operation binding for a REST datasource using the POSTXML protocol.
+	 *
+	 * @param type the datasource operation type
+	 * @return the configured operation binding
+	 */
 	private static OperationBinding createOperationBinding(DSOperationType type) {
 		OperationBinding binding = new OperationBinding();
 		binding.setOperationType(type);
@@ -229,6 +326,11 @@ public class ProfilePanel extends VLayout //NOSONAR
 		return binding;
 	}
 
+	/**
+	 * Builds the context menu for the profile list grid.
+	 *
+	 * @return the configured menu
+	 */
 	private Menu buildListContextMenu() {
 		Menu menu = new Menu();
 		menu.setItems(
@@ -240,6 +342,11 @@ public class ProfilePanel extends VLayout //NOSONAR
 		return menu;
 	}
 
+	/**
+	 * Builds the "Import DAT" menu item, opening a remote file chooser to select DAT files to import.
+	 *
+	 * @return the configured menu item
+	 */
 	private MenuItem buildImportDatMenuItem() {
 		MenuItem item = new MenuItem();
 		item.setTitle(Client.getSession().getMsg("MainFrame.btnImportDat.text"));
@@ -252,12 +359,22 @@ public class ProfilePanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds a separator menu item.
+	 *
+	 * @return the configured separator menu item
+	 */
 	private MenuItem buildSeparatorMenuItem() {
 		MenuItem item = new MenuItem();
 		item.setIsSeparator(true);
 		return item;
 	}
 
+	/**
+	 * Builds the "Delete profile" menu item, removing the selected profiles from the list grid.
+	 *
+	 * @return the configured menu item
+	 */
 	private MenuItem buildDeleteProfileMenuItem() {
 		MenuItem item = new MenuItem();
 		item.setTitle(Client.getSession().getMsg("MainFrame.mntmDeleteProfile.text"));
@@ -267,6 +384,11 @@ public class ProfilePanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the "Rename profile" menu item, starting inline editing of the selected profile.
+	 *
+	 * @return the configured menu item
+	 */
 	private MenuItem buildRenameProfileMenuItem() {
 		MenuItem item = new MenuItem();
 		item.setTitle(Client.getSession().getMsg("MainFrame.mntmRenameProfile.text"));
@@ -276,6 +398,11 @@ public class ProfilePanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the "Drop cache" menu item, triggering a custom datasource operation to drop the cache of the selected profile.
+	 *
+	 * @return the configured menu item
+	 */
 	private MenuItem buildDropCacheMenuItem() {
 		MenuItem item = new MenuItem();
 		item.setTitle(Client.getSession().getMsg("MainFrame.mntmDropCache.text"));
@@ -285,12 +412,22 @@ public class ProfilePanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the context menu for the profile folder tree grid.
+	 *
+	 * @return the configured menu
+	 */
 	private Menu buildTreeContextMenu() {
 		Menu menu = new Menu();
 		menu.setItems(buildCreateFolderMenuItem(), buildDeleteFolderMenuItem());
 		return menu;
 	}
 
+	/**
+	 * Builds the "Create folder" menu item, adding a new folder node under the selected tree node.
+	 *
+	 * @return the configured menu item
+	 */
 	private MenuItem buildCreateFolderMenuItem() {
 		MenuItem item = new MenuItem();
 		item.setTitle(Client.getSession().getMsg("MainFrame.mntmCreateFolder.text"));
@@ -308,6 +445,11 @@ public class ProfilePanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the "Delete folder" menu item, removing the selected tree node and refreshing the list grid.
+	 *
+	 * @return the configured menu item
+	 */
 	private MenuItem buildDeleteFolderMenuItem() {
 		MenuItem item = new MenuItem();
 		item.setTitle(Client.getSession().getMsg("MainFrame.mntmDeleteFolder.text"));
@@ -328,6 +470,11 @@ public class ProfilePanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the "Manage files uploads" button, opening a remote file chooser for upload management.
+	 *
+	 * @return the configured button
+	 */
 	private IButton buildManageUploadsButton() {
 		IButton button = new IButton("Manage files uploads");
 		button.setAutoFit(true);
@@ -336,6 +483,11 @@ public class ProfilePanel extends VLayout //NOSONAR
 		return button;
 	}
 
+	/**
+	 * Builds the "Import DAT" toolbar button, opening a remote file chooser and selecting each imported record.
+	 *
+	 * @return the configured button
+	 */
 	private IButton buildImportDatButton() {
 		IButton button = new IButton(Client.getSession().getMsg("MainFrame.btnImportDat.text"));
 		button.setAutoFit(true);
@@ -349,6 +501,11 @@ public class ProfilePanel extends VLayout //NOSONAR
 		return button;
 	}
 
+	/**
+	 * Builds the "Import from MAME" menu button, offering import with or without software lists.
+	 *
+	 * @return the configured menu button
+	 */
 	private IMenuButton buildImportMameButton() {
 		MenuItem withoutSL = new MenuItem();
 		withoutSL.setTitle("without Software list");
@@ -369,6 +526,9 @@ public class ProfilePanel extends VLayout //NOSONAR
 		return button;
 	}
 
+	/**
+	 * Refreshes the profile list grid while preserving the current selection state.
+	 */
 	void refreshListGrid() {
 		String selection = listgrid.getSelectedState();
 		listgrid.refreshData((dsResponse, data, dsRequest) -> listgrid.setSelectedState(selection));

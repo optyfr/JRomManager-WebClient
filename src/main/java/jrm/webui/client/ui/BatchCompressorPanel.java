@@ -21,16 +21,33 @@ import jrm.webui.client.protocol.Q_Compressor;
 import jrm.webui.client.protocol.Q_Global;
 import jrm.webui.client.ui.RemoteFileChooser.PathInfo;
 
+/**
+ * SmartGWT panel for the batch compressor UI.
+ * <p>
+ * Displays a list grid of archives to (re)compress and a control form offering
+ * the output format, a force flag, a clear action, and a start action. Archives
+ * can be added or removed via the grid's context menu.
+ *
+ * @since 2.5
+ */
 public class BatchCompressorPanel extends VLayout //NOSONAR
 {
 
+	/** Name of the grid column holding the archive file path. */
 	private static final String FILE = "file";
+	/** Name of the grid column holding the operation result. */
 	private static final String RESULT = "result";
+	/** Icon path for the clear (trash bin) action. */
 	private static final String ICON_BIN = "icons/bin.png";
+	/** Icon path for the start (go) action. */
 	private static final String ICON_BULLET_GO = "icons/bullet_go.png";
 
+	/** The grid listing the archives selected for batch compression. */
 	ListGrid fr;
 
+	/**
+	 * Constructs the batch compressor panel, building its grid and control form.
+	 */
 	public BatchCompressorPanel() {
 		setHeight100();
 		fr = buildGrid();
@@ -38,6 +55,11 @@ public class BatchCompressorPanel extends VLayout //NOSONAR
 		addMember(buildForm());
 	}
 
+	/**
+	 * Builds the control form hosting the format, force, clear and start items.
+	 *
+	 * @return the configured dynamic form
+	 */
 	private DynamicForm buildForm() {
 		DynamicForm form = new DynamicForm();
 		form.setWidth100();
@@ -53,6 +75,13 @@ public class BatchCompressorPanel extends VLayout //NOSONAR
 		return form;
 	}
 
+	/**
+	 * Builds the archive format selector (ZIP / TZIP / SEVENZIP).
+	 * <p>
+	 * Persists the chosen value on the server through a global property update.
+	 *
+	 * @return the configured select item
+	 */
 	private SelectItem buildFormatItem() {
 		SelectItem format = new SelectItem();
 		format.setValueMap("ZIP", "TZIP", "SEVENZIP");
@@ -64,6 +93,13 @@ public class BatchCompressorPanel extends VLayout //NOSONAR
 		return format;
 	}
 
+	/**
+	 * Builds the "force compression" checkbox.
+	 * <p>
+	 * Persists the chosen value on the server through a global property update.
+	 *
+	 * @return the configured checkbox item
+	 */
 	private CheckboxItem buildForceItem() {
 		CheckboxItem force = new CheckboxItem("force");
 		force.setTitle(Client.getSession().getMsg("BatchCompressorPanel.Force")); //$NON-NLS-1$
@@ -75,6 +111,11 @@ public class BatchCompressorPanel extends VLayout //NOSONAR
 		return force;
 	}
 
+	/**
+	 * Builds the "clear" button which removes all entries from the grid.
+	 *
+	 * @return the configured button item
+	 */
 	private ButtonItem buildClearButton() {
 		ButtonItem clear = new ButtonItem();
 		clear.setTitle(Client.getSession().getMsg("BatchCompressorPanel.Clear")); //$NON-NLS-1$
@@ -88,6 +129,11 @@ public class BatchCompressorPanel extends VLayout //NOSONAR
 		return clear;
 	}
 
+	/**
+	 * Builds the "start" button which triggers the batch compression on the server.
+	 *
+	 * @return the configured button item
+	 */
 	private ButtonItem buildStartButton() {
 		ButtonItem start = new ButtonItem();
 		start.setTitle(Client.getSession().getMsg("BatchCompressorPanel.Start")); //$NON-NLS-1$
@@ -99,6 +145,11 @@ public class BatchCompressorPanel extends VLayout //NOSONAR
 		return start;
 	}
 
+	/**
+	 * Builds the archives/results grid with its context menu and data source.
+	 *
+	 * @return the configured list grid
+	 */
 	private ListGrid buildGrid() {
 		ListGrid grid = new ListGrid();
 		grid.setHeight100();
@@ -120,6 +171,11 @@ public class BatchCompressorPanel extends VLayout //NOSONAR
 		return grid;
 	}
 
+	/**
+	 * Builds the context menu of the grid, offering add and delete actions.
+	 *
+	 * @return the configured menu
+	 */
 	private Menu buildGridContextMenu() {
 		Menu menu = new Menu();
 		menu.addItem(buildAddMenuItem());
@@ -127,6 +183,11 @@ public class BatchCompressorPanel extends VLayout //NOSONAR
 		return menu;
 	}
 
+	/**
+	 * Builds the "add archive" menu item which opens a remote file chooser.
+	 *
+	 * @return the configured menu item
+	 */
 	private MenuItem buildAddMenuItem() {
 		MenuItem add = new MenuItem();
 		add.setTitle(Client.getSession().getMsg("BatchCompressorPanel.AddArchive")); //$NON-NLS-1$
@@ -143,6 +204,11 @@ public class BatchCompressorPanel extends VLayout //NOSONAR
 		return add;
 	}
 
+	/**
+	 * Builds the "delete selection" menu item, enabled only when rows are selected.
+	 *
+	 * @return the configured menu item
+	 */
 	private MenuItem buildDeleteMenuItem() {
 		MenuItem delete = new MenuItem();
 		delete.setTitle(Client.getSession().getMsg("BatchCompressorPanel.DeleteSelection")); //$NON-NLS-1$
@@ -151,6 +217,16 @@ public class BatchCompressorPanel extends VLayout //NOSONAR
 		return delete;
 	}
 
+	/**
+	 * Indicates whether some other object is equal to this panel.
+	 * <p>
+	 * Delegates to the super implementation only when the other object is also a
+	 * {@link BatchCompressorPanel}; otherwise returns {@code false}.
+	 *
+	 * @param obj
+	 *            the reference object with which to compare
+	 * @return {@code true} if the other object is the same panel instance, {@code false} otherwise
+	 */
 	@Override
 	public boolean equals(Object obj) {
         if(obj instanceof BatchCompressorPanel)
@@ -158,6 +234,11 @@ public class BatchCompressorPanel extends VLayout //NOSONAR
 		return false;
 	}
 
+	/**
+	 * Returns the hash code for this panel, delegating to the super implementation.
+	 *
+	 * @return the hash code value
+	 */
 	@Override
 	public int hashCode() {
 		return super.hashCode();

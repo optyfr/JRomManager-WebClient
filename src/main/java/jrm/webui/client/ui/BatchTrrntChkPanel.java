@@ -33,29 +33,60 @@ import jrm.webui.client.protocol.Q_TrntChk;
 import jrm.webui.client.ui.RemoteFileChooser.CallBack;
 import jrm.webui.client.ui.RemoteFileChooser.PathInfo;
 
+/**
+ * SmartGWT panel for the batch torrent checker UI.
+ * <p>
+ * Shows an SDR (source torrent / destination dir / result) grid with expandable
+ * per-row detail tree grids, and a bottom form offering the check mode
+ * (filename / filesize / SHA1), archived-folder detection, removal of unknown
+ * files and wrong-sized files, and a start button.
+ *
+ * @since 2.5
+ */
 public class BatchTrrntChkPanel extends VLayout //NOSONAR
 {
 
+	/** Settings key for the torrent check mode. */
 	private static final String TRNTCHK_MODE = "trntchk.mode";
+	/** Value for the filename-only check mode. */
 	private static final String FILENAME = "FILENAME";
+	/** Name of the column holding the source torrent path. */
 	private static final String SRC = "src";
+	/** Name of the column holding the destination directory path. */
 	private static final String DST = "dst";
+	/** Name of the column holding the operation result. */
 	private static final String RESULT = "result";
+	/** Name of the column holding the selection flag. */
 	private static final String SELECTED = "selected";
+	/** Name of the detail tree column holding the entry status. */
 	private static final String STATUS = "status";
+	/** Name of the detail tree column holding the entry title. */
 	private static final String TITLE = "title";
+	/** Name of the detail tree column holding the entry length. */
 	private static final String LENGTH = "length";
+	/** Extra-data key used to toggle display of OK entries. */
 	private static final String SHOW_OK = "showOK";
+	/** Status value for an OK entry. */
 	private static final String STATUS_OK = "OK";
+	/** Status value for a size-mismatch entry. */
 	private static final String STATUS_SIZE = "SIZE";
+	/** Status value for a SHA1-mismatch entry. */
 	private static final String STATUS_SHA1 = "SHA1";
+	/** Status value for a missing entry. */
 	private static final String STATUS_MISSING = "MISSING";
+	/** Status value for a skipped entry. */
 	private static final String STATUS_SKIPPED = "SKIPPED";
+	/** Status value for an unknown entry. */
 	private static final String STATUS_UNKNOWN = "UNKNWON";
+	/** Icon path for the start action. */
 	private static final String ICON_BULLET_GO = "icons/bullet_go.png";
 
+	/** The SDR (source torrent / destination dir / result) grid. */
 	ListGrid sdr;
 
+	/**
+	 * Constructs the panel, building the SDR grid and the bottom control form.
+	 */
 	public BatchTrrntChkPanel() {
 		setHeight100();
 		sdr = buildSdrGrid();
@@ -63,6 +94,11 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		addMember(buildBottomForm());
 	}
 
+	/**
+	 * Builds the SDR grid with its fields, context menu, and expandable rows.
+	 *
+	 * @return the configured list grid
+	 */
 	private ListGrid buildSdrGrid() {
 		ListGrid grid = new ListGrid() //NOSONAR
         {
@@ -92,6 +128,7 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		return grid;
 	}
 
+	/** Builds the SDR "src" column field. */
 	private ListGridField buildSrcField() {
 		ListGridField field = new ListGridField(SRC, Client.getSession().getMsg("MainFrame.TorrentFiles"));
 		field.setWidth("35%");
@@ -99,12 +136,14 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		return field;
 	}
 
+	/** Builds the SDR "dst" column field. */
 	private ListGridField buildDstField() {
 		ListGridField field = new ListGridField(DST, Client.getSession().getMsg("MainFrame.DstDirs"));
 		field.setCanEdit(false);
 		return field;
 	}
 
+	/** Builds the SDR "result" column field. */
 	private ListGridField buildResultField() {
 		ListGridField field = new ListGridField(RESULT, Client.getSession().getMsg("MainFrame.Result"));
 		field.setWidth("35%");
@@ -112,6 +151,7 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		return field;
 	}
 
+	/** Builds the SDR "selected" column field. */
 	private ListGridField buildSelectedField() {
 		ListGridField field = new ListGridField(SELECTED);
 		field.setWidth(20);
@@ -119,6 +159,14 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		return field;
 	}
 
+	/**
+	 * Builds the SDR grid context menu with update/add, set destination, and
+	 * delete actions.
+	 *
+	 * @param grid
+	 *            the grid the menu is attached to
+	 * @return the configured menu
+	 */
 	private Menu buildSdrContextMenu(ListGrid grid) {
 		Menu contextMenu = new Menu();
 		contextMenu.addItem(buildUpdateOrAddMenuItem(grid));
@@ -127,6 +175,13 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		return contextMenu;
 	}
 
+	/**
+	 * Builds the "update or add torrent" menu item which opens a remote file chooser.
+	 *
+	 * @param grid
+	 *            the grid the item is attached to
+	 * @return the configured menu item
+	 */
 	private MenuItem buildUpdateOrAddMenuItem(ListGrid grid) {
 		MenuItem item = new MenuItem();
 		item.setDynamicTitleFunction((target, menu, menuItem) -> Client.getSession().getMsg(
@@ -138,6 +193,13 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the "set destination" menu item, enabled only on single selection.
+	 *
+	 * @param grid
+	 *            the grid the item is attached to
+	 * @return the configured menu item
+	 */
 	private MenuItem buildSetDestMenuItem(ListGrid grid) {
 		MenuItem item = new MenuItem();
 		item.setTitle("Set Destination");
@@ -147,6 +209,13 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the "delete torrent" menu item, enabled only on selection.
+	 *
+	 * @param grid
+	 *            the grid the item is attached to
+	 * @return the configured menu item
+	 */
 	private MenuItem buildDeleteMenuItem(ListGrid grid) {
 		MenuItem item = new MenuItem();
 		item.setTitle(Client.getSession().getMsg("BatchToolsTrrntChkPanel.mntmDelTorrent.text"));
@@ -155,10 +224,25 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the callback that updates the destination column of the selected row.
+	 *
+	 * @param grid
+	 *            the grid being updated
+	 * @return the remote file chooser callback
+	 */
 	private CallBack setDestCB(ListGrid grid) {
 		return pi -> updDataRecursive(grid, pi, grid.getRecordIndex(grid.getSelectedRecord()), 0, DST);
 	}
 
+	/**
+	 * Builds the callback that updates the source column of the selected row, or
+	 * adds new rows if no row is selected.
+	 *
+	 * @param grid
+	 *            the grid being updated
+	 * @return the remote file chooser callback
+	 */
 	private CallBack updateOrAddCB(ListGrid grid) {
 		return pi -> {
 			Record rec = grid.getSelectedRecord();
@@ -170,6 +254,18 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		};
 	}
 
+	/**
+	 * Recursively adds records to the given grid, one per selected path.
+	 *
+	 * @param grid
+	 *            the grid to add records to
+	 * @param pi
+	 *            the selected path infos
+	 * @param i
+	 *            the current path index
+	 * @param attr
+	 *            the attribute name to set with the path
+	 */
 	private void addDataRecursive(ListGrid grid, PathInfo[] pi, int i, String attr) {
 		if (i < pi.length) {
 			Record rec = new Record(Collections.singletonMap(attr, pi[i].path));
@@ -177,6 +273,21 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		}
 	}
 
+	/**
+	 * Recursively updates records in the given grid with the selected paths,
+	 * falling back to adding new records when the grid runs out of rows.
+	 *
+	 * @param grid
+	 *            the grid to update records in
+	 * @param pi
+	 *            the selected path infos
+	 * @param start
+	 *            the grid row index at which to start updating
+	 * @param i
+	 *            the current path index
+	 * @param attr
+	 *            the attribute name to set with the path
+	 */
 	private void updDataRecursive(ListGrid grid, PathInfo[] pi, int start, int i, String attr) {
 		if (i < pi.length) {
 			if (start + i < grid.getTotalRows()) {
@@ -189,6 +300,15 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		}
 	}
 
+	/**
+	 * Builds the expandable detail tree grid for a given SDR row, showing the
+	 * per-entry status (OK / SIZE / SHA1 / MISSING / SKIPPED / UNKNOWN) of the
+	 * checked torrent.
+	 *
+	 * @param rcrd
+	 *            the parent SDR record to display details for
+	 * @return the configured tree grid
+	 */
 	private TreeGrid buildExpansionGrid(ListGridRecord rcrd) {
 		TreeGrid grid = new TreeGrid();
 		Boolean[] showok = {null};
@@ -219,6 +339,18 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		return grid;
 	}
 
+	/**
+	 * Builds the context menu of the expansion tree grid, offering a toggle to
+	 * show or hide OK entries.
+	 *
+	 * @param grid
+	 *            the tree grid the menu is attached to
+	 * @param rcrd
+	 *            the parent SDR record
+	 * @param showok
+	 *            mutable holder for the current "show OK" state
+	 * @return the configured menu
+	 */
 	private Menu buildExpansionContextMenu(TreeGrid grid, ListGridRecord rcrd, Boolean[] showok) {
 		Menu contextMenu = new Menu();
 		MenuItem showokItem = new MenuItem();
@@ -235,6 +367,17 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		return contextMenu;
 	}
 
+	/**
+	 * Builds the data source for the expansion tree grid, injecting the parent
+	 * SDR source path and the "show OK" flag as extra data, and refreshing the
+	 * show-OK state from the server response.
+	 *
+	 * @param rcrd
+	 *            the parent SDR record
+	 * @param showok
+	 *            mutable holder for the current "show OK" state
+	 * @return the configured data source
+	 */
 	private com.smartgwt.client.data.DataSource buildExpansionDataSource(ListGridRecord rcrd, Boolean[] showok) {
 		final var ds = DSBatchTrntChkReportTree.getInstance();
 		final var extradata = new HashMap<String, String>();
@@ -245,6 +388,12 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		return ds;
 	}
 
+	/**
+	 * Builds the "status" column field of the expansion tree grid, with a cell
+	 * formatter that color-codes the status value.
+	 *
+	 * @return the configured list grid field
+	 */
 	private ListGridField buildStatusField() {
 		ListGridField field = new ListGridField(STATUS);
 		field.setWidth(100);
@@ -252,6 +401,14 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		return field;
 	}
 
+	/**
+	 * Builds the "title" column field of the expansion tree grid, whose hover
+	 * tooltip shows the parent SDR row title.
+	 *
+	 * @param rcrd
+	 *            the parent SDR record
+	 * @return the configured list grid field
+	 */
 	private ListGridField buildTitleField(ListGridRecord rcrd) {
 		ListGridField field = new ListGridField(TITLE);
 		field.setHoverCustomizer(new HoverCustomizer() {
@@ -263,6 +420,12 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		return field;
 	}
 
+	/**
+	 * Builds the "length" column field of the expansion tree grid, whose hover
+	 * tooltip shows a human-readable file size.
+	 *
+	 * @return the configured list grid field
+	 */
 	private ListGridField buildLengthField() {
 		ListGridField field = new ListGridField(LENGTH);
 		field.setWidth(100);
@@ -275,6 +438,13 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		return field;
 	}
 
+	/**
+	 * Formats a torrent-check status value as color-coded HTML.
+	 *
+	 * @param value
+	 *            the raw status value
+	 * @return the formatted HTML string, or {@code null} if the value is {@code null}
+	 */
 	private static String statusFormatter(Object value) {
 		if (value == null) {
 			return null;
@@ -290,6 +460,13 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
         };
 	}
 
+	/**
+	 * Converts a byte count into a human-readable file size string (e.g. "1.5 KB").
+	 *
+	 * @param size
+	 *            the size in bytes
+	 * @return the formatted file size string
+	 */
 	private static String readableFileSize(long size) {
 		if (size <= 0) {
 			return "0";
@@ -299,6 +476,13 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		return NumberFormat.getFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
 	}
 
+	/**
+	 * Builds the bottom control form hosting the check mode selector, the
+	 * archived-folder detection, remove-unknown-files and remove-wrong-sized
+	 * checkboxes, and the start button.
+	 *
+	 * @return the configured dynamic form
+	 */
 	private DynamicForm buildBottomForm() {
 		DynamicForm form = new DynamicForm();
 		form.setWidth100();
@@ -316,6 +500,13 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		return form;
 	}
 
+	/**
+	 * Builds the check mode selector (FILENAME / FILESIZE / SHA1), persisted as a
+	 * global property. Changing the mode also disables the remove-wrong-sized
+	 * checkbox when the FILENAME mode is selected.
+	 *
+	 * @return the configured select item
+	 */
 	private SelectItem buildCheckModeItem() {
 		SelectItem item = new SelectItem();
 		item.setValueMap(FILENAME, "FILESIZE", "SHA1");
@@ -329,6 +520,11 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the "detect archived folders" checkbox, persisted as a global property.
+	 *
+	 * @return the configured checkbox item
+	 */
 	private CheckboxItem buildDetectArchivedFolderItem() {
 		CheckboxItem item = new CheckboxItem();
 		item.setTitle(Client.getSession().getMsg("BatchTrrntChkPanel.chckbxDetectArchivedFolder.text"));
@@ -338,6 +534,11 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the "remove unknown files" checkbox, persisted as a global property.
+	 *
+	 * @return the configured checkbox item
+	 */
 	private CheckboxItem buildRemoveUnknownFilesItem() {
 		CheckboxItem item = new CheckboxItem();
 		item.setTitle(Client.getSession().getMsg("BatchToolsTrrntChkPanel.chckbxRemoveUnknownFiles.text"));
@@ -347,6 +548,12 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the "remove wrong sized files" checkbox, persisted as a global
+	 * property and disabled when the check mode is FILENAME.
+	 *
+	 * @return the configured checkbox item
+	 */
 	private CheckboxItem buildRemoveWrongSizedItem() {
 		CheckboxItem item = new CheckboxItem("remove_wrong_sized_files");
 		item.setTitle(Client.getSession().getMsg("BatchToolsTrrntChkPanel.chckbxRemoveWrongSized.text"));
@@ -357,6 +564,11 @@ public class BatchTrrntChkPanel extends VLayout //NOSONAR
 		return item;
 	}
 
+	/**
+	 * Builds the "start" button which triggers the batch torrent check on the server.
+	 *
+	 * @return the configured button item
+	 */
 	private ButtonItem buildStartItem() {
 		ButtonItem item = new ButtonItem();
 		item.setTitle(Client.getSession().getMsg("BatchToolsTrrntChkPanel.TrntCheckStart.text"));

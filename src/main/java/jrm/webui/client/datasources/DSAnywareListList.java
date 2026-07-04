@@ -14,11 +14,32 @@ import com.smartgwt.client.util.JSOHelper;
 
 import jrm.webui.client.Client;
 
+/**
+ * SmartGWT data source for the list of software lists.
+ * <p>
+ * Exposes the top-level collection of software lists (each an
+ * {@code AnywareList}) available to the client, with localized title and
+ * description labels resolved from the server session. Requests are issued as
+ * POSTXML FETCH operations against the {@code /datasources/AnywareListList}
+ * endpoint, with cache bypass and optional extra data on each request.
+ *
+ * @since 2.5
+ */
 public class DSAnywareListList extends RestDataSource {
+    /** Base identifier and URL path segment for this data source. */
     private static final String BASENAME = "AnywareListList";
 
+    /** Additional data merged into every outgoing request. */
     private Map<String, String> extradata = Collections.emptyMap();
 
+    /**
+     * Constructs a new {@code AnywareListList} data source.
+     * <p>
+     * Configures the XML data format, the FETCH operation binding, and the
+     * declared fields: {@code status}, {@code name}, {@code description}, and
+     * {@code have}. The {@code name}, {@code description}, and {@code have}
+     * field titles are localized through the server session message bundle.
+     */
     public DSAnywareListList() {
         setID(BASENAME);
         setDataURL("/datasources/" + BASENAME);
@@ -36,10 +57,20 @@ public class DSAnywareListList extends RestDataSource {
                 new DataSourceTextField("have", Client.getSession().getMsg("SoftwareListListRenderer.Have")));
     }
 
+    /**
+     * Sets additional data to be merged into every outgoing request.
+     *
+     * @param data the extra data map
+     */
     public void setExtraData(Map<String, String> data) {
         this.extradata = data;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Forces a cache bypass and merges extra data into the request before sending.
+     */
     @Override
     protected Object transformRequest(DSRequest dsRequest) {
         final var data = dsRequest.getData();
@@ -51,6 +82,11 @@ public class DSAnywareListList extends RestDataSource {
         return super.transformRequest(dsRequest);
     }
 
+    /**
+     * Returns the singleton instance, creating it if necessary.
+     *
+     * @return the shared {@code DSAnywareListList} instance
+     */
     public static DSAnywareListList getInstance() {
         if (null == get(BASENAME))
             return new DSAnywareListList();
