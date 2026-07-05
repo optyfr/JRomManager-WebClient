@@ -19,6 +19,10 @@ public class A_Progress extends A_ // NOSONAR
 {
     /** JSON property key for the {@code params} object. */
     private static final String PARAMS_STR = "params";
+    /** JSON property key for the {@code threadCnt} value. */
+    private static final String THREAD_CNT_STR = "threadCnt";
+    /** JSON property key for the {@code multipleSubInfos} flag. */
+    private static final String MULTIPLE_SUB_INFOS_STR = "multipleSubInfos";
 
     /**
      * Constructs a Progress action from a base action.
@@ -119,7 +123,7 @@ public class A_Progress extends A_ // NOSONAR
          * @return the thread count
          */
         public final int getThreadCnt() {
-            return params.getInt("threadCnt");
+            return params.getInt(THREAD_CNT_STR);
         }
 
         /**
@@ -128,7 +132,7 @@ public class A_Progress extends A_ // NOSONAR
          * @return {@code true} if multiple sub-infos are present
          */
         public final Boolean getMultipleSubInfos() {
-            return params.getBoolean("multipleSubInfos");
+            return params.getBoolean(MULTIPLE_SUB_INFOS_STR);
         }
     }
 
@@ -164,7 +168,7 @@ public class A_Progress extends A_ // NOSONAR
          * @return the thread count
          */
         public final int getThreadCnt() {
-            return params.getInt("threadCnt");
+            return params.getInt(THREAD_CNT_STR);
         }
 
         /**
@@ -173,7 +177,7 @@ public class A_Progress extends A_ // NOSONAR
          * @return {@code true} if multiple sub-infos are present
          */
         public final Boolean getMultipleSubInfos() {
-            return params.getBoolean("multipleSubInfos");
+            return params.getBoolean(MULTIPLE_SUB_INFOS_STR);
         }
     }
 
@@ -303,7 +307,7 @@ public class A_Progress extends A_ // NOSONAR
              * @return {@code true} if multiple sub-infos are present
              */
             public final Boolean isMultipleSubInfos() {
-                return getBoolean("multipleSubInfos");
+                return getBoolean(MULTIPLE_SUB_INFOS_STR);
             }
 
             /**
@@ -312,7 +316,7 @@ public class A_Progress extends A_ // NOSONAR
              * @return the thread count
              */
             public final int getThreadCnt() {
-                return getInt("threadCnt");
+                return getInt(THREAD_CNT_STR);
             }
 
             /**

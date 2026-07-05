@@ -37,8 +37,9 @@ configurations.all {
 
 apply plugin: 'java'
 java {
-    sourceCompatibility = 17
-    targetCompatibility = 17
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 compileJava.options.encoding = 'UTF-8'
 
