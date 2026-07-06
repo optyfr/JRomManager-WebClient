@@ -13,62 +13,91 @@ import com.smartgwt.client.types.DSOperationType;
 import com.smartgwt.client.types.DSProtocol;
 import com.smartgwt.client.util.JSOHelper;
 
-public class DSAnyware extends RestDataSource
-{
-	private static final String BASENAME = "Anyware";
+/**
+ * SmartGWT data source for individual ware entries (ROMs, disks, samples, etc.).
+ * <p>
+ * Exposes the per-ware details attached to a parent {@code AnywareList} entry,
+ * including hash checksums (CRC, MD5, SHA-1) and size. Requests are issued as
+ * POSTXML FETCH operations against the {@code /datasources/Anyware} endpoint,
+ * with optional extra data merged into each outgoing request.
+ *
+ * @since 2.5
+ */
+public class DSAnyware extends RestDataSource {
+    /** Base identifier and URL path segment for this data source. */
+    private static final String BASENAME = "Anyware";
 
-	private Map<String, String> extradata = Collections.emptyMap();
+    /** Additional data merged into every outgoing request. */
+    private Map<String, String> extradata = Collections.emptyMap();
 
-	private DSAnyware()
-	{
-		setID(BASENAME);
-		setDataURL("/datasources/" + BASENAME);
-		setDataFormat(DSDataFormat.XML);
-		OperationBinding operationBinding = new OperationBinding();
-		operationBinding.setOperationType(DSOperationType.FETCH);
-		operationBinding.setDataProtocol(DSProtocol.POSTXML);
-		setOperationBindings(operationBinding);
-		DataSourceTextField listField = new DataSourceTextField("list");
-		listField.setPrimaryKey(true);
-		listField.setHidden(true);
-		listField.setForeignKey("AnywareList.list");
-		DataSourceTextField wareField = new DataSourceTextField("ware");
-		wareField.setPrimaryKey(true);
-		wareField.setHidden(true);
-		wareField.setForeignKey("AnywareList.name");
-		DataSourceTextField nameField = new DataSourceTextField("name");
-		nameField.setPrimaryKey(true);
-		setFields(
-			listField,
-			wareField,
-			nameField,
-			new DataSourceTextField("status"),
-			new DataSourceIntegerField("size"),
-			new DataSourceTextField("crc"),
-			new DataSourceTextField("md5"),
-			new DataSourceTextField("sha1")
-		);
-	}
+    /**
+     * Constructs a new {@code Anyware} data source.
+     * <p>
+     * Configures the XML data format, the FETCH operation binding, and the
+     * declared fields: {@code list}, {@code ware}, {@code name}, {@code status},
+     * {@code size}, {@code crc}, {@code md5}, and {@code sha1}.
+     */
+    private DSAnyware() {
+        setID(BASENAME);
+        setDataURL("/datasources/" + BASENAME);
+        setDataFormat(DSDataFormat.XML);
+        OperationBinding operationBinding = new OperationBinding();
+        operationBinding.setOperationType(DSOperationType.FETCH);
+        operationBinding.setDataProtocol(DSProtocol.POSTXML);
+        setOperationBindings(operationBinding);
+        DataSourceTextField listField = new DataSourceTextField("list");
+        listField.setPrimaryKey(true);
+        listField.setHidden(true);
+        listField.setForeignKey("AnywareList.list");
+        DataSourceTextField wareField = new DataSourceTextField("ware");
+        wareField.setPrimaryKey(true);
+        wareField.setHidden(true);
+        wareField.setForeignKey("AnywareList.name");
+        DataSourceTextField nameField = new DataSourceTextField("name");
+        nameField.setPrimaryKey(true);
+        setFields(
+                listField,
+                wareField,
+                nameField,
+                new DataSourceTextField("status"),
+                new DataSourceIntegerField("size"),
+                new DataSourceTextField("crc"),
+                new DataSourceTextField("md5"),
+                new DataSourceTextField("sha1"));
+    }
 
-	public void setExtraData(Map<String, String> data)
-	{
-		this.extradata = data;
-	}
-	
-	@Override
-	protected Object transformRequest(DSRequest dsRequest)
-	{
-		final var data = dsRequest.getData();
-		if(data != null)
-			JSOHelper.addProperties(data, JSOHelper.convertMapToJavascriptObject(extradata));
-		else
-			dsRequest.setData(extradata);
-		return super.transformRequest(dsRequest);
-	}
-	
-	public static DSAnyware getInstance()
-	{
-		if(null == get(BASENAME)) return new DSAnyware();
-		return (DSAnyware)get(BASENAME);
-	}
+    /**
+     * Sets additional data to be merged into every outgoing request.
+     *
+     * @param data the extra data map
+     */
+    public void setExtraData(Map<String, String> data) {
+        this.extradata = data;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Merges extra data into the request before sending.
+     */
+    @Override
+    protected Object transformRequest(DSRequest dsRequest) {
+        final var data = dsRequest.getData();
+        if (data != null)
+            JSOHelper.addProperties(data, JSOHelper.convertMapToJavascriptObject(extradata));
+        else
+            dsRequest.setData(extradata);
+        return super.transformRequest(dsRequest);
+    }
+
+    /**
+     * Returns the singleton instance, creating it if necessary.
+     *
+     * @return the shared {@code DSAnyware} instance
+     */
+    public static DSAnyware getInstance() {
+        if (null == get(BASENAME))
+            return new DSAnyware();
+        return (DSAnyware) get(BASENAME);
+    }
 }

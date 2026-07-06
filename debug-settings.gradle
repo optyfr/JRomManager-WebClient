@@ -1,7 +1,0 @@
-pluginManagement {
-	plugins {
-		id "org.sonarqube" version "latest.release"
-	}
-}
-rootProject.name = 'WebClient'
-rootProject.buildFileName = 'debug.gradle'

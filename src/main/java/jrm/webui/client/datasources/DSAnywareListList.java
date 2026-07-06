@@ -14,51 +14,82 @@ import com.smartgwt.client.util.JSOHelper;
 
 import jrm.webui.client.Client;
 
-public class DSAnywareListList extends RestDataSource
-{
-	private static final String BASENAME = "AnywareListList";
+/**
+ * SmartGWT data source for the list of software lists.
+ * <p>
+ * Exposes the top-level collection of software lists (each an
+ * {@code AnywareList}) available to the client, with localized title and
+ * description labels resolved from the server session. Requests are issued as
+ * POSTXML FETCH operations against the {@code /datasources/AnywareListList}
+ * endpoint, with cache bypass and optional extra data on each request.
+ *
+ * @since 2.5
+ */
+public class DSAnywareListList extends RestDataSource {
+    /** Base identifier and URL path segment for this data source. */
+    private static final String BASENAME = "AnywareListList";
 
-	private Map<String, String> extradata = Collections.emptyMap();
+    /** Additional data merged into every outgoing request. */
+    private Map<String, String> extradata = Collections.emptyMap();
 
-	public DSAnywareListList()
-	{
-		setID(BASENAME);
-		setDataURL("/datasources/"+BASENAME);
-		setDataFormat(DSDataFormat.XML);
-		OperationBinding fetchob = new OperationBinding();
-		fetchob.setOperationType(DSOperationType.FETCH);
-		fetchob.setDataProtocol(DSProtocol.POSTXML);
-		setOperationBindings(fetchob);
-		DataSourceTextField nameField = new DataSourceTextField("name", Client.getSession().getMsg("SoftwareListListRenderer.Name"));
-		nameField.setPrimaryKey(true);
-		setFields(
-			new DataSourceTextField("status"),
-			nameField,
-			new DataSourceTextField("description", Client.getSession().getMsg("SoftwareListListRenderer.Description")),
-			new DataSourceTextField("have", Client.getSession().getMsg("SoftwareListListRenderer.Have"))
-		);
-	}
+    /**
+     * Constructs a new {@code AnywareListList} data source.
+     * <p>
+     * Configures the XML data format, the FETCH operation binding, and the
+     * declared fields: {@code status}, {@code name}, {@code description}, and
+     * {@code have}. The {@code name}, {@code description}, and {@code have}
+     * field titles are localized through the server session message bundle.
+     */
+    public DSAnywareListList() {
+        setID(BASENAME);
+        setDataURL("/datasources/" + BASENAME);
+        setDataFormat(DSDataFormat.XML);
+        OperationBinding fetchob = new OperationBinding();
+        fetchob.setOperationType(DSOperationType.FETCH);
+        fetchob.setDataProtocol(DSProtocol.POSTXML);
+        setOperationBindings(fetchob);
+        DataSourceTextField nameField = new DataSourceTextField("name", Client.getSession().getMsg("SoftwareListListRenderer.Name"));
+        nameField.setPrimaryKey(true);
+        setFields(
+                new DataSourceTextField("status"),
+                nameField,
+                new DataSourceTextField("description", Client.getSession().getMsg("SoftwareListListRenderer.Description")),
+                new DataSourceTextField("have", Client.getSession().getMsg("SoftwareListListRenderer.Have")));
+    }
 
-	public void setExtraData(Map<String, String> data)
-	{
-		this.extradata = data;
-	}
+    /**
+     * Sets additional data to be merged into every outgoing request.
+     *
+     * @param data the extra data map
+     */
+    public void setExtraData(Map<String, String> data) {
+        this.extradata = data;
+    }
 
-	@Override
-	protected Object transformRequest(DSRequest dsRequest)
-	{
-		final var data = dsRequest.getData();
-		dsRequest.setBypassCache(true);
-		if(data != null)
-			JSOHelper.addProperties(data, JSOHelper.convertMapToJavascriptObject(extradata));
-		else
-			dsRequest.setData(extradata);
-		return super.transformRequest(dsRequest);
-	}
-	
-	public static DSAnywareListList getInstance()
-	{
-		if(null == get(BASENAME)) return new DSAnywareListList();
-		return (DSAnywareListList)get(BASENAME);
-	}
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Forces a cache bypass and merges extra data into the request before sending.
+     */
+    @Override
+    protected Object transformRequest(DSRequest dsRequest) {
+        final var data = dsRequest.getData();
+        dsRequest.setBypassCache(true);
+        if (data != null)
+            JSOHelper.addProperties(data, JSOHelper.convertMapToJavascriptObject(extradata));
+        else
+            dsRequest.setData(extradata);
+        return super.transformRequest(dsRequest);
+    }
+
+    /**
+     * Returns the singleton instance, creating it if necessary.
+     *
+     * @return the shared {@code DSAnywareListList} instance
+     */
+    public static DSAnywareListList getInstance() {
+        if (null == get(BASENAME))
+            return new DSAnywareListList();
+        return (DSAnywareListList) get(BASENAME);
+    }
 }

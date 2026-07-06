@@ -1,22 +1,33 @@
 package jrm.webui.client.protocol;
 
-public class Q_TrntChk extends Q_	//NOSONAR
+/**
+ * Query commands for Torrent Check operations.
+ *
+ * @since 2.5
+ */
+public class Q_TrntChk extends Q_ // NOSONAR
 {
-	protected Q_TrntChk()
-	{
-		super();
-	}
-	
-	public static class Start extends Q_
-	{
-		protected Start()
-		{
-			super();
-		}
-		
-		public static final Start instantiate()
-		{
-			return Q_.instantiateCmd("TrntChk.start").cast();
-		}
-	}
+    /** Protected constructor for JavaScript object overlay types. */
+    protected Q_TrntChk() {
+        super();
+    }
+
+    /**
+     * Query to start the Torrent Check operation.
+     */
+    public static class Start extends Q_ {
+        /** Protected constructor for JavaScript object overlay types. */
+        protected Start() {
+            super();
+        }
+
+        /**
+         * Creates a new Torrent Check start query.
+         *
+         * @return a new Start query instance
+         */
+        public static final Start instantiate() {
+            return Q_.instantiateCmd("TrntChk.start").cast();
+        }
+    }
 }
