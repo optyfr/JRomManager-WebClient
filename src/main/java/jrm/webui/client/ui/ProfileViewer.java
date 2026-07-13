@@ -34,18 +34,15 @@ import jrm.webui.client.datasources.DSAnywareList;
 import jrm.webui.client.datasources.DSAnywareListList;
 
 /**
- * Window displaying the contents of a profile as three synchronized list grids:
- * the list of ware lists (e.g. machine lists), the wares within the selected
- * list (e.g. machines), and the entries (ROMs/disks/samples) within the
- * selected ware.
+ * Window displaying the contents of a profile as three synchronized list grids: the list of ware lists (e.g. machine lists), the
+ * wares within the selected list (e.g. machines), and the entries (ROMs/disks/samples) within the selected ware.
  * <p>
- * Each grid is paired with a toolbar of status filter toggle buttons. The
- * viewer registers itself with the {@link Client} child-window list and can be
- * reset (refreshed) programmatically through the static {@link #reset()} API.
+ * Each grid is paired with a toolbar of status filter toggle buttons. The viewer registers itself with the {@link Client}
+ * child-window list and can be reset (refreshed) programmatically through the static {@link #reset()} API.
  *
  * @since 2.5
  */
-public class ProfileViewer extends Window //NOSONAR
+public class ProfileViewer extends Window // NOSONAR
 {
 	/** Status value indicating a fully complete set. */
 	private static final String STATUS_COMPLETE = "COMPLETE";
@@ -86,8 +83,8 @@ public class ProfileViewer extends Window //NOSONAR
 	 *
 	 * @since 2.5
 	 */
-	class AnywareListList extends ListGrid //NOSONAR
-    {
+	class AnywareListList extends ListGrid // NOSONAR
+	{
 		/** Status-to-icon mapping for ware list rows. */
 		private static final Map<String, String> STATUS_ICONS = Map.of(
 				STATUS_COMPLETE, "/images/disk_multiple_green.png",
@@ -128,6 +125,12 @@ public class ProfileViewer extends Window //NOSONAR
 
 		/**
 		 * Returns the status icon for the name field, falling back to the default behavior otherwise.
+		 * 
+		 * @param field the field being rendered
+		 * @param value the value of the field
+		 * @param recrd the record being rendered
+		 * 
+		 * @return the icon URL for the field value, or {@code null} if none
 		 */
 		@Override
 		public String getValueIcon(ListGridField field, Object value, ListGridRecord recrd) {
@@ -155,6 +158,7 @@ public class ProfileViewer extends Window //NOSONAR
 	 * @param minWidth the minimum width in pixels
 	 * @param width the width, or {@code null} to leave it unset
 	 * @param align the alignment, or {@code null} to leave it unset
+	 * 
 	 * @return the configured list grid field
 	 */
 	private static ListGridField buildField(String name, int minWidth, String width, Alignment align) {
@@ -177,6 +181,7 @@ public class ProfileViewer extends Window //NOSONAR
 	 * @param align the alignment, or {@code null} to leave it unset
 	 * @param canEdit whether the field is editable
 	 * @param canFilter whether the field can be filtered
+	 * 
 	 * @return the configured list grid field
 	 */
 	private static ListGridField buildField(String name, String title, int minWidth, String width,
@@ -195,14 +200,13 @@ public class ProfileViewer extends Window //NOSONAR
 	/**
 	 * List grid displaying the wares (machines or software) within the selected ware list.
 	 * <p>
-	 * Selecting a ware resets the {@link Anyware} grid to display its entries.
-	 * Double-clicking a {@code cloneof} or {@code romof} cell navigates to the
-	 * referenced ware.
+	 * Selecting a ware resets the {@link Anyware} grid to display its entries. Double-clicking a {@code cloneof} or {@code romof}
+	 * cell navigates to the referenced ware.
 	 *
 	 * @since 2.5
 	 */
-	class AnywareList extends ListGrid //NOSONAR
-    {
+	class AnywareList extends ListGrid // NOSONAR
+	{
 		/** Record attribute holding the name of a ware. */
 		private static final String NAME = "name";
 		/** Status-to-icon mapping for ware rows. */
@@ -231,7 +235,7 @@ public class ProfileViewer extends Window //NOSONAR
 		/**
 		 * Constructs the ware grid, binding its datasource, selection/click handlers, context menu, and fields.
 		 */
-		public AnywareList() //NOSONAR
+		public AnywareList() // NOSONAR
 		{
 			ds = DSAnywareList.getInstance();
 			setCanEdit(true);
@@ -319,6 +323,7 @@ public class ProfileViewer extends Window //NOSONAR
 		 * @param name the field name
 		 * @param title the field title
 		 * @param icons the status-to-icon mapping
+		 * 
 		 * @return the configured status field
 		 */
 		private ListGridField buildStatusField(String name, String title, Map<String, String> icons) {
@@ -374,6 +379,12 @@ public class ProfileViewer extends Window //NOSONAR
 
 		/**
 		 * Returns the icon for a ware cell based on the field name and record attributes.
+		 * 
+		 * @param field the field being rendered
+		 * @param value the value of the field
+		 * @param recrd the record being rendered
+		 * 
+		 * @return the icon URL for the field value, or {@code null} if none
 		 */
 		@Override
 		public String getValueIcon(ListGridField field, Object value, ListGridRecord recrd) {
@@ -407,13 +418,12 @@ public class ProfileViewer extends Window //NOSONAR
 	/**
 	 * List grid displaying the entries (ROMs/disks/samples) within the selected ware.
 	 * <p>
-	 * Provides a context menu to copy entry attributes (CRC, SHA-1, name) and to
-	 * search the web for the selected entry.
+	 * Provides a context menu to copy entry attributes (CRC, SHA-1, name) and to search the web for the selected entry.
 	 *
 	 * @since 2.5
 	 */
-	class Anyware extends ListGrid //NOSONAR
-    {
+	class Anyware extends ListGrid // NOSONAR
+	{
 		/** Status-to-icon mapping for entry rows. */
 		private static final Map<String, String> STATUS_ICONS = Map.of(
 				"OK", "/images/icons/bullet_green.png",
@@ -473,6 +483,7 @@ public class ProfileViewer extends Window //NOSONAR
 		 * @param name the field name
 		 * @param title the field title
 		 * @param icons the status-to-icon mapping
+		 * 
 		 * @return the configured status field
 		 */
 		private ListGridField buildStatusField(String name, String title, Map<String, String> icons) {
@@ -514,6 +525,7 @@ public class ProfileViewer extends Window //NOSONAR
 		 * @param name the field name
 		 * @param minWidth the minimum width in pixels
 		 * @param formatter the cell formatter wrapping the value in a {@code <code>} element
+		 * 
 		 * @return the configured code field
 		 */
 		private ListGridField buildCodeField(String name, int minWidth, com.smartgwt.client.widgets.grid.CellFormatter formatter) {
@@ -573,6 +585,7 @@ public class ProfileViewer extends Window //NOSONAR
 		 * @param title the menu item title
 		 * @param attr the record attribute to copy
 		 * @param dialog the dialog used to prompt the user for the copy
+		 * 
 		 * @return the configured menu item
 		 */
 		private MenuItem buildCopyMenuItem(String title, String attr, Dialog dialog) {
@@ -611,6 +624,12 @@ public class ProfileViewer extends Window //NOSONAR
 
 		/**
 		 * Returns the type icon for the name field, falling back to the default behavior otherwise.
+		 * 
+		 * @param field the field being rendered
+		 * @param value the value of the field
+		 * @param recrd the record being rendered
+		 * 
+		 * @return the icon URL for the field value, or {@code null} if none
 		 */
 		@Override
 		public String getValueIcon(ListGridField field, Object value, ListGridRecord recrd) {
@@ -838,6 +857,7 @@ public class ProfileViewer extends Window //NOSONAR
 	 * @param name the button name (used as the filter value)
 	 * @param icon the button icon path
 	 * @param promptKey the i18n message key for the tooltip, or {@code null} for no tooltip
+	 * 
 	 * @return the configured toggle button
 	 */
 	private ToolStripButton buildFilterButton(String name, String icon, String promptKey) {
