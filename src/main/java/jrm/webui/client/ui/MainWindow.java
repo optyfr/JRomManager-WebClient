@@ -103,10 +103,10 @@ public class MainWindow extends Window //NOSONAR
         setShowHeaderIcon(true);
         addCloseClickHandler(event -> {
             RPCRequest request = new RPCRequest();
-            String logout = Location.getProtocol() + "//logout:logout@" + Location.getHost() + Location.getPath(); //$NON-NLS-1$
+            String logout = Location.getProtocol() + "//logout:logout@" + Location.getHost() + Location.getPath();
             request.setActionURL(logout);
             request.setSendNoQueue(true);
-            request.setHttpHeaders(Collections.singletonMap("Authorization", "Basic AAAAAAAAAAAAAAAAAAA=")); //$NON-NLS-1$ //$NON-NLS-2$
+            request.setHttpHeaders(Collections.singletonMap("Authorization", "Basic AAAAAAAAAAAAAAAAAAA=")); //NOSONAR
             request.setWillHandleError(true);
             RPCManager.sendRequest(request, (response, rawData, request1) -> {
                 Cookies.removeCookie("JSESSIONID"); //$NON-NLS-1$
