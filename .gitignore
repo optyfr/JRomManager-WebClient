@@ -30,3 +30,5 @@ www-test/
 /bin/
 /build/
 .classpath
+.project
+.settings/
