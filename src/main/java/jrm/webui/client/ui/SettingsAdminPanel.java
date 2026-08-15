@@ -29,7 +29,7 @@ public class SettingsAdminPanel extends VLayout /* NOSONAR */ {
     /** Field name for the user login column. */
     private static final String LOGIN = "Login";
     /** Field name for the user password column. */
-    private static final String PASSWORD = "Password";
+    private static final String PASSWORD_TITLE = "Password";
     /** Field name for the user roles column. */
     private static final String ROLES = "Roles";
     /** Role value identifying an administrator. */
@@ -62,7 +62,7 @@ public class SettingsAdminPanel extends VLayout /* NOSONAR */ {
             final var login = new DataSourceTextField(LOGIN);
             login.setPrimaryKey(true);
             login.setRequired(true);
-            final var pw = new DataSourceTextField(PASSWORD);
+            final var pw = new DataSourceTextField(PASSWORD_TITLE);
             pw.setRequired(true);
             final var roles = new DataSourceTextField(ROLES);
             roles.setValueMap(ADMIN, "user");
@@ -84,7 +84,7 @@ public class SettingsAdminPanel extends VLayout /* NOSONAR */ {
             setDataSource(ds);
             ListGridField logfinField = new ListGridField(LOGIN);
             logfinField.setWidth(160);
-            ListGridField passwordField = new ListGridField(PASSWORD);
+            ListGridField passwordField = new ListGridField(PASSWORD_TITLE);
             passwordField.setWidth("*");
             ListGridField rolesField = new ListGridField(ROLES);
             rolesField.setWidth(80);
