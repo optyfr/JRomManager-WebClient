@@ -19,4 +19,11 @@ public interface ReportStatus {
      * @return the window hosting the status, for chaining
      */
     Window setStatus(String status);
+
+    /**
+     * Updates the copyable summary text shown at the top of the report.
+     *
+     * @param summary the summary and missing/partial title list
+     */
+    void setSummary(String summary);
 }

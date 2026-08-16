@@ -63,4 +63,27 @@ public class A_Report extends A_ // NOSONAR
         }
     }
 
+    /**
+     * Action indicating that a fixDAT was written.
+     */
+    public static class FixDatCreated extends A_ {
+        /**
+         * Constructs a FixDatCreated action from a base action.
+         *
+         * @param a the base action
+         */
+        public FixDatCreated(final A_ a) {
+            this(a.response);
+        }
+
+        /**
+         * Constructs a FixDatCreated action from an enhanced JavaScript response.
+         *
+         * @param response the enhanced JavaScript response object
+         */
+        public FixDatCreated(final EnhJSO response) {
+            super(response);
+        }
+    }
+
 }

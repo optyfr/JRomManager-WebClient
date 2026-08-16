@@ -336,6 +336,15 @@ public class MainWindow extends Window //NOSONAR
     }
 
     /**
+     * Reacts to a successful fixDAT export.
+     *
+     * @param params the fixDAT created event parameters
+     */
+    public void update(A_Report.FixDatCreated params) {
+        SC.say(Client.getSession().getMsg("Report.CreateFixDat"));
+    }
+
+    /**
      * Reacts to a lite report filter applied event by forwarding each filter
      * parameter to the batch DirUpd8r report and reloading it.
      *
