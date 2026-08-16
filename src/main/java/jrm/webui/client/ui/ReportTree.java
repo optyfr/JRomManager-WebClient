@@ -39,6 +39,8 @@ final class ReportTree extends TreeGrid /* NOSONAR: must extend Smart GWT TreeGr
     private static final String TITLE = "title";
     /** Custom data-source operation name used to fetch the detail of a selected record. */
     private static final String DETAIL = "detail";
+    /** Custom data-source operation name used to fetch the full copyable report text. */
+    private static final String COPY = "copy";
     /** Record attribute holding the parent identifier of a node, used to distinguish child entries. */
     private static final String PARENT_ID = "ParentID";
     /** Prompt text shown when copying a value to the clipboard via a dialog. */
@@ -146,9 +148,26 @@ final class ReportTree extends TreeGrid /* NOSONAR: must extend Smart GWT TreeGr
         setShowCustomIconOpen(true);
         setDataFetchMode(FetchMode.PAGED);
         final var ds = DSReportTree.getInstance(src);
-        ds.setCB(data -> status.setStatus(XMLTools.selectString(data, "/response/infos")));
+        ds.setCB(data -> {
+            status.setStatus(XMLTools.selectString(data, "/response/infos"));
+            status.setSummary(XMLTools.selectString(data, "/response/summary"));
+        });
         setDataSource(ds, new TreeGridField(TITLE));
         setContextMenu(new ReportMenu(src));
+    }
+
+    /**
+     * Fetches the full copyable report text and shows it in a selectable dialog.
+     */
+    void copyReport() {
+        final Dialog dialog = new Dialog();
+        dialog.setWidth(700);
+        getDataSource().performCustomOperation(COPY, new Record(), (dsResponse, data, dsRequest) -> {
+            Record[] records = dsResponse.getData();
+            if (records != null && records.length > 0)
+                SC.askforValue("Copy", SELECT_AND_COPY_THE_TEXT_BELOW, records[0].getAttribute("Text"), v -> {
+                }, dialog);
+        });
     }
 
     /**

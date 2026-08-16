@@ -43,4 +43,34 @@ public class Q_Report extends Q_ // NOSONAR
             return this;
         }
     }
+
+    /**
+     * Query to export a fixDAT of missing and partial titles.
+     */
+    public static class CreateFixDat extends Q_ {
+        /** Protected constructor for JavaScript object overlay types. */
+        protected CreateFixDat() {
+            super();
+        }
+
+        /**
+         * Creates a new create-fixDAT query.
+         *
+         * @return a new CreateFixDat query instance
+         */
+        public static final CreateFixDat instantiate() {
+            return Q_.instantiateCmd("Report.createFixDat").cast();
+        }
+
+        /**
+         * Sets the destination path for the fixDAT file.
+         *
+         * @param path the abstract destination path
+         * @return this query for chaining
+         */
+        public final CreateFixDat setPath(String path) {
+            getParams().set("path", path);
+            return this;
+        }
+    }
 }

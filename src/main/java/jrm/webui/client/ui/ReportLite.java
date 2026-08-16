@@ -4,8 +4,13 @@ import java.util.HashMap;
 
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
+import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.LayoutSpacer;
+import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 import jrm.webui.client.Client;
 
@@ -17,6 +22,8 @@ import jrm.webui.client.Client;
 public final class ReportLite extends Window implements ReportStatus /* NOSONAR */ {
     /** The report tree displayed in this window. */
     private ReportTree tree;
+    /** Copyable summary and missing/partial title list. */
+    private TextAreaItem summaryItem;
 
     /**
      * Constructs the lightweight report viewer window for the given report source.
@@ -47,12 +54,50 @@ public final class ReportLite extends Window implements ReportStatus /* NOSONAR 
         setShowHeaderIcon(true);
         addCloseClickHandler(event -> ReportLite.this.markForDestroy());
         tree = new ReportTree(src, this);
-        addItem(tree);
+        final var layout = new VLayout();
+        layout.setWidth100();
+        layout.setHeight100();
+        layout.addMember(buildToolStrip());
+        layout.addMember(buildSummaryForm());
+        layout.addMember(tree);
+        addItem(layout);
         final var hlayout = new HLayout();
         hlayout.addMember(new LayoutSpacer("*", 20));
         hlayout.addMember(new IButton("Close", e -> ReportLite.this.markForDestroy()));
         addItem(hlayout);
         show();
+    }
+
+    private ToolStrip buildToolStrip() {
+        final ToolStrip strip = new ToolStrip();
+        strip.setWidth100();
+        final ToolStripButton copy = new ToolStripButton();
+        copy.setAutoFit(true);
+        copy.setTitle(Client.getSession().getMsg("Report.CopyReport"));
+        copy.addClickHandler(event -> tree.copyReport());
+        strip.addButton(copy);
+        return strip;
+    }
+
+    private DynamicForm buildSummaryForm() {
+        final DynamicForm form = new DynamicForm();
+        form.setWidth100();
+        form.setHeight(140);
+        form.setNumCols(1);
+        form.setColWidths("*");
+        summaryItem = new TextAreaItem("summary");
+        summaryItem.setShowTitle(false);
+        summaryItem.setWidth("*");
+        summaryItem.setHeight("*");
+        summaryItem.setCanEdit(false);
+        form.setItems(summaryItem);
+        return form;
+    }
+
+    @Override
+    public void setSummary(String summary) {
+        if (summaryItem != null)
+            summaryItem.setValue(summary != null ? summary : "");
     }
 
     /**

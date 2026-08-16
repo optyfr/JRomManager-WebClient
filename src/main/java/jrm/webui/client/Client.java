@@ -101,6 +101,7 @@ public class Client implements EntryPoint {
                 case "NPlayers.loaded" -> mainWindow.update(new A_NPlayers.Loaded(a));
                 case "Report.applyFilters" -> mainWindow.update(new A_Report.ApplyFilter(a));
                 case "ReportLite.applyFilters" -> mainWindow.update(new A_ReportLite.ApplyFilter(a));
+                case "Report.fixDatCreated" -> mainWindow.update(new A_Report.FixDatCreated(a));
                 case "Dat2Dir.clearResults" -> mainWindow.update(new A_Dat2Dir.ClearResults(a));
                 case "Dat2Dir.updateResult" -> mainWindow.update(new A_Dat2Dir.UpdateResult(a));
                 case "Dat2Dir.end" -> mainWindow.update(new A_Dat2Dir.End(a));
