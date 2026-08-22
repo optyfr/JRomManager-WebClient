@@ -216,7 +216,7 @@ public class ProfilePanel extends VLayout //NOSONAR
 	 *
 	 * @param event the data-arrived event (unused)
 	 */
-	private void onTreeDataArrived(@SuppressWarnings("unused") DataArrivedEvent event) //NOSONAR
+	private void onTreeDataArrived(DataArrivedEvent event) //NOSONAR
 	{
 		treegrid.selectSingleRecord(0);
 		listgrid.setCriteria(null);
